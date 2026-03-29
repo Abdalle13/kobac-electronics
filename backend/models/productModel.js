@@ -40,9 +40,9 @@ const productSchema = mongoose.Schema(
       default: [],
     },
     technicalSpecs: {
-      type: Object,
-      required: false,
-      default: {},
+      ram: { type: String },
+      storage: { type: String },
+      processor: { type: String }
     },
   },
   {
