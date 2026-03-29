@@ -50,13 +50,21 @@ The server natively runs on `http://localhost:5000` unless overridden in your `.
 - `POST /api/users/login`: Authenticate and receive a JWT token (`email`, `password`)
 - `GET /api/users`: Fetch all profiles (Requires **Admin** privileges)
 - `GET /api/users/profile`: Retrieve personal user data (Requires auth token)
+- `PUT /api/users/profile`: Update user profile components like name or password (Requires auth token)
 
 ### Products
 - `GET /api/products`: Output a dictionary of active products.
 - `GET /api/products/:id`: Read an individual product.
 - `POST /api/products`: Create a boilerplate product (Requires **Admin**).
 - `DELETE /api/products/:id`: Delete a specific product (Requires **Admin**).
+- `PUT /api/products/:id`: Update existing product details, pricing, stock, and images (Requires **Admin**).
 
 ### Orders & Payments
 - `POST /api/orders`: Securely drop stock quantities and file an Order (Requires Auth).
+- `GET /api/orders/myorders`: Retrieve a history of the logged-in user's past orders (Requires Auth).
+- `GET /api/orders`: Fetch all incoming orders globally for the dashboard (Requires **Admin**).
+- `PUT /api/orders/:id/pay`: Explictly mark an order as paid (Requires Auth).
 - `POST /api/payment/evcplus`: Simulated payment gateway endpoint mimicking EVC processing callbacks.
+
+### 🖼️ Uploads
+- `POST /api/upload`: Allows sending a multi-part form image to the local `uploads/` dir natively using Multer (Requires Auth).
