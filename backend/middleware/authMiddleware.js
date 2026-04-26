@@ -12,6 +12,11 @@ const protect = async (req, res, next) => {
 
       req.user = await User.findById(decoded.userId).select('-password');
 
+      if (req.user && req.user.status === 'INACTIVE') {
+        res.status(403).json({ message: 'Your account is inactive. Please contact admin.' });
+        return;
+      }
+
       next();
     } catch (error) {
       res.status(401).json({ message: 'Not authorized, token failed' });

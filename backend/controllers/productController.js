@@ -5,7 +5,16 @@ import Product from '../models/productModel.js';
 // @access  Public
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const keyword = req.query.keyword
+      ? {
+          name: {
+            $regex: req.query.keyword,
+            $options: 'i',
+          },
+        }
+      : {};
+
+    const products = await Product.find({ ...keyword, status: { $ne: 'Archived' } }).sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: 'Server Error: Unable to fetch products', error: error.message });
@@ -48,15 +57,16 @@ const createProduct = async (req, res) => {
   res.status(201).json(createdProduct);
 };
 
-// @desc    Delete a product
-// @route   DELETE /api/products/:id
+// @desc    Toggle product status (Active/Archived)
+// @route   PUT /api/products/:id/status
 // @access  Private/Admin
-const deleteProduct = async (req, res) => {
+const toggleProductStatus = async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (product) {
-    await product.deleteOne();
-    res.json({ message: 'Product removed' });
+    product.status = product.status === 'Active' ? 'Archived' : 'Active';
+    const updatedProduct = await product.save();
+    res.json({ message: `Product ${updatedProduct.status === 'Archived' ? 'archived' : 'reactivated'}`, product: updatedProduct });
   } else {
     res.status(404).json({ message: 'Product not found' });
   }
@@ -70,7 +80,7 @@ const updateProduct = async (req, res) => {
     name,
     price,
     description,
-    image,
+    images,
     brand,
     category,
     countInStock,
@@ -83,7 +93,7 @@ const updateProduct = async (req, res) => {
     product.name = name;
     product.price = price;
     product.description = description;
-    product.image = image;
+    product.images = images;
     product.brand = brand;
     product.category = category;
     product.countInStock = countInStock;
@@ -96,4 +106,4 @@ const updateProduct = async (req, res) => {
   }
 };
 
-export { getProducts, getProductById, createProduct, deleteProduct, updateProduct };
+export { getProducts, getProductById, createProduct, toggleProductStatus, updateProduct };

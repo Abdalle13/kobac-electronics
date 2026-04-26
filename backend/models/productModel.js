@@ -18,7 +18,7 @@ const productSchema = mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ['Phone', 'Laptop', 'Watch'],
+      enum: ['Phone', 'Laptop', 'Watch', 'Headphones', 'Tablet', 'Gaming', 'Accessories'],
     },
     description: {
       type: String,
@@ -43,6 +43,12 @@ const productSchema = mongoose.Schema(
       ram: { type: String },
       storage: { type: String },
       processor: { type: String }
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: ['Active', 'Archived'],
+      default: 'Active',
     },
   },
   {

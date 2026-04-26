@@ -84,6 +84,7 @@ const updateOrderToPaid = async (req, res) => {
   if (order) {
     order.isPaid = true;
     order.paidAt = Date.now();
+    order.status = 'Paid';
     order.paymentResult = {
       transactionId: req.body.transactionId,
       status: req.body.status,
@@ -110,8 +111,79 @@ const getMyOrders = async (req, res) => {
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = async (req, res) => {
-  const orders = await Order.find({}).populate('user', 'id name');
+  const orders = await Order.find({}).populate('user', 'id name email');
   res.json(orders);
 };
 
-export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders, getOrders };
+// @desc    Update order to delivered
+// @route   PUT /api/orders/:id/deliver
+// @access  Private/Admin
+const updateOrderToDelivered = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (order) {
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+    order.status = 'Delivered';
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } else {
+    res.status(404).json({ message: 'Order not found' });
+  }
+};
+
+// @desc    Update order to paid (Admin manual)
+// @route   PUT /api/orders/:id/payadmin
+// @access  Private/Admin
+const updateOrderToPaidAdmin = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (order) {
+    order.isPaid = true;
+    order.paidAt = Date.now();
+    order.status = 'Paid';
+    order.paymentResult = {
+      status: 'Manual',
+      update_time: Date.now(),
+    };
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } else {
+    res.status(404).json({ message: 'Order not found' });
+  }
+};
+
+// @desc    Cancel order (Admin/Customer manual)
+// @route   PUT /api/orders/:id/cancel
+// @access  Private
+const cancelOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (order) {
+    if (order.status === 'Cancelled') {
+      res.status(400).json({ message: 'Order is already cancelled' });
+      return;
+    }
+
+    order.status = 'Cancelled';
+    
+    // Restore stock
+    const Product = (await import('../models/productModel.js')).default;
+    for (const item of order.orderItems) {
+      const product = await Product.findById(item.product);
+      if (product) {
+        product.countInStock += item.qty;
+        await product.save();
+      }
+    }
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } else {
+    res.status(404).json({ message: 'Order not found' });
+  }
+};
+
+export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders, getOrders, updateOrderToDelivered, updateOrderToPaidAdmin, cancelOrder };

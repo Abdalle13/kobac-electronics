@@ -1,4 +1,5 @@
 import express from 'express';
+import colors from 'colors';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
@@ -30,7 +31,7 @@ app.use('/api/upload', uploadRoutes);
 
 // Make the uploads folder static so it can be accessed in browser via /uploads
 const __dirname = path.resolve();
-app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Root Endpoint
 app.get('/', (req, res) => {

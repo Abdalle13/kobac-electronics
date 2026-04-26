@@ -9,12 +9,18 @@ const authUser = async (req, res) => {
 
   const user = await User.findOne({ email });
 
+  if (user && user.status === 'INACTIVE') {
+    res.status(403).json({ message: 'Account is inactive. Please contact support.' });
+    return;
+  }
+
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
+      image: user.image,
       token: generateToken(res, user._id),
     });
   } else {
@@ -46,11 +52,21 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      image: user.image,
       token: generateToken(res, user._id),
     });
   } else {
     res.status(400).json({ message: 'Invalid user data received' });
   }
+};
+
+
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+const getUsers = async (req, res) => {
+  const users = await User.find({});
+  res.json(users);
 };
 
 // @desc    Get user profile
@@ -65,18 +81,11 @@ const getUserProfile = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      image: user.image,
     });
   } else {
     res.status(404).json({ message: 'User not found' });
   }
-};
-
-// @desc    Get all users
-// @route   GET /api/users
-// @access  Private/Admin
-const getUsers = async (req, res) => {
-  const users = await User.find({});
-  res.json(users);
 };
 
 // @desc    Update user profile
@@ -88,6 +97,9 @@ const updateUserProfile = async (req, res) => {
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
+    if (req.body.image !== undefined) {
+      user.image = req.body.image;
+    }
 
     if (req.body.password) {
       user.password = req.body.password;
@@ -100,6 +112,7 @@ const updateUserProfile = async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
+      image: updatedUser.image,
       token: generateToken(res, updatedUser._id),
     });
   } else {
@@ -107,4 +120,30 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-export { authUser, registerUser, getUserProfile, updateUserProfile, getUsers };
+// @desc    Toggle user status (Active/Inactive)
+// @route   PUT /api/users/:id/status
+// @access  Private/Admin
+const toggleUserStatus = async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    if (user.role === 'Admin' && user._id.toString() === req.user._id.toString()) {
+      res.status(400).json({ message: 'You cannot deactivate your own admin account' });
+      return;
+    }
+    
+    user.status = user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    const updatedUser = await user.save();
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      status: updatedUser.status
+    });
+  } else {
+    res.status(404).json({ message: 'User not found' });
+  }
+};
+
+export { authUser, registerUser, getUsers, getUserProfile, updateUserProfile, toggleUserStatus };

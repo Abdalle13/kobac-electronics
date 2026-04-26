@@ -8,10 +8,6 @@ const userSchema = mongoose.Schema(
       required: [true, 'Name is required'],
       minlength: [3, 'Name must be at least 3 characters long'],
     },
-    image: {
-      type: String,
-      default: '/images/default-avatar.png',
-    },
     email: {
       type: String,
       required: [true, 'Email is required'],
@@ -26,11 +22,21 @@ const userSchema = mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters long'],
     },
+    image: {
+      type: String,
+      default: '', 
+    },
     role: {
       type: String,
       required: true,
       enum: ['Admin', 'Customer'],
       default: 'Customer',
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: ['ACTIVE', 'INACTIVE'],
+      default: 'ACTIVE',
     },
   },
   {
@@ -44,9 +50,9 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 // Encrypt password before saving
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    next();
+    return;
   }
 
   const salt = await bcrypt.genSalt(10);
