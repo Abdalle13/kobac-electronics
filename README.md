@@ -82,4 +82,4 @@ npm run data:import
 ## 📄 License
 This project is for demonstration purposes. All rights reserved.
 
-**Developed with ❤️ by Abdalle & Antigravity AI**
+**Developed with ❤️ by Abdalle**
