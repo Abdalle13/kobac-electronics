@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, Package, ShoppingBag, LogOut, CheckCircle2, Users, PieChart, DollarSign, Activity, Power, XCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, ShoppingBag, LogOut, CheckCircle2, Users, PieChart, DollarSign, Activity, Power, XCircle, Menu } from 'lucide-react';
 import { fetchProducts } from '../redux/slices/productSlice';
 import { listOrders, deliverOrder, payOrderAdmin } from '../redux/slices/orderSlice';
 import api from '../utils/api';
@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   const { orders, loading: ordersLoading } = useSelector((state) => state.order);
 
   const [activeTab, setActiveTab] = useState('overview');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -263,12 +264,28 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full h-screen overflow-hidden bg-[var(--color-background)]">
+    <div className="flex flex-col lg:flex-row w-full h-screen overflow-hidden bg-[var(--color-background)]">
+      
+      {/* Mobile Sidebar Toggle */}
+      <div className="lg:hidden h-16 glass border-b border-white/5 flex items-center justify-between px-6 z-[60] shrink-0">
+        <h2 className="text-xl font-black text-white">Admin Pro</h2>
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="p-2 text-gray-400 hover:text-white transition-colors"
+        >
+          {isSidebarOpen ? <XCircle size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
 
       {/* Sidebar - Premium Glassmorphism */}
-      <aside className="w-full md:w-64 glass border-r-0 md:border-r border-white/5 flex flex-col z-10 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none rounded-tr-3xl"></div>
-        <div className="p-6 relative z-10">
+      <aside className={`
+        fixed inset-0 z-[50] lg:relative lg:inset-auto lg:z-10
+        w-full sm:w-64 glass border-r-0 lg:border-r border-white/5 
+        flex flex-col transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none rounded-tr-3xl hidden lg:block"></div>
+        <div className="p-6 relative z-10 hidden lg:block">
           <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-primary mb-1">Admin Pro</h2>
           <p className="text-xs font-medium text-gray-500 uppercase tracking-widest">{userInfo?.name || 'Administrator'}</p>
         </div>
@@ -282,7 +299,10 @@ const AdminDashboard = () => {
           ].map(item => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                setIsSidebarOpen(false);
+              }}
               className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-300 relative overflow-hidden group ${activeTab === item.id
                   ? 'text-white font-bold'
                   : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -313,9 +333,9 @@ const AdminDashboard = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Admin Specific Header */}
-        <header className="h-20 glass border-b border-white/5 flex items-center justify-between px-8 z-20 shrink-0">
-          <div className="flex-1 flex items-center gap-8">
-            <h1 className="text-2xl font-bold text-white tracking-wide whitespace-nowrap">{getTabTitle()}</h1>
+        <header className="h-16 lg:h-20 glass border-b border-white/5 flex items-center justify-between px-4 lg:px-8 z-20 shrink-0">
+          <div className="flex-1 flex items-center gap-4 lg:gap-8">
+            <h1 className="text-lg lg:text-2xl font-bold text-white tracking-wide truncate">{getTabTitle()}</h1>
             {(activeTab !== 'overview') && (
               <div className="max-w-md w-full relative hidden lg:block">
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -338,7 +358,7 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        <main className="flex-1 p-8 overflow-y-auto w-full">
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto w-full">
 
           {activeTab === 'overview' && (
             <div>
@@ -451,8 +471,8 @@ const AdminDashboard = () => {
                 </Button>
               </div>
 
-              <div className="glass border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-                <table className="w-full text-left border-collapse">
+              <div className="glass border border-white/5 rounded-2xl overflow-x-auto shadow-2xl">
+                <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
                     <tr className="bg-white/5 border-b border-white/10 text-gray-400 text-xs uppercase tracking-widest font-bold">
                       <th className="p-4 font-medium">ID / Name</th>
@@ -511,8 +531,8 @@ const AdminDashboard = () => {
 
           {activeTab === 'orders' && (
             <div>
-              <div className="glass border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-                <table className="w-full text-left border-collapse">
+              <div className="glass border border-white/5 rounded-2xl overflow-x-auto shadow-2xl">
+                <table className="w-full text-left border-collapse min-w-[800px]">
                   <thead>
                     <tr className="bg-white/5 border-b border-white/10 text-gray-400 text-xs uppercase tracking-widest font-bold">
                       <th className="p-4 font-medium">Order ID</th>
@@ -573,8 +593,8 @@ const AdminDashboard = () => {
 
           {activeTab === 'users' && (
             <div>
-              <div className="glass border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-                <table className="w-full text-left border-collapse">
+              <div className="glass border border-white/5 rounded-2xl overflow-x-auto shadow-2xl">
+                <table className="w-full text-left border-collapse min-w-[600px]">
                   <thead>
                     <tr className="bg-white/5 border-b border-white/10 text-gray-400 text-xs uppercase tracking-widest font-bold">
                       <th className="p-4 font-medium">User</th>
@@ -772,31 +792,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-[#0A0A0B] border-t border-white/5 z-[70] flex items-center justify-around px-4">
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'users' ? 'text-primary scale-110' : 'text-gray-500'}`}
-        >
-          <Users size={20} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Users</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('products')}
-          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'products' ? 'text-primary scale-110' : 'text-gray-500'}`}
-        >
-          <Package size={20} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Stock</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('orders')}
-          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'orders' ? 'text-primary scale-110' : 'text-gray-500'}`}
-        >
-          <ShoppingBag size={20} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Orders</span>
-        </button>
-      </div>
-
+      {/* No mobile bottom nav needed anymore as we have the hamburger menu */}
     </div>
   );
 };
