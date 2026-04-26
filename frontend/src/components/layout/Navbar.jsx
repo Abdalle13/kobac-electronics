@@ -12,7 +12,7 @@ import Button from '../ui/Button';
 
 const Navbar = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false); 
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [keyword, setKeyword] = useState('');
 
@@ -49,10 +49,9 @@ const Navbar = () => {
     <>
       {/* Promo Bar */}
       <div className="bg-[var(--color-primary)] text-white text-[10px] sm:text-xs font-bold py-1.5 sm:py-2 text-center tracking-wide">
-        <span className="flex items-center justify-center gap-1.5 sm:gap-2 px-4">
+        <span className="flex items-center justify-center gap-2 px-4">
           <Zap size={12} className="animate-pulse shrink-0" />
-          <span className="sm:hidden">FREE Delivery on $400+</span>
-          <span className="hidden sm:inline">Spend $400+ and Get FREE Delivery — Limited Time Offer</span>
+          <span>Spend $400+ and Get FREE Delivery — Limited Time Offer</span>
         </span>
       </div>
 
@@ -62,7 +61,7 @@ const Navbar = () => {
 
           {/* Logo */}
           <Link to="/" className="text-base sm:text-xl md:text-2xl font-black tracking-tighter text-white shrink-0">
-            Kobac <span className="text-primary">Electronics</span>
+            KOBAC <span className="text-primary">Electronics</span>
           </Link>
 
           {/* Center Nav — desktop only */}
@@ -214,7 +213,7 @@ const Navbar = () => {
             {/* ── Top bar ── */}
             <div className="flex items-center justify-between px-5 pt-4 pb-2 border-b border-white/[0.06]">
               <Link to="/" onClick={closeDrawer} className="text-base font-black tracking-tighter text-white">
-                Kobac <span className="text-primary">Electronics</span>
+                KOBAC <span className="text-primary">Electronics</span>
               </Link>
               <button
                 onClick={closeDrawer}
@@ -238,15 +237,13 @@ const Navbar = () => {
                     <Link
                       to={to}
                       onClick={closeDrawer}
-                      className={`flex items-center gap-4 px-3 py-4 rounded-2xl transition-all active:scale-[0.97] group ${
-                        highlight
+                      className={`flex items-center gap-4 px-3 py-4 rounded-2xl transition-all active:scale-[0.97] group ${highlight
                           ? 'text-primary'
                           : 'text-white hover:bg-white/[0.04]'
-                      }`}
+                        }`}
                     >
-                      <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                        highlight ? 'bg-primary/15' : 'bg-white/[0.06] group-hover:bg-primary/10'
-                      }`}>
+                      <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${highlight ? 'bg-primary/15' : 'bg-white/[0.06] group-hover:bg-primary/10'
+                        }`}>
                         <Icon size={18} className={highlight ? 'text-primary' : 'text-gray-400 group-hover:text-primary'} />
                       </span>
                       <span className="text-xl font-black tracking-wide">{label}</span>
@@ -286,7 +283,7 @@ const Navbar = () => {
               {userInfo ? (
                 <div className="space-y-1">
                   <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] mb-4">Account</p>
-                  
+
                   {/* Profile card */}
                   <div className="flex items-center gap-3.5 bg-white/[0.04] border border-white/[0.07] rounded-2xl px-4 py-3 mb-3">
                     <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-white font-black text-base shadow-lg shadow-primary/25 shrink-0 overflow-hidden">
