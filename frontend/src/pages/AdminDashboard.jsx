@@ -678,6 +678,7 @@ const AdminDashboard = () => {
                   <label className="mb-1 text-sm text-[var(--color-text-secondary)]">Product Image</label>
                   <input
                     type="file"
+                    accept="image/*"
                     onChange={(e) => setImageFile(e.target.files[0])}
                     className="bg-[#0d0d0f] border border-[var(--color-border)] rounded-md px-3 py-1.5 text-white focus:outline-none focus:border-[var(--color-primary)] text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[var(--color-primary)] file:text-white hover:file:bg-[var(--color-primary-hover)]"
                   />

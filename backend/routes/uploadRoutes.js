@@ -14,19 +14,21 @@ const imagekit = new ImageKit({
 const storage = multer.memoryStorage();
 
 function checkFileType(file, cb) {
-  const filetypes = /jpg|jpeg|png/;
+  // Broadly accept most common image extensions and mimetypes
+  const filetypes = /jpg|jpeg|png|webp|gif|heic|heif|svg/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
+  const mimetype = file.mimetype.startsWith('image/');
 
-  if (extname && mimetype) {
+  if (extname || mimetype) {
     return cb(null, true);
   } else {
-    cb('Images only!');
+    cb(new Error('Images only!'));
   }
 }
 
 const upload = multer({
   storage,
+  limits: { fileSize: 20 * 1024 * 1024 }, // Increase limit to 20MB for high-res mobile photos
   fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
   },
