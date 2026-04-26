@@ -15,7 +15,7 @@ const Footer = () => {
           <div className="sm:col-span-1">
             <Link to="/" className="inline-block mb-3 sm:mb-4">
               <span className="text-base sm:text-lg font-black text-white tracking-tight">
-                Kobac <span className="text-primary">Electronics</span>
+                KOBAC <span className="text-primary">Electronics</span>
               </span>
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed mb-4 sm:mb-5 max-w-xs">
@@ -24,13 +24,15 @@ const Footer = () => {
             {/* Social Icons */}
             <div className="flex gap-2.5 sm:gap-3">
               {[
-                { label: 'X', href: '#', svg: <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /> },
-                { label: 'IG', href: '#', svg: <><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></> },
-                { label: 'TK', href: '#', svg: <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.5a8.17 8.17 0 0 0 4.78 1.52V6.56a4.86 4.86 0 0 1-1.01.13z" /> },
+                { label: 'X', href: 'https://x.com/ApdulahiHu34594', svg: <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /> },
+                { label: 'IG', href: 'https://www.instagram.com/zekovic__?igsh=cHdwMm93OGhwZ21o&utm_source=qr', svg: <><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></> },
+                { label: 'TK', href: 'https://www.tiktok.com/@zekovic25?_r=1&_t=ZS-95e2nvNNw5R', svg: <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.5a8.17 8.17 0 0 0 4.78 1.52V6.56a4.86 4.86 0 0 1-1.01.13z" /> },
               ].map(({ label, href, svg }) => (
                 <a
                   key={label}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.14] transition-all"
                 >

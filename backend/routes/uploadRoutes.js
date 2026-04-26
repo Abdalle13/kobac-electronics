@@ -39,9 +39,12 @@ const upload = multer({
 // @access  Private
 router.post('/', upload.single('image'), async (req, res) => {
   try {
+    console.log('Upload request received');
     if (!req.file) {
+      console.log('No file in request');
       return res.status(400).send('No file uploaded.');
     }
+    console.log(`Uploading file: ${req.file.originalname}, Size: ${req.file.size} bytes`);
 
     const response = await imagekit.upload({
       file: req.file.buffer, // required, buffer from multer memory storage

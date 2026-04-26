@@ -7,6 +7,8 @@ import { updateUserProfile } from '../redux/slices/authSlice';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 
+import api from '../utils/api';
+
 const ProfilePage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -50,19 +52,11 @@ const ProfilePage = () => {
     setUploading(true);
 
     try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`
-        },
-        body: formData,
-      });
-      if (!res.ok) throw new Error('Image upload failed');
-      const data = await res.text();
+      const { data } = await api.post('/upload', formData);
       setImage(data);
       toast.success('Image uploaded! Click Update Profile to save.');
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.response?.data?.message || err.message);
     } finally {
       setUploading(false);
     }

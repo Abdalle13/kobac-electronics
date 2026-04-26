@@ -166,9 +166,7 @@ const AdminDashboard = () => {
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
-        const uploadRes = await api.post('/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        const uploadRes = await api.post('/upload', formData);
         uploadedImagePath = uploadRes.data;
       }
 
