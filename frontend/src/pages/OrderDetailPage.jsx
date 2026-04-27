@@ -129,9 +129,22 @@ const OrderDetailPage = () => {
               </h3>
               <div className="space-y-2 text-white">
                 <p className="font-bold text-lg">{order.user?.name || 'Customer'}</p>
-                <p className="text-gray-400">{order.shippingAddress?.address || 'No address provided'}</p>
-                <p className="text-gray-400">{order.shippingAddress?.city}, {order.shippingAddress?.postalCode}</p>
-                <p className="text-gray-400">{order.shippingAddress?.country}</p>
+                <p className="text-gray-400">
+                  <span className="text-gray-500 font-medium mr-2">Street:</span>
+                  {order.shippingAddress?.streetName || 'No street provided'}
+                </p>
+                <p className="text-gray-400">
+                  <span className="text-gray-500 font-medium mr-2">City:</span>
+                  {order.shippingAddress?.city}
+                </p>
+                <p className="text-gray-400">
+                  <span className="text-gray-500 font-medium mr-2">District:</span>
+                  {order.shippingAddress?.district}
+                </p>
+                <p className="text-gray-400">
+                  <span className="text-gray-500 font-medium mr-2">Landmark:</span>
+                  {order.shippingAddress?.landmark}
+                </p>
               </div>
             </div>
 

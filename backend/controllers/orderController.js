@@ -168,7 +168,7 @@ const cancelOrder = async (req, res) => {
     }
 
     order.status = 'Cancelled';
-    
+
     // Restore stock
     const Product = (await import('../models/productModel.js')).default;
     for (const item of order.orderItems) {

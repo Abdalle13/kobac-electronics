@@ -63,52 +63,25 @@ const AdminDashboard = () => {
   }, [activeTab, userInfo]);
 
   useEffect(() => {
-    if (activeTab === 'orders' && userInfo && userInfo.role === 'Admin') {
-      dispatch(listOrders());
-    }
-  }, [activeTab, userInfo, dispatch]);
+  }, [userInfo, navigate]);
 
   useEffect(() => {
-    if (activeTab === 'overview' && userInfo && userInfo.role === 'Admin') {
+    if (userInfo && userInfo.role === 'Admin') {
+      // Fetch everything needed for the overview immediately
+      dispatch(listOrders());
+      dispatch(fetchProducts(''));
+      
       const fetchStats = async () => {
         try {
-          const [ordersRes, usersRes] = await Promise.all([
-            api.get('/orders'),
+          const [usersRes] = await Promise.all([
             api.get('/users')
           ]);
 
-          const orders = ordersRes.data;
-          const validOrders = orders.filter(o => o.status !== 'Cancelled');
-
-          const totalSales = validOrders.reduce((acc, order) => acc + order.totalPrice, 0);
-
-          const now = new Date();
-          const thisMonth = now.getMonth();
-          const thisYear = now.getFullYear();
-          let thisMonthSales = 0;
-          let lastMonthSales = 0;
-
-          validOrders.forEach(order => {
-            const d = new Date(order.createdAt);
-            if (d.getFullYear() === thisYear) {
-              if (d.getMonth() === thisMonth) thisMonthSales += order.totalPrice;
-              else if (d.getMonth() === thisMonth - 1) lastMonthSales += order.totalPrice;
-            } else if (d.getFullYear() === thisYear - 1 && thisMonth === 0 && d.getMonth() === 11) {
-              lastMonthSales += order.totalPrice;
-            }
-          });
-
-          let percentageChange = 0;
-          if (lastMonthSales === 0 && thisMonthSales > 0) percentageChange = 100;
-          else if (lastMonthSales > 0) percentageChange = ((thisMonthSales - lastMonthSales) / lastMonthSales) * 100;
-
-          setDashboardStats({
-            totalSales,
-            totalOrders: orders.length,
+          setDashboardStats(prev => ({
+            ...prev,
             totalUsers: usersRes.data.length,
-            percentageChange,
             loading: false
-          });
+          }));
         } catch (error) {
           console.error('Error fetching stats:', error);
           setDashboardStats(prev => ({ ...prev, loading: false }));
@@ -116,7 +89,22 @@ const AdminDashboard = () => {
       };
       fetchStats();
     }
+  }, [userInfo, dispatch]);
+
+  useEffect(() => {
+    if (activeTab === 'users' && userInfo && userInfo.role === 'Admin') {
+      const fetchUsers = async () => {
+        try {
+          const res = await api.get('/users');
+          setUsersList(res.data);
+        } catch (error) {
+          console.error('Error fetching users:', error);
+        }
+      };
+      fetchUsers();
+    }
   }, [activeTab, userInfo]);
+
   const handleLogout = () => {
     dispatch(logout());
     navigate('/');
@@ -263,11 +251,11 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex flex-col lg:flex-row w-full h-screen overflow-hidden bg-[var(--color-background)]">
-      
+
       {/* Mobile Sidebar Toggle */}
       <div className="lg:hidden h-16 glass border-b border-white/5 flex items-center justify-between px-6 z-[60] shrink-0">
         <h2 className="text-xl font-black text-white">Admin Pro</h2>
-        <button 
+        <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="p-2 text-gray-400 hover:text-white transition-colors"
         >
@@ -285,7 +273,6 @@ const AdminDashboard = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none rounded-tr-3xl hidden lg:block"></div>
         <div className="p-6 relative z-10 hidden lg:block">
           <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-primary mb-1">Admin Pro</h2>
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-widest">{userInfo?.name || 'Administrator'}</p>
         </div>
 
         <nav className="flex-1 px-4 space-y-2 relative z-10 mt-4">
@@ -302,8 +289,8 @@ const AdminDashboard = () => {
                 setIsSidebarOpen(false);
               }}
               className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-300 relative overflow-hidden group ${activeTab === item.id
-                  ? 'text-white font-bold'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'text-white font-bold'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
             >
               {activeTab === item.id && (
@@ -349,9 +336,12 @@ const AdminDashboard = () => {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-bold text-white">{userInfo?.name || 'Admin User'}</p>
+            </div>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white text-sm font-black shadow-[0_0_15px_rgba(0,102,255,0.4)]">
-               {userInfo?.name?.charAt(0).toUpperCase() || 'A'}
+              {userInfo?.name?.charAt(0).toUpperCase() || 'A'}
             </div>
           </div>
         </header>
@@ -359,105 +349,99 @@ const AdminDashboard = () => {
         <main className="flex-1 p-4 lg:p-8 overflow-y-auto w-full">
 
           {activeTab === 'overview' && (
-            <div>
-              {dashboardStats.loading ? (
+            <div className="space-y-8">
+              {(dashboardStats.loading || ordersLoading || productsLoading) ? (
                 <div className="flex justify-center py-20 text-gray-500">Loading metrics...</div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                  {/* Revenue Card */}
-                  <div className="relative group overflow-hidden rounded-2xl p-6 glass border-white/5 hover:border-primary/30 transition-colors shadow-2xl">
-                    <div className="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-colors"></div>
-                    <div className="flex items-center gap-4 mb-4 relative z-10">
-                      <div className="p-3 bg-gradient-to-br from-blue-500/20 to-blue-600/5 text-blue-400 rounded-xl border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]">
-                        <DollarSign className="w-6 h-6" />
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Revenue Card */}
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl">
+                          <DollarSign className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Revenue</h3>
                       </div>
-                      <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Total Revenue</h3>
+                      <p className="text-3xl font-black text-white">
+                        ${orders.filter(o => o.status !== 'Cancelled').reduce((acc, o) => acc + o.totalPrice, 0).toLocaleString('en-US')}
+                      </p>
                     </div>
-                    <p className="text-4xl font-black text-white relative z-10 tracking-tight">${dashboardStats.totalSales.toLocaleString('en-US')}</p>
-                    <p className={`text-xs mt-2 font-medium flex items-center gap-1 ${dashboardStats.percentageChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {dashboardStats.percentageChange >= 0 ? '+' : ''}{dashboardStats.percentageChange.toFixed(1)}% vs last month
-                    </p>
-                  </div>
 
-                  {/* Orders Card */}
-                  <div className="relative group overflow-hidden rounded-2xl p-6 glass border-white/5 hover:border-primary/30 transition-colors shadow-2xl">
-                    <div className="absolute -right-10 -top-10 w-32 h-32 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-colors"></div>
-                    <div className="flex items-center gap-4 mb-4 relative z-10">
-                      <div className="p-3 bg-gradient-to-br from-green-500/20 to-green-600/5 text-green-400 rounded-xl border border-green-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-                        <ShoppingBag className="w-6 h-6" />
+                    {/* Orders Card */}
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-green-500/10 text-green-400 rounded-xl">
+                          <ShoppingBag className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Orders</h3>
                       </div>
-                      <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Total Orders</h3>
+                      <p className="text-3xl font-black text-white">{orders.length}</p>
                     </div>
-                    <p className="text-4xl font-black text-white relative z-10 tracking-tight">{dashboardStats.totalOrders}</p>
-                  </div>
 
-                  {/* Users Card */}
-                  <div className="relative group overflow-hidden rounded-2xl p-6 glass border-white/5 hover:border-primary/30 transition-colors shadow-2xl">
-                    <div className="absolute -right-10 -top-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-colors"></div>
-                    <div className="flex items-center gap-4 mb-4 relative z-10">
-                      <div className="p-3 bg-gradient-to-br from-purple-500/20 to-purple-600/5 text-purple-400 rounded-xl border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-                        <Users className="w-6 h-6" />
+                    {/* Users Card */}
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-purple-500/10 text-purple-400 rounded-xl">
+                          <Users className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Users</h3>
                       </div>
-                      <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Total Users</h3>
+                      <p className="text-3xl font-black text-white">{dashboardStats.totalUsers}</p>
                     </div>
-                    <p className="text-4xl font-black text-white relative z-10 tracking-tight">{dashboardStats.totalUsers}</p>
-                  </div>
 
-                  {/* Products Card */}
-                  <div className="relative group overflow-hidden rounded-2xl p-6 glass border-white/5 hover:border-primary/30 transition-colors shadow-2xl">
-                    <div className="absolute -right-10 -top-10 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl group-hover:bg-orange-500/20 transition-colors"></div>
-                    <div className="flex items-center gap-4 mb-4 relative z-10">
-                      <div className="p-3 bg-gradient-to-br from-orange-500/20 to-orange-600/5 text-orange-400 rounded-xl border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)]">
-                        <Package className="w-6 h-6" />
+                    {/* Products Card */}
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-orange-500/10 text-orange-400 rounded-xl">
+                          <Package className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Products</h3>
                       </div>
-                      <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Products</h3>
+                      <p className="text-3xl font-black text-white">{products.length}</p>
                     </div>
-                    <p className="text-4xl font-black text-white relative z-10 tracking-tight">{products.length}</p>
                   </div>
-                </div>
-              )}
 
-
-
-              <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
-                <div className="glass border border-white/5 rounded-2xl p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-lg font-bold text-white">Recent Transactions</h3>
-                    <button onClick={() => setActiveTab('orders')} className="text-primary text-sm hover:underline">View All</button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                      <thead className="bg-white/5 text-gray-400 text-xs uppercase">
-                        <tr>
-                          <th className="p-3">Customer</th>
-                          <th className="p-3">Amount</th>
-                          <th className="p-3">Status</th>
-                          <th className="p-3 text-right">Date</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5">
-                        {orders.slice(0, 5).map(o => (
-                          <tr key={o._id} className="hover:bg-white/5 transition-colors">
-                            <td className="p-3">
-                              <p className="text-sm text-white font-medium">{o.user?.name || 'Unknown'}</p>
-                              <p className="text-[10px] text-gray-500">{o.user?.email}</p>
-                            </td>
-                            <td className="p-3 text-sm text-white">${o.totalPrice.toLocaleString('en-US')}</td>
-                            <td className="p-3">
-                              <Badge variant={o.isPaid ? 'success' : 'neutral'} className="text-[10px] px-2 py-0.5">
-                                {o.isPaid ? 'Paid' : 'Pending'}
-                              </Badge>
-                            </td>
-                            <td className="p-3 text-right text-[10px] text-gray-400">
-                              {new Date(o.createdAt).toLocaleDateString()}
-                            </td>
+                  {/* Recent Transactions */}
+                  <div className="glass border border-white/5 rounded-2xl p-8 shadow-2xl">
+                    <div className="flex justify-between items-center mb-8">
+                      <h3 className="text-lg font-black text-white tracking-tight">Recent Transactions</h3>
+                      <button onClick={() => setActiveTab('orders')} className="text-primary text-xs font-bold uppercase tracking-widest hover:underline">View All</button>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <thead className="text-gray-500 text-[10px] uppercase tracking-widest font-black">
+                          <tr className="border-b border-white/5">
+                            <th className="pb-4">Customer</th>
+                            <th className="pb-4">Amount</th>
+                            <th className="pb-4">Status</th>
+                            <th className="pb-4 text-right">Date</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {orders.slice(0, 8).map(o => (
+                            <tr key={o._id} className="hover:bg-white/[0.02] transition-colors">
+                              <td className="py-4">
+                                <p className="text-sm text-white font-bold">{o.user?.name || 'Guest'}</p>
+                                <p className="text-[10px] text-gray-500">{o.user?.email}</p>
+                              </td>
+                              <td className="py-4 text-sm text-white font-black">${o.totalPrice.toLocaleString('en-US')}</td>
+                              <td className="py-4">
+                                <Badge variant={o.isPaid ? 'success' : 'neutral'} className="text-[9px] px-3 py-1 font-black">
+                                  {o.isPaid ? 'PAID' : 'PENDING'}
+                                </Badge>
+                              </td>
+                              <td className="py-4 text-right text-[10px] text-gray-500 font-bold">
+                                {new Date(o.createdAt).toLocaleDateString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           )}
 
@@ -739,9 +723,10 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <h3 className="text-gray-400 text-xs uppercase tracking-wider mb-2 font-semibold">Shipping Address</h3>
-                  <p>{selectedOrder.shippingAddress?.address}</p>
-                  <p>{selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.postalCode}</p>
-                  <p>{selectedOrder.shippingAddress?.country}</p>
+                  <p><span className="text-gray-500 font-medium">Street:</span> {selectedOrder.shippingAddress?.streetName}</p>
+                  <p><span className="text-gray-500 font-medium">City:</span> {selectedOrder.shippingAddress?.city}</p>
+                  <p><span className="text-gray-500 font-medium">District:</span> {selectedOrder.shippingAddress?.district}</p>
+                  <p><span className="text-gray-500 font-medium">Landmark:</span> {selectedOrder.shippingAddress?.landmark}</p>
                 </div>
               </div>
 

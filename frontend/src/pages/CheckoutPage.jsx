@@ -16,7 +16,13 @@ const CheckoutPage = () => {
   const dispatch = useDispatch();
 
   const [step, setStep] = useState(1);
-  const [shipping, setShipping] = useState({ fullName: '', address: '', city: '', postalCode: '', country: '' });
+  const [shipping, setShipping] = useState({ 
+    fullName: '', 
+    streetName: '', 
+    city: '', 
+    district: '', 
+    landmark: '' 
+  });
   const [paymentMethod, setPaymentMethod] = useState('EVC Plus');
   const [evcNumber, setEvcNumber] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
@@ -64,7 +70,12 @@ const CheckoutPage = () => {
         price: item.price,
         product: item._id
       })),
-      shippingAddress: shipping,
+      shippingAddress: {
+        streetName: shipping.streetName,
+        city: shipping.city,
+        district: shipping.district,
+        landmark: shipping.landmark
+      },
       paymentMethod: paymentMethod,
       itemsPrice,
       shippingPrice,
@@ -141,32 +152,39 @@ const CheckoutPage = () => {
                   value={shipping.fullName} 
                   onChange={e => setShipping({...shipping, fullName: e.target.value})} 
                 />
-                <Input 
-                  label="Address" 
-                  required 
-                  value={shipping.address} 
-                  onChange={e => setShipping({...shipping, address: e.target.value})} 
-                />
+                
                 <div className="grid grid-cols-2 gap-4">
                   <Input 
                     label="City" 
+                    placeholder="e.g. Muqdisho, Hargeisa"
                     required 
                     value={shipping.city} 
                     onChange={e => setShipping({...shipping, city: e.target.value})} 
                   />
                   <Input 
-                    label="Postal Code" 
+                    label="District" 
+                    placeholder="e.g. Hodan, Karan"
                     required 
-                    value={shipping.postalCode} 
-                    onChange={e => setShipping({...shipping, postalCode: e.target.value})} 
+                    value={shipping.district} 
+                    onChange={e => setShipping({...shipping, district: e.target.value})} 
                   />
                 </div>
+
                 <Input 
-                  label="Country" 
+                  label="Street Name / House No" 
                   required 
-                  value={shipping.country} 
-                  onChange={e => setShipping({...shipping, country: e.target.value})} 
+                  value={shipping.streetName} 
+                  onChange={e => setShipping({...shipping, streetName: e.target.value})} 
                 />
+
+                <Input 
+                  label="Nearest Landmark" 
+                  placeholder="e.g. Near Masjidka Isbaheysiga"
+                  required 
+                  value={shipping.landmark} 
+                  onChange={e => setShipping({...shipping, landmark: e.target.value})} 
+                />
+
                 <div className="pt-4 flex justify-end">
                   <Button type="submit" className="w-full sm:w-auto">Continue to Payment</Button>
                 </div>
