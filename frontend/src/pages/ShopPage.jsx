@@ -6,16 +6,7 @@ import ProductCard from '../components/product/ProductCard';
 import { SlidersHorizontal, X, Smartphone, Laptop, Watch, Headphones, Tablet, Gamepad2, Package, Search } from 'lucide-react';
 import Button from '../components/ui/Button';
 
-const CATEGORIES = [
-  { label: 'All', value: '', icon: null },
-  { label: 'Phones', value: 'Phone', icon: Smartphone },
-  { label: 'Laptops', value: 'Laptop', icon: Laptop },
-  { label: 'Wearables', value: 'Watch', icon: Watch },
-  { label: 'Headphones', value: 'Headphones', icon: Headphones },
-  { label: 'Tablets', value: 'Tablet', icon: Tablet },
-  { label: 'Gaming', value: 'Gaming', icon: Gamepad2 },
-  { label: 'Accessories', value: 'Accessories', icon: Package },
-];
+// Removed hardcoded CATEGORIES array to use dynamic categories from products.
 
 const PRICE_RANGES = [
   { label: 'All Prices', val: '' },
@@ -33,6 +24,22 @@ const ShopPage = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const categories = [
+    { label: 'All', value: '', icon: null },
+    ...Array.from(new Set(products.map(p => p.category)))
+      .filter(Boolean)
+      .map(cat => ({
+        label: cat.charAt(0).toUpperCase() + cat.slice(1),
+        value: cat,
+        icon: cat.toLowerCase().includes('phone') ? Smartphone :
+              cat.toLowerCase().includes('laptop') ? Laptop :
+              cat.toLowerCase().includes('watch') ? Watch :
+              cat.toLowerCase().includes('headphone') ? Headphones :
+              cat.toLowerCase().includes('tablet') ? Tablet :
+              cat.toLowerCase().includes('game') ? Gamepad2 : Package
+      }))
+  ];
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -90,7 +97,7 @@ const ShopPage = () => {
 
           {/* Category Pill Row */}
           <div className="flex gap-2 overflow-x-auto pb-1 mt-4 sm:mt-5 scrollbar-hide">
-            {CATEGORIES.map(({ label, value, icon: Icon }) => (
+            {categories.map(({ label, value, icon: Icon }) => (
               <button
                 key={value}
                 onClick={() => setCategoryFilter(value)}

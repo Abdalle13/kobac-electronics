@@ -148,10 +148,13 @@ const HomePage = () => {
       {/* ── Features ─────────────────────────────── */}
       <section className="py-14 sm:py-20 bg-[var(--color-surface)]/30 border-y border-[var(--color-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-14">
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white tracking-tighter">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-4">
               Why choose us?
             </h2>
+            <p className="text-gray-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+              We provide authentic electronics with reliable support and localized delivery services across Somalia.
+            </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
             {[

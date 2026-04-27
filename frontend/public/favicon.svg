@@ -16,6 +16,6 @@
       </feMerge>
     </filter>
   </defs>
-  <rect width="32" height="32" rx="10" fill="#0A0A0B"/>
+
   <path d="M11 7V25M11 16L22 7M15 16L22 25" stroke="url(#glow)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#shadow)"/>
 </svg>
