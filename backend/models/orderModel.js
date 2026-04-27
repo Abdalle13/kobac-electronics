@@ -1,3 +1,4 @@
+// Order Model - Updated for local context
 import mongoose from 'mongoose';
 
 const orderSchema = mongoose.Schema(
@@ -80,6 +81,6 @@ const orderSchema = mongoose.Schema(
   }
 );
 
-const Order = mongoose.model('Order', orderSchema);
+const Order = mongoose.models.Order_Somalia || mongoose.model('Order_Somalia', orderSchema);
 
 export default Order;

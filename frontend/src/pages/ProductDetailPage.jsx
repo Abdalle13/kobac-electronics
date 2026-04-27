@@ -6,6 +6,7 @@ import { fetchProductDetails, clearProductDetails } from '../redux/slices/produc
 import { addToCart, toggleCart } from '../redux/slices/cartSlice';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import { formatCurrency } from '../utils/formatter';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -119,7 +120,7 @@ const ProductDetailPage = () => {
           </h1>
           
           <div className="flex items-center gap-4 mb-6">
-            <span className="text-3xl font-extrabold text-white">${product.price.toLocaleString('en-US')}</span>
+            <span className="text-3xl font-extrabold text-white">{formatCurrency(product.price)}</span>
             {product.countInStock > 0 ? (
               <Badge variant="success" className="flex items-center gap-1">
                 <Check className="w-3 h-3" /> In Stock ({product.countInStock} available)

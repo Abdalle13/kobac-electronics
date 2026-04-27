@@ -6,6 +6,7 @@ import { ArrowLeft, Package, Truck, CreditCard, Calendar, CheckCircle2, AlertCir
 import { getOrderDetails } from '../redux/slices/orderSlice';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
+import { formatCurrency } from '../utils/formatter';
 
 const OrderDetailPage = () => {
   const { id } = useParams();
@@ -105,7 +106,7 @@ const OrderDetailPage = () => {
                           />
                           <div>
                             <Link to={`/product/${item.product}`} className="text-white font-bold hover:text-primary transition-colors line-clamp-1">{item.name}</Link>
-                            <p className="text-xs text-gray-500 font-mono tracking-tighter">${(item.price || 0).toLocaleString('en-US')} per unit</p>
+                            <p className="text-xs text-gray-500 font-mono tracking-tighter">{formatCurrency(item.price)} per unit</p>
                           </div>
                         </div>
                       </td>
@@ -113,7 +114,7 @@ const OrderDetailPage = () => {
                         <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-white font-bold">{item.qty}</span>
                       </td>
                       <td className="p-6 text-right text-white font-bold">
-                        ${((item.price || 0) * (item.qty || 0)).toLocaleString('en-US')}
+                        {formatCurrency(item.price * item.qty)}
                       </td>
                     </tr>
                   ))}
@@ -179,19 +180,19 @@ const OrderDetailPage = () => {
             <div className="space-y-4 relative z-10">
               <div className="flex justify-between text-gray-400">
                 <span>Items Subtotal</span>
-                <span className="text-white font-mono">${(order.itemsPrice || 0).toLocaleString('en-US')}</span>
+                <span className="text-white font-mono">{formatCurrency(order.itemsPrice)}</span>
               </div>
               <div className="flex justify-between text-gray-400">
                 <span>Shipping Fees</span>
-                <span className="text-white font-mono">${(order.shippingPrice || 0).toLocaleString('en-US')}</span>
+                <span className="text-white font-mono">{formatCurrency(order.shippingPrice)}</span>
               </div>
               <div className="flex justify-between text-gray-400 pb-4 border-b border-white/5">
                 <span>Tax (5%)</span>
-                <span className="text-white font-mono">${(order.taxPrice || 0).toLocaleString('en-US')}</span>
+                <span className="text-white font-mono">{formatCurrency(order.taxPrice)}</span>
               </div>
               <div className="flex justify-between items-end pt-2">
                 <span className="text-gray-400 font-bold">Total Payable</span>
-                <span className="text-3xl font-black text-white">${(order.totalPrice || 0).toLocaleString('en-US')}</span>
+                <span className="text-3xl font-black text-white">{formatCurrency(order.totalPrice)}</span>
               </div>
             </div>
           </div>

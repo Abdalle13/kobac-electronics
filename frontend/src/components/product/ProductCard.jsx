@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { addToCart, toggleCart } from '../../redux/slices/cartSlice';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
+import { formatCurrency } from '../../utils/formatter';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ const ProductCard = ({ product }) => {
 
         <div className="flex items-center justify-between gap-2">
           <span className="text-base sm:text-xl font-bold text-white">
-            ${product.price.toLocaleString('en-US')}
+            {formatCurrency(product.price)}
           </span>
           <button
             onClick={handleAddToCart}

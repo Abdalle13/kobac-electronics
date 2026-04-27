@@ -7,6 +7,7 @@ import { createOrder, payOrder, resetOrder } from '../redux/slices/orderSlice';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { useEffect } from 'react';
+import { formatCurrency } from '../utils/formatter';
 
 const CheckoutPage = () => {
   const { cartItems } = useSelector(state => state.cart);
@@ -280,7 +281,7 @@ const CheckoutPage = () => {
                   <div className="flex-1">
                     <h4 className="text-sm text-white line-clamp-1">{item.name}</h4>
                     <p className="text-xs text-gray-400 mt-1">Qty: {item.qty}</p>
-                    <p className="text-sm font-semibold text-white mt-1">${(item.price * item.qty).toLocaleString('en-US')}</p>
+                    <p className="text-sm font-semibold text-white mt-1">{formatCurrency(item.price * item.qty)}</p>
                   </div>
                 </div>
               ))}
@@ -289,19 +290,19 @@ const CheckoutPage = () => {
             <div className="border-t border-[var(--color-border)] pt-4 space-y-3">
               <div className="flex justify-between text-gray-400 text-sm">
                 <span>Subtotal</span>
-                <span>${itemsPrice.toLocaleString('en-US')}</span>
+                <span>{formatCurrency(itemsPrice)}</span>
               </div>
               <div className="flex justify-between text-gray-400 text-sm">
                 <span>Tax (5%)</span>
-                <span>${taxPrice.toLocaleString('en-US')}</span>
+                <span>{formatCurrency(taxPrice)}</span>
               </div>
               <div className="flex justify-between text-gray-400 text-sm">
                 <span>Shipping</span>
-                <span>{shippingPrice === 0 ? 'Free' : `$${shippingPrice.toLocaleString('en-US')}`}</span>
+                <span>{shippingPrice === 0 ? 'Free' : formatCurrency(shippingPrice)}</span>
               </div>
               <div className="flex justify-between text-white font-bold text-lg pt-3 border-t border-[var(--color-border)]">
                 <span>Total</span>
-                <span>${totalPrice.toLocaleString('en-US')}</span>
+                <span>{formatCurrency(totalPrice)}</span>
               </div>
             </div>
           </div>

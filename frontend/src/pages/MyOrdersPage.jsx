@@ -6,6 +6,7 @@ import { listMyOrders } from '../redux/slices/orderSlice';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { formatCurrency } from '../utils/formatter';
 
 const MyOrdersPage = () => {
   const dispatch = useDispatch();
@@ -112,7 +113,7 @@ const MyOrdersPage = () => {
                 <div className="flex flex-col justify-between items-end">
                   <div className="text-right">
                     <p className="text-xs text-gray-500 mb-1">Total Amount</p>
-                    <p className="text-2xl font-bold text-white">${order.totalPrice.toLocaleString('en-US')}</p>
+                    <p className="text-2xl font-bold text-white">{formatCurrency(order.totalPrice)}</p>
                   </div>
                   <Button 
                     variant="secondary" 

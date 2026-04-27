@@ -9,6 +9,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Badge from '../components/ui/Badge';
 import { logout } from '../redux/slices/authSlice';
+import { formatCurrency } from '../utils/formatter';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -364,7 +365,7 @@ const AdminDashboard = () => {
                         <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Revenue</h3>
                       </div>
                       <p className="text-3xl font-black text-white">
-                        ${orders.filter(o => o.status !== 'Cancelled').reduce((acc, o) => acc + o.totalPrice, 0).toLocaleString('en-US')}
+                        {formatCurrency(orders.filter(o => o.status !== 'Cancelled').reduce((acc, o) => acc + o.totalPrice, 0))}
                       </p>
                     </div>
 
@@ -425,7 +426,7 @@ const AdminDashboard = () => {
                                 <p className="text-sm text-white font-bold">{o.user?.name || 'Guest'}</p>
                                 <p className="text-[10px] text-gray-500">{o.user?.email}</p>
                               </td>
-                              <td className="py-4 text-sm text-white font-black">${o.totalPrice.toLocaleString('en-US')}</td>
+                              <td className="py-4 text-sm text-white font-black">{formatCurrency(o.totalPrice)}</td>
                               <td className="py-4">
                                 <Badge variant={o.isPaid ? 'success' : 'neutral'} className="text-[9px] px-3 py-1 font-black">
                                   {o.isPaid ? 'PAID' : 'PENDING'}
@@ -479,7 +480,7 @@ const AdminDashboard = () => {
                             </div>
                           </div>
                         </td>
-                        <td className="p-4 text-white">${product.price.toLocaleString('en-US')}</td>
+                        <td className="p-4 text-white">{formatCurrency(product.price)}</td>
                         <td className="p-4"><Badge variant="neutral">{product.category}</Badge></td>
                         <td className="p-4 lg:table-cell hidden">
                           <span className={product.countInStock > 0 ? 'text-green-500' : 'text-red-500'}>
@@ -529,7 +530,7 @@ const AdminDashboard = () => {
                       <tr key={order._id} className="hover:bg-[#111] transition-colors">
                         <td className="p-4 text-xs text-gray-400">{order._id.substring(0, 12)}...</td>
                         <td className="p-4 text-white">{order.user?.name || 'Guest'}</td>
-                        <td className="p-4 text-white">${order.totalPrice.toLocaleString('en-US')}</td>
+                        <td className="p-4 text-white">{formatCurrency(order.totalPrice)}</td>
                         <td className="p-4">
                           <Badge variant={order.isDelivered ? 'success' : 'neutral'}>
                             {order.isDelivered ? 'Delivered' : 'Pending'}
@@ -747,7 +748,7 @@ const AdminDashboard = () => {
                           <span className="text-white">{item.name}</span>
                         </td>
                         <td className="p-3 text-center">{item.qty}</td>
-                        <td className="p-3 text-right">${(item.price * item.qty).toLocaleString('en-US')}</td>
+                        <td className="p-3 text-right">{formatCurrency(item.price * item.qty)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -761,10 +762,10 @@ const AdminDashboard = () => {
                   <p><span className="text-gray-400">Delivered:</span> {selectedOrder.isDelivered ? <span className="text-green-500 font-medium">Yes ({new Date(selectedOrder.deliveredAt).toLocaleDateString()})</span> : <span className="text-red-500">Pending</span>}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-gray-400">Items: <span className="text-white">${selectedOrder.itemsPrice?.toLocaleString('en-US')}</span></p>
-                  <p className="text-gray-400">Shipping: <span className="text-white">${selectedOrder.shippingPrice?.toLocaleString('en-US')}</span></p>
-                  <p className="text-xs text-gray-500 mb-1">Tax: ${selectedOrder.taxPrice?.toLocaleString('en-US')}</p>
-                  <p className="text-xl font-bold text-[var(--color-primary)]">Total: ${selectedOrder.totalPrice?.toLocaleString('en-US')}</p>
+                  <p className="text-gray-400">Items: <span className="text-white">{formatCurrency(selectedOrder.itemsPrice)}</span></p>
+                  <p className="text-gray-400">Shipping: <span className="text-white">{formatCurrency(selectedOrder.shippingPrice)}</span></p>
+                  <p className="text-xs text-gray-500 mb-1">Tax: {formatCurrency(selectedOrder.taxPrice)}</p>
+                  <p className="text-xl font-bold text-[var(--color-primary)]">Total: {formatCurrency(selectedOrder.totalPrice)}</p>
                 </div>
               </div>
             </div>

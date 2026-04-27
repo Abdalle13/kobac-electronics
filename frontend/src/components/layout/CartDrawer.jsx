@@ -5,6 +5,7 @@ import { removeFromCart, addToCart } from '../../redux/slices/cartSlice';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatCurrency } from '../../utils/formatter';
 
 const CartDrawer = ({ isOpen, setIsOpen }) => {
   const dispatch = useDispatch();
@@ -84,7 +85,7 @@ const CartDrawer = ({ isOpen, setIsOpen }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-white truncate leading-tight mb-0.5">{item.name}</h4>
-                  <p className="text-xs text-gray-500 mb-2">${item.price.toLocaleString('en-US')}</p>
+                  <p className="text-xs text-gray-500 mb-2">{formatCurrency(item.price)}</p>
                   <div className="flex items-center justify-between">
                     {/* Qty controls */}
                     <div className="flex items-center gap-1 bg-white/[0.05] rounded-lg px-1 py-0.5">
@@ -107,7 +108,7 @@ const CartDrawer = ({ isOpen, setIsOpen }) => {
                     {/* Line total + remove */}
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-white">
-                        ${(item.price * item.qty).toLocaleString('en-US')}
+                        {formatCurrency(item.price * item.qty)}
                       </span>
                       <button
                         onClick={() => dispatch(removeFromCart(item._id))}
@@ -128,7 +129,7 @@ const CartDrawer = ({ isOpen, setIsOpen }) => {
           <div className="px-4 sm:px-5 py-4 border-t border-white/[0.07] bg-[#0D0D0F] shrink-0">
             <div className="flex justify-between items-center mb-3">
               <span className="text-sm text-gray-400 font-medium">Subtotal</span>
-              <span className="text-xl font-black text-white">${cartTotal.toLocaleString('en-US')}</span>
+              <span className="text-xl font-black text-white">{formatCurrency(cartTotal)}</span>
             </div>
             <p className="text-[10px] text-gray-600 mb-3">Shipping and taxes calculated at checkout.</p>
             <Button variant="primary" className="w-full py-3.5 text-sm font-bold" onClick={handleCheckout}>
