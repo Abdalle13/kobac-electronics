@@ -644,18 +644,13 @@ const AdminDashboard = () => {
                 <Input label="Name" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                 <Input label="Brand" required value={formData.brand} onChange={e => setFormData({ ...formData, brand: e.target.value })} />
 
-                <div className="flex flex-col mb-4">
-                  <label className="mb-1 text-sm text-[var(--color-text-secondary)]">Category</label>
-                  <select
-                    value={formData.category}
-                    onChange={e => setFormData({ ...formData, category: e.target.value })}
-                    className="bg-[#0d0d0f] border border-[var(--color-border)] rounded-md px-3 py-2 text-white focus:outline-none focus:border-[var(--color-primary)]"
-                  >
-                    <option value="Phone">Phone</option>
-                    <option value="Laptop">Laptop</option>
-                    <option value="Watch">Watch</option>
-                  </select>
-                </div>
+                <Input 
+                  label="Category" 
+                  placeholder="e.g. Phone, Gaming, Home Appliances"
+                  required 
+                  value={formData.category} 
+                  onChange={e => setFormData({ ...formData, category: e.target.value })} 
+                />
 
                 <div className="flex flex-col mb-4">
                   <label className="mb-1 text-sm text-[var(--color-text-secondary)]">Product Image</label>
