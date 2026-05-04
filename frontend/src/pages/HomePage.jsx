@@ -51,43 +51,43 @@ const HomePage = () => {
   return (
     <div className="w-full">
       {/* ── Hero ─────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-8 pb-20 sm:pt-12 sm:pb-32 md:pt-16 md:pb-40">
+      <section className="relative overflow-hidden pt-24 pb-24 sm:pt-12 sm:pb-32 md:pt-16 md:pb-40 min-h-[85vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/hero.png"
             alt="Premium Electronics"
-            className="w-full h-full object-cover opacity-30 mix-blend-overlay"
+            className="w-full h-full object-cover opacity-40 mix-blend-overlay scale-110 sm:scale-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0B]/60 via-[#0A0A0B]/75 to-[#0A0A0B] sm:bg-gradient-to-r sm:from-[#0A0A0B] sm:via-[#0A0A0B]/80 sm:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0B]/80 via-[#0A0A0B]/85 to-[#0A0A0B] sm:bg-gradient-to-r sm:from-[#0A0A0B] sm:via-[#0A0A0B]/80 sm:to-transparent" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 relative z-10 w-full">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-center sm:text-left max-w-2xl mx-auto sm:mx-0"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-5 sm:mb-6">
-              <Zap size={11} className="animate-pulse" /> Exclusive tech 2026
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8">
+              <Zap size={12} className="animate-pulse" /> Kobac Exclusive 2026
             </div>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-4 sm:mb-6 text-white leading-[0.88]">
-              ELEVEN <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-[#0066FF]">
+            <h1 className="text-6xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 sm:mb-8 text-white leading-[0.85] uppercase italic">
+              SMARTER <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-[#0066FF] not-italic">
                 BEYOND
               </span>
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-gray-400 mb-8 sm:mb-10 leading-relaxed max-w-sm sm:max-w-md mx-auto sm:mx-0">
-              Experience the pinnacle of innovation. From ultra-powerful laptops to the smartest watches, we define the standard of modern electronics.
+            <p className="text-sm sm:text-base md:text-lg text-gray-400 mb-10 sm:mb-12 leading-relaxed max-w-sm sm:max-w-md mx-auto sm:mx-0 font-medium">
+              Discover the next generation of tech. We bring you the world's most advanced electronics, delivered straight to your door. <span className="text-blue-400/80">Tayo iyo Hal-abuur.</span>
             </p>
-            <div className="flex flex-col xs:flex-row gap-3 justify-center sm:justify-start">
+            <div className="flex flex-col xs:flex-row gap-4 justify-center sm:justify-start">
               <Link to="/shop" className="w-full xs:w-auto">
-                <Button className="w-full xs:w-auto px-8 py-3.5 text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 rounded-xl">
+                <Button className="w-full xs:w-auto px-10 py-4 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 rounded-2xl shadow-2xl shadow-blue-600/20 hover:scale-105 transition-transform active:scale-95">
                   Explore Shop <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
               <Link to="/shop" className="w-full xs:w-auto">
-                <Button variant="ghost" className="w-full xs:w-auto px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white border border-white/10 rounded-xl hover:bg-white/5">
+                <Button variant="ghost" className="w-full xs:w-auto px-10 py-4 text-xs font-black uppercase tracking-widest text-white border border-white/10 rounded-2xl hover:bg-white/5 backdrop-blur-md">
                   View Catalog
                 </Button>
               </Link>
