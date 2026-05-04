@@ -74,10 +74,6 @@ npm run data:import
 
 ---
 
-## 📸 Screenshots
-*(Add your live site screenshots here to show off the beautiful design!)*
-
----
 
 ## 📄 License
 This project is for demonstration purposes. All rights reserved.

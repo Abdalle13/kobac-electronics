@@ -186,4 +186,56 @@ const cancelOrder = async (req, res) => {
   }
 };
 
-export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders, getOrders, updateOrderToDelivered, updateOrderToPaidAdmin, cancelOrder };
+// @desc    Get order summary (Lacagta/Finance)
+// @route   GET /api/orders/summary
+// @access  Private/Admin
+const getOrderSummary = async (req, res) => {
+  try {
+    const orders = await Order.find({});
+    
+    const totalSales = orders.reduce((acc, order) => acc + (order.isPaid ? order.totalPrice : 0), 0);
+    const numOrders = orders.length;
+    
+    const evcSales = orders
+      .filter(o => o.paymentMethod === 'EVC Plus' && o.isPaid)
+      .reduce((acc, o) => acc + o.totalPrice, 0);
+      
+    const codSales = orders
+      .filter(o => o.paymentMethod === 'Cash on Delivery' && o.isPaid)
+      .reduce((acc, o) => acc + o.totalPrice, 0);
+
+    // Group sales by day for a mini-chart/list (last 7 days)
+    const salesByDay = orders
+      .filter(o => o.isPaid && o.paidAt)
+      .reduce((acc, o) => {
+        const paidDate = new Date(o.paidAt);
+        if (!isNaN(paidDate)) {
+          const day = paidDate.toLocaleDateString();
+          acc[day] = (acc[day] || 0) + o.totalPrice;
+        }
+        return acc;
+      }, {});
+
+    res.json({
+      totalSales,
+      numOrders,
+      evcSales,
+      codSales,
+      salesByDay
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching summary', error: error.message });
+  }
+};
+
+export { 
+  addOrderItems, 
+  getOrderById, 
+  updateOrderToPaid, 
+  getMyOrders, 
+  getOrders, 
+  updateOrderToDelivered, 
+  updateOrderToPaidAdmin, 
+  cancelOrder,
+  getOrderSummary
+};

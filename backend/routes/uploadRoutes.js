@@ -5,11 +5,16 @@ import ImageKit from 'imagekit';
 
 const router = express.Router();
 
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
-});
+let imagekit;
+if (process.env.IMAGEKIT_PUBLIC_KEY && process.env.IMAGEKIT_PRIVATE_KEY && process.env.IMAGEKIT_URL_ENDPOINT) {
+  imagekit = new ImageKit({
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+  });
+} else {
+  console.warn('WARNING: ImageKit credentials missing. Uploads will not work.'.red.bold);
+}
 
 const storage = multer.memoryStorage();
 
@@ -45,6 +50,10 @@ router.post('/', upload.single('image'), async (req, res) => {
       return res.status(400).send('No file uploaded.');
     }
     console.log(`Uploading file: ${req.file.originalname}, Size: ${req.file.size} bytes`);
+
+    if (!imagekit) {
+      return res.status(500).send('Image upload service not configured.');
+    }
 
     const response = await imagekit.upload({
       file: req.file.buffer, // required, buffer from multer memory storage

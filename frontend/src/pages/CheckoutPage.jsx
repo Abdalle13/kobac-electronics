@@ -17,12 +17,12 @@ const CheckoutPage = () => {
   const dispatch = useDispatch();
 
   const [step, setStep] = useState(1);
-  const [shipping, setShipping] = useState({ 
-    fullName: '', 
-    streetName: '', 
-    city: '', 
-    district: '', 
-    landmark: '' 
+  const [shipping, setShipping] = useState({
+    fullName: '',
+    streetName: '',
+    city: '',
+    district: '',
+    landmark: ''
   });
   const [paymentMethod, setPaymentMethod] = useState('EVC Plus');
   const [evcNumber, setEvcNumber] = useState('');
@@ -62,7 +62,7 @@ const CheckoutPage = () => {
 
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
-    
+
     const orderData = {
       orderItems: cartItems.map(item => ({
         name: item.name,
@@ -87,7 +87,7 @@ const CheckoutPage = () => {
     const resultAction = await dispatch(createOrder(orderData));
     if (createOrder.fulfilled.match(resultAction)) {
       const createdOrder = resultAction.payload;
-      
+
       if (paymentMethod === 'EVC Plus') {
         // Mock EVC Plus Payment call
         const paymentResult = {
@@ -98,7 +98,7 @@ const CheckoutPage = () => {
         };
         await dispatch(payOrder({ id: createdOrder._id, paymentResult }));
       }
-      
+
       setIsSuccess(true);
     }
   };
@@ -111,7 +111,7 @@ const CheckoutPage = () => {
         </div>
         <h2 className="text-3xl font-bold text-white mb-4">Order Placed Successfully!</h2>
         <p className="text-gray-400 mb-8 max-w-md">
-          Thank you for your purchase. Your order has been placed and is being processed. 
+          Thank you for your purchase. Your order has been placed and is being processed.
           You will receive an email confirmation shortly.
         </p>
         <Button onClick={() => navigate('/shop')}>Continue Shopping</Button>
@@ -121,7 +121,7 @@ const CheckoutPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 w-full flex-grow">
-      
+
       {/* Checkout Steps Indicator */}
       <div className="flex items-center justify-center mb-12">
         <div className={`flex items-center ${step >= 1 ? 'text-[var(--color-primary)]' : 'text-gray-500'}`}>
@@ -140,50 +140,50 @@ const CheckoutPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
+
         {/* Forms */}
         <div className="md:col-span-2">
           {step === 1 && (
             <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 md:p-8 shadow-xl">
               <h2 className="text-2xl font-bold text-white mb-6">Shipping Details</h2>
               <form onSubmit={handleShippingSubmit} className="space-y-4">
-                <Input 
-                  label="Full Name" 
-                  required 
-                  value={shipping.fullName} 
-                  onChange={e => setShipping({...shipping, fullName: e.target.value})} 
+                <Input
+                  label="Full Name"
+                  required
+                  value={shipping.fullName}
+                  onChange={e => setShipping({ ...shipping, fullName: e.target.value })}
                 />
-                
+
                 <div className="grid grid-cols-2 gap-4">
-                  <Input 
-                    label="City" 
+                  <Input
+                    label="City"
                     placeholder="e.g. Muqdisho, Hargeisa"
-                    required 
-                    value={shipping.city} 
-                    onChange={e => setShipping({...shipping, city: e.target.value})} 
+                    required
+                    value={shipping.city}
+                    onChange={e => setShipping({ ...shipping, city: e.target.value })}
                   />
-                  <Input 
-                    label="District" 
+                  <Input
+                    label="District"
                     placeholder="e.g. Hodan, Karan"
-                    required 
-                    value={shipping.district} 
-                    onChange={e => setShipping({...shipping, district: e.target.value})} 
+                    required
+                    value={shipping.district}
+                    onChange={e => setShipping({ ...shipping, district: e.target.value })}
                   />
                 </div>
 
-                <Input 
-                  label="Street Name / House No" 
-                  required 
-                  value={shipping.streetName} 
-                  onChange={e => setShipping({...shipping, streetName: e.target.value})} 
+                <Input
+                  label="Street Name"
+                  required
+                  value={shipping.streetName}
+                  onChange={e => setShipping({ ...shipping, streetName: e.target.value })}
                 />
 
-                <Input 
-                  label="Nearest Landmark" 
+                <Input
+                  label="Nearest Landmark"
                   placeholder="e.g. Near Masjidka Isbaheysiga"
-                  required 
-                  value={shipping.landmark} 
-                  onChange={e => setShipping({...shipping, landmark: e.target.value})} 
+                  required
+                  value={shipping.landmark}
+                  onChange={e => setShipping({ ...shipping, landmark: e.target.value })}
                 />
 
                 <div className="pt-4 flex justify-end">
@@ -197,14 +197,14 @@ const CheckoutPage = () => {
             <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 md:p-8 shadow-xl">
               <h2 className="text-2xl font-bold text-white mb-6">Payment Method</h2>
               <form onSubmit={handlePaymentSubmit}>
-                
+
                 <div className="space-y-4 mb-8">
                   <label className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'EVC Plus' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5' : 'border-gray-700 bg-[#111] hover:bg-gray-800'}`}>
-                    <input 
-                      type="radio" 
-                      name="paymentMethod" 
-                      value="EVC Plus" 
-                      checked={paymentMethod === 'EVC Plus'} 
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="EVC Plus"
+                      checked={paymentMethod === 'EVC Plus'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="w-5 h-5 accent-[var(--color-primary)]"
                     />
@@ -218,11 +218,11 @@ const CheckoutPage = () => {
                   </label>
 
                   <label className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'Cash on Delivery' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5' : 'border-gray-700 bg-[#111] hover:bg-gray-800'}`}>
-                    <input 
-                      type="radio" 
-                      name="paymentMethod" 
-                      value="Cash on Delivery" 
-                      checked={paymentMethod === 'Cash on Delivery'} 
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="Cash on Delivery"
+                      checked={paymentMethod === 'Cash on Delivery'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="w-5 h-5 accent-[var(--color-primary)]"
                     />
@@ -241,12 +241,12 @@ const CheckoutPage = () => {
                     <h3 className="font-medium text-white mb-4 flex items-center gap-2">
                       <CreditCard className="w-4 h-4 text-gray-400" /> Enter EVC Plus Details
                     </h3>
-                    <Input 
-                      label="Mobile Number" 
-                      placeholder="e.g. 061XXXXXXX" 
+                    <Input
+                      label="Mobile Number"
+                      placeholder="e.g. 061XXXXXXX"
                       type="tel"
-                      required 
-                      value={evcNumber} 
+                      required
+                      value={evcNumber}
                       onChange={(e) => setEvcNumber(e.target.value)}
                     />
                   </div>
@@ -273,7 +273,7 @@ const CheckoutPage = () => {
         <div className="md:col-span-1">
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 sticky top-24">
             <h2 className="text-xl font-bold text-white mb-6 pb-4 border-b border-[var(--color-border)]">Order Summary</h2>
-            
+
             <div className="flex flex-col gap-4 mb-6">
               {cartItems.map(item => (
                 <div key={item._id} className="flex gap-4">

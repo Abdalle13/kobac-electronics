@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, Package, ShoppingBag, LogOut, CheckCircle2, Users, PieChart, DollarSign, Activity, Power, XCircle, Menu } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, ShoppingBag, LogOut, CheckCircle2, Users, PieChart, DollarSign, Settings, Activity, Power, XCircle, Menu } from 'lucide-react';
 import { fetchProducts } from '../redux/slices/productSlice';
 import { listOrders, deliverOrder, payOrderAdmin } from '../redux/slices/orderSlice';
 import api from '../utils/api';
@@ -30,7 +31,8 @@ const AdminDashboard = () => {
     totalOrders: 0,
     totalUsers: 0,
     percentageChange: 0,
-    loading: true
+    loading: true,
+    monthlySales: []
   });
 
   // Form State
@@ -39,6 +41,29 @@ const AdminDashboard = () => {
     ram: '', storage: '', processor: ''
   });
   const [imageFile, setImageFile] = useState(null);
+  const [financeData, setFinanceData] = useState({
+    totalSales: 0,
+    numOrders: 0,
+    evcSales: 0,
+    codSales: 0,
+    salesByDay: {},
+    loading: true
+  });
+  const [profileForm, setProfileForm] = useState({
+    name: userInfo?.name || '',
+    email: userInfo?.email || '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [storeSettings, setStoreSettings] = useState({
+    storeName: '',
+    supportEmail: '',
+    supportPhone: '',
+    freeShippingThreshold: 400,
+    heroBanners: [],
+    loading: true
+  });
+  const [newBanner, setNewBanner] = useState(null);
 
   useEffect(() => {
     // If not admin, redirect
@@ -74,13 +99,23 @@ const AdminDashboard = () => {
       
       const fetchStats = async () => {
         try {
-          const [usersRes] = await Promise.all([
-            api.get('/users')
+          const [usersRes, summaryRes] = await Promise.all([
+            api.get('/users'),
+            api.get('/orders/summary')
           ]);
+
+          // Prepare chart data from salesByDay
+          const chartData = Object.entries(summaryRes.data.salesByDay || {})
+            .map(([date, amount]) => ({
+              date: date.split('/')[0] + '/' + date.split('/')[1], // Short date MM/DD
+              amount: amount
+            }))
+            .slice(-7); // Last 7 data points
 
           setDashboardStats(prev => ({
             ...prev,
             totalUsers: usersRes.data.length,
+            monthlySales: chartData,
             loading: false
           }));
         } catch (error) {
@@ -93,16 +128,17 @@ const AdminDashboard = () => {
   }, [userInfo, dispatch]);
 
   useEffect(() => {
-    if (activeTab === 'users' && userInfo && userInfo.role === 'Admin') {
-      const fetchUsers = async () => {
+    if (activeTab === 'settings' && userInfo && userInfo.role === 'Admin') {
+      const fetchSettings = async () => {
         try {
-          const res = await api.get('/users');
-          setUsersList(res.data);
+          const res = await api.get('/settings');
+          setStoreSettings({ ...res.data, loading: false });
         } catch (error) {
-          console.error('Error fetching users:', error);
+          console.error('Error fetching settings:', error);
+          setStoreSettings(prev => ({ ...prev, loading: false }));
         }
       };
-      fetchUsers();
+      fetchSettings();
     }
   }, [activeTab, userInfo]);
 
@@ -240,22 +276,46 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    if (profileForm.password !== profileForm.confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+    try {
+      const { data } = await api.put('/users/profile', {
+        name: profileForm.name,
+        email: profileForm.email,
+        password: profileForm.password
+      });
+      alert('Profile updated successfully! Some changes may require re-login.');
+      setProfileForm(prev => ({ ...prev, password: '', confirmPassword: '' }));
+    } catch (err) {
+      alert(err.response?.data?.message || err.message);
+    }
+  };
+
   const getTabTitle = () => {
     switch (activeTab) {
       case 'overview': return 'Dashboard Overview';
       case 'products': return 'Manage Products';
       case 'orders': return 'Customer Orders';
       case 'users': return 'Manage Users';
+      case 'finance': return 'Payment Analytics';
+      case 'settings': return 'Dashboard Settings';
       default: return 'Dashboard';
     }
   };
 
   return (
-    <div className="flex flex-col lg:flex-row w-full h-screen overflow-hidden bg-[var(--color-background)]">
+    <div className="flex flex-col lg:flex-row w-full h-screen overflow-hidden bg-[#050505] text-white">
 
-      {/* Mobile Sidebar Toggle */}
-      <div className="lg:hidden h-16 glass border-b border-white/5 flex items-center justify-between px-6 z-[60] shrink-0">
-        <h2 className="text-xl font-black text-white">Admin Pro</h2>
+      {/* Mobile Header */}
+      <div className="lg:hidden h-16 bg-black/60 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-6 z-[80] shrink-0">
+        <div className="flex items-center gap-2">
+           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-black text-black text-xl">K</div>
+           <span className="font-black tracking-tighter text-lg uppercase italic">Kobac</span>
+        </div>
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="p-2 text-gray-400 hover:text-white transition-colors"
@@ -264,54 +324,75 @@ const AdminDashboard = () => {
         </button>
       </div>
 
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[65] transition-opacity duration-500"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar - Premium Glassmorphism */}
       <aside className={`
-        fixed inset-0 z-[50] lg:relative lg:inset-auto lg:z-10
-        w-full sm:w-64 glass border-r-0 lg:border-r border-white/5 
-        flex flex-col transform transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        fixed inset-0 z-[70] lg:relative lg:inset-auto lg:z-10
+        w-full sm:w-72 bg-black/60 backdrop-blur-3xl border-r border-white/5 
+        flex flex-col transform transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
+        ${isSidebarOpen ? 'translate-x-0 opacity-100 pointer-events-auto' : '-translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto'}
       `}>
-        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none rounded-tr-3xl hidden lg:block"></div>
-        <div className="p-6 relative z-10 hidden lg:block">
-          <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-primary mb-1">Admin Pro</h2>
+        {/* Mobile Sidebar Header */}
+        <div className="lg:hidden p-6 flex items-center justify-between border-b border-white/5">
+          <div className="flex items-center gap-3">
+             <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center font-black text-black text-lg">K</div>
+             <span className="font-black tracking-tighter text-lg uppercase italic">Kobac</span>
+          </div>
+          <button onClick={() => setIsSidebarOpen(false)} className="p-2 text-gray-500 hover:text-white">
+             <XCircle size={24} />
+          </button>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2 relative z-10 mt-4">
+        <div className="p-8 hidden lg:block">
+           <div className="flex items-center gap-3 mb-12 group cursor-pointer">
+              <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center font-black text-black text-2xl shadow-2xl shadow-primary/20 group-hover:scale-110 transition-transform">K</div>
+              <div>
+                <h1 className="font-black tracking-tighter text-xl leading-none uppercase italic">Kobac</h1>
+                <p className="text-[10px] text-gray-500 font-bold tracking-[0.2em] uppercase mt-1">Electronics</p>
+              </div>
+            </div>
+        </div>
+
+        <nav className="flex-1 px-6 space-y-1 relative z-10 lg:mt-0 mt-8">
           {[
             { id: 'overview', icon: PieChart, label: 'Overview' },
             { id: 'products', icon: Package, label: 'Products' },
             { id: 'orders', icon: ShoppingBag, label: 'Orders' },
-            { id: 'users', icon: Users, label: 'Users' }
+            { id: 'users', icon: Users, label: 'Users' },
+            { id: 'finance', icon: DollarSign, label: 'Payments' },
+            { id: 'settings', icon: Settings, label: 'Settings' }
           ].map(item => (
             <button
               key={item.id}
               onClick={() => {
                 setActiveTab(item.id);
-                setIsSidebarOpen(false);
+                if (window.innerWidth < 1024) setIsSidebarOpen(false);
               }}
-              className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-300 relative overflow-hidden group ${activeTab === item.id
-                ? 'text-white font-bold'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group ${activeTab === item.id
+                ? 'bg-primary/10 text-primary border border-primary/20'
+                : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
                 }`}
             >
-              {activeTab === item.id && (
-                <div className="absolute inset-0 bg-primary/20 bg-opacity-20 border border-primary/30 rounded-xl"></div>
-              )}
-              {activeTab === item.id && (
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full shadow-[0_0_10px_#0066FF]"></div>
-              )}
-              <item.icon className={`w-5 h-5 relative z-10 ${activeTab === item.id ? 'text-primary' : 'group-hover:scale-110 transition-transform'}`} />
-              <span className="relative z-10 tracking-wide text-sm">{item.label}</span>
+              <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-primary' : 'group-hover:scale-110 transition-transform'}`} />
+              <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
             </button>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-[var(--color-border)]">
+        <div className="p-8">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+            className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500/70 hover:text-red-500 hover:bg-red-500/10 transition-all group border border-transparent hover:border-red-500/20"
           >
-            <LogOut className="w-5 h-5" /> Logout
+            <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-xs font-black uppercase tracking-widest">Logout</span>
           </button>
         </div>
       </aside>
@@ -354,62 +435,133 @@ const AdminDashboard = () => {
               {(dashboardStats.loading || ordersLoading || productsLoading) ? (
                 <div className="flex justify-center py-20 text-gray-500">Loading metrics...</div>
               ) : (
-                <>
+                <div className="px-4 sm:px-0 space-y-6 sm:space-y-8 pb-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* Revenue Card */}
-                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl">
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 blur-3xl group-hover:bg-blue-500/10 transition-colors"></div>
+                      <div className="flex items-center gap-4 mb-4 relative z-10">
+                        <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20">
                           <DollarSign className="w-6 h-6" />
                         </div>
-                        <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Revenue</h3>
+                        <h3 className="text-gray-400 font-semibold tracking-wider text-[10px] uppercase">Total Revenue</h3>
                       </div>
-                      <p className="text-3xl font-black text-white">
-                        {formatCurrency(orders.filter(o => o.status !== 'Cancelled').reduce((acc, o) => acc + o.totalPrice, 0))}
+                      <p className="text-3xl font-black text-white relative z-10">
+                        {formatCurrency(orders.filter(o => o.isPaid).reduce((acc, o) => acc + o.totalPrice, 0))}
                       </p>
                     </div>
 
                     {/* Orders Card */}
-                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="p-3 bg-green-500/10 text-green-400 rounded-xl">
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 blur-3xl group-hover:bg-green-500/10 transition-colors"></div>
+                      <div className="flex items-center gap-4 mb-4 relative z-10">
+                        <div className="p-3 bg-green-500/10 text-green-400 rounded-xl border border-green-500/20">
                           <ShoppingBag className="w-6 h-6" />
                         </div>
-                        <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Orders</h3>
+                        <h3 className="text-gray-400 font-semibold tracking-wider text-[10px] uppercase">Orders</h3>
                       </div>
-                      <p className="text-3xl font-black text-white">{orders.length}</p>
+                      <p className="text-3xl font-black text-white relative z-10">{orders.length}</p>
                     </div>
 
                     {/* Users Card */}
-                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="p-3 bg-purple-500/10 text-purple-400 rounded-xl">
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 blur-3xl group-hover:bg-purple-500/10 transition-colors"></div>
+                      <div className="flex items-center gap-4 mb-4 relative z-10">
+                        <div className="p-3 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20">
                           <Users className="w-6 h-6" />
                         </div>
-                        <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Users</h3>
+                        <h3 className="text-gray-400 font-semibold tracking-wider text-[10px] uppercase">Active Users</h3>
                       </div>
-                      <p className="text-3xl font-black text-white">{dashboardStats.totalUsers}</p>
+                      <p className="text-3xl font-black text-white relative z-10">{dashboardStats.totalUsers}</p>
                     </div>
 
-                    {/* Products Card */}
-                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="p-3 bg-orange-500/10 text-orange-400 rounded-xl">
+                    {/* Catalog Card */}
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 blur-3xl group-hover:bg-orange-500/10 transition-colors"></div>
+                      <div className="flex items-center gap-4 mb-4 relative z-10">
+                        <div className="p-3 bg-orange-500/10 text-orange-400 rounded-xl border border-orange-500/20">
                           <Package className="w-6 h-6" />
                         </div>
-                        <h3 className="text-gray-400 font-semibold tracking-wider text-xs uppercase">Products</h3>
+                        <h3 className="text-gray-400 font-semibold tracking-wider text-[10px] uppercase">Products</h3>
                       </div>
-                      <p className="text-3xl font-black text-white">{products.length}</p>
+                      <p className="text-3xl font-black text-white relative z-10">{products.length}</p>
+                    </div>
+                  </div>
+
+                  {/* Revenue Chart */}
+                  <div className="glass border border-white/5 sm:rounded-3xl rounded-none -mx-4 sm:mx-0 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-3xl pointer-events-none"></div>
+                    <div className="flex justify-between items-center mb-8 relative z-10">
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-black text-white tracking-tighter uppercase italic">Monthly Revenue</h3>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest mt-1">Sales performance over time</p>
+                      </div>
+                      <div className="flex items-center gap-2 text-primary bg-primary/5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-primary/10">
+                        <Activity size={14} className="sm:w-4 sm:h-4" />
+                        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest">Live Growth</span>
+                      </div>
+                    </div>
+                    
+                    <div className="h-[250px] sm:h-[350px] w-full relative z-10">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={dashboardStats.monthlySales.length > 0 ? dashboardStats.monthlySales : [{date: 'No Data', amount: 0}]}>
+                          <defs>
+                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                          <XAxis 
+                            dataKey="date" 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fill: '#4b5563', fontSize: 10, fontWeight: 800 }}
+                            dy={15}
+                          />
+                          <YAxis 
+                            hide 
+                            domain={['auto', 'auto']}
+                          />
+                          <Tooltip 
+                            cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 2 }}
+                            contentStyle={{ 
+                              backgroundColor: 'rgba(5, 5, 5, 0.95)', 
+                              border: '1px solid rgba(255,255,255,0.05)',
+                              borderRadius: '16px',
+                              backdropFilter: 'blur(20px)',
+                              boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+                              padding: '12px'
+                            }}
+                            itemStyle={{ color: '#fff', fontSize: '14px', fontWeight: 900 }}
+                            labelStyle={{ color: '#9ca3af', fontSize: '10px', marginBottom: '6px', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '2px' }}
+                            formatter={(value) => [formatCurrency(value), 'Revenue']}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="amount" 
+                            stroke="#3b82f6" 
+                            strokeWidth={3}
+                            fillOpacity={1} 
+                            fill="url(#colorRevenue)" 
+                            animationDuration={2500}
+                            activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#050505' }}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
 
                   {/* Recent Transactions */}
-                  <div className="glass border border-white/5 rounded-2xl p-8 shadow-2xl">
-                    <div className="flex justify-between items-center mb-8">
-                      <h3 className="text-lg font-black text-white tracking-tight">Recent Transactions</h3>
-                      <button onClick={() => setActiveTab('orders')} className="text-primary text-xs font-bold uppercase tracking-widest hover:underline">View All</button>
+                  <div className="glass border border-white/5 sm:rounded-3xl rounded-none -mx-4 sm:mx-0 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                    <div className="flex justify-between items-center mb-8 relative z-10">
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-black text-white tracking-tighter uppercase italic">Recent Transactions</h3>
+                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest mt-1">Latest Store Activity</p>
+                      </div>
+                      <button onClick={() => setActiveTab('orders')} className="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-primary text-[10px] font-black uppercase tracking-widest transition-colors border border-white/5">View All</button>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto relative z-10">
                       <table className="w-full text-left">
                         <thead className="text-gray-500 text-[10px] uppercase tracking-widest font-black">
                           <tr className="border-b border-white/5">
@@ -420,15 +572,22 @@ const AdminDashboard = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
-                          {orders.slice(0, 8).map(o => (
-                            <tr key={o._id} className="hover:bg-white/[0.02] transition-colors">
+                          {orders.slice(0, 5).map(o => (
+                            <tr key={o._id} className="hover:bg-white/[0.02] transition-colors group">
                               <td className="py-4">
-                                <p className="text-sm text-white font-bold">{o.user?.name || 'Guest'}</p>
-                                <p className="text-[10px] text-gray-500">{o.user?.email}</p>
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-white transition-colors border border-white/10">
+                                    {o.user?.name?.charAt(0) || 'G'}
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-white font-black">{o.user?.name || 'Guest'}</p>
+                                    <p className="text-[9px] text-gray-500 tracking-wider uppercase">{o._id.substring(0, 8)}</p>
+                                  </div>
+                                </div>
                               </td>
-                              <td className="py-4 text-sm text-white font-black">{formatCurrency(o.totalPrice)}</td>
+                              <td className="py-4 text-xs text-white font-black">{formatCurrency(o.totalPrice)}</td>
                               <td className="py-4">
-                                <Badge variant={o.isPaid ? 'success' : 'neutral'} className="text-[9px] px-3 py-1 font-black">
+                                <Badge variant={o.isPaid ? 'success' : 'neutral'} className="text-[8px] px-2.5 py-1 font-black tracking-widest">
                                   {o.isPaid ? 'PAID' : 'PENDING'}
                                 </Badge>
                               </td>
@@ -441,7 +600,7 @@ const AdminDashboard = () => {
                       </table>
                     </div>
                   </div>
-                </>
+                </div>
               )}
             </div>
           )}
@@ -493,15 +652,15 @@ const AdminDashboard = () => {
                           </Badge>
                         </td>
                         <td className="p-4 text-right space-x-2">
-                          <button onClick={() => openEditModal(product)} className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors">
+                          <button onClick={() => openEditModal(product)} className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors" title="Edit Product">
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleToggleProductStatus(product._id)}
-                            className={`p-2 rounded-lg transition-colors ${product.status === 'Active' ? 'text-red-400 hover:bg-red-400/10' : 'text-green-400 hover:bg-green-400/10'}`}
-                            title={product.status === 'Active' ? 'Archive Product' : 'Restore Product'}
+                            onClick={() => handleDelete(product._id)}
+                            className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                            title="Delete Product"
                           >
-                            {product.status === 'Active' ? <Trash2 className="w-4 h-4" /> : <Power className="w-4 h-4" />}
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </td>
                       </tr>
@@ -589,7 +748,7 @@ const AdminDashboard = () => {
                   </thead>
                   <tbody className="divide-y divide-[var(--color-border)]">
                     {usersList.length === 0 ? (
-                      <tr><td colSpan="4" className="p-8 text-center text-gray-500">Loading...</td></tr>
+                      <tr><td colSpan="5" className="p-8 text-center text-gray-500">Loading...</td></tr>
                     ) : usersList.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase())).map(user => (
                       <tr key={user._id} className="hover:bg-[#111] transition-colors">
                         <td className="p-4 flex items-center gap-3">
@@ -623,6 +782,225 @@ const AdminDashboard = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'finance' && (
+            <div className="space-y-8">
+              {financeData.loading ? (
+                <div className="flex justify-center py-20 text-gray-500">Calculating financials...</div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl bg-gradient-to-br from-blue-600/10 to-transparent">
+                      <p className="text-gray-500 text-xs font-black uppercase tracking-widest mb-2">Total Paid Sales</p>
+                      <p className="text-4xl font-black text-white">{formatCurrency(financeData.totalSales)}</p>
+                      <p className="text-[10px] text-blue-400 mt-2 font-bold uppercase tracking-wider">From {financeData.numOrders} Orders</p>
+                    </div>
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
+                      <p className="text-gray-500 text-xs font-black uppercase tracking-widest mb-2">EVC Plus Sales</p>
+                      <p className="text-3xl font-black text-blue-400">{formatCurrency(financeData.evcSales)}</p>
+                      <div className="w-full bg-white/5 h-1.5 rounded-full mt-4 overflow-hidden">
+                         <div className="bg-blue-400 h-full rounded-full" style={{ width: `${(financeData.evcSales / (financeData.totalSales || 1)) * 100}%` }}></div>
+                      </div>
+                    </div>
+                    <div className="glass border border-white/5 rounded-2xl p-6 shadow-2xl">
+                      <p className="text-gray-500 text-xs font-black uppercase tracking-widest mb-2">Cash on Delivery</p>
+                      <p className="text-3xl font-black text-green-400">{formatCurrency(financeData.codSales)}</p>
+                      <div className="w-full bg-white/5 h-1.5 rounded-full mt-4 overflow-hidden">
+                         <div className="bg-green-400 h-full rounded-full" style={{ width: `${(financeData.codSales / (financeData.totalSales || 1)) * 100}%` }}></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="glass border border-white/5 rounded-2xl p-8 shadow-2xl">
+                    <h3 className="text-lg font-black text-white mb-6 tracking-tight">Sales History (Paid)</h3>
+                    <div className="space-y-4">
+                      {Object.keys(financeData.salesByDay).length === 0 ? (
+                        <p className="text-gray-500 text-sm italic">No sales history yet.</p>
+                      ) : Object.entries(financeData.salesByDay).map(([date, amount]) => (
+                        <div key={date} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
+                              {date.split('/')[0]}/{date.split('/')[1]}
+                            </div>
+                            <span className="text-gray-300 font-bold text-sm">{date}</span>
+                          </div>
+                          <span className="text-white font-black">{formatCurrency(amount)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="max-w-4xl mx-auto space-y-8">
+              {/* Store Configuration Card */}
+              <div className="glass border border-white/5 rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+                <div className="mb-8 border-b border-white/5 pb-6">
+                  <h3 className="text-xl font-black text-white mb-2">Store Configuration</h3>
+                  <p className="text-gray-500 text-sm">Global settings for your shop identity and shipping.</p>
+                </div>
+
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <Input 
+                      label="Store Name" 
+                      value={storeSettings.storeName} 
+                      onChange={e => setStoreSettings({...storeSettings, storeName: e.target.value})}
+                      placeholder="e.g. Kobac Electronics"
+                    />
+                    <Input 
+                      label="Free Shipping Threshold ($)" 
+                      type="number"
+                      value={storeSettings.freeShippingThreshold} 
+                      onChange={e => setStoreSettings({...storeSettings, freeShippingThreshold: Number(e.target.value)})}
+                      placeholder="e.g. 400"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <Input 
+                      label="Support Email" 
+                      type="email"
+                      value={storeSettings.supportEmail} 
+                      onChange={e => setStoreSettings({...storeSettings, supportEmail: e.target.value})}
+                      placeholder="support@kobac.com"
+                    />
+                    <Input 
+                      label="Support Phone" 
+                      value={storeSettings.supportPhone} 
+                      onChange={e => setStoreSettings({...storeSettings, supportPhone: e.target.value})}
+                      placeholder="+252 61 XXXXXXX"
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={async () => {
+                        try {
+                          await api.put('/settings', storeSettings);
+                          alert('Store settings saved!');
+                        } catch (err) { alert(err.message); }
+                      }}
+                      className="px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs"
+                    >
+                      Save Store Info
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Banner Management */}
+              <div className="glass border border-white/5 rounded-3xl p-8 sm:p-10 shadow-2xl">
+                <h3 className="text-xl font-black text-white mb-6">Home Page Banners</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                   {storeSettings.heroBanners.map((banner, idx) => (
+                     <div key={idx} className="relative group rounded-xl overflow-hidden aspect-video border border-white/10">
+                        <img src={banner} className="w-full h-full object-cover" alt="Banner" />
+                        <button 
+                          onClick={() => {
+                            const newBanners = storeSettings.heroBanners.filter((_, i) => i !== idx);
+                            setStoreSettings({...storeSettings, heroBanners: newBanners});
+                          }}
+                          className="absolute top-2 right-2 bg-red-500 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 size={16} className="text-white" />
+                        </button>
+                     </div>
+                   ))}
+                   <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-xl aspect-video bg-white/[0.02]">
+                      <input 
+                        type="file" 
+                        id="banner-upload" 
+                        hidden 
+                        onChange={async (e) => {
+                          const file = e.target.files[0];
+                          if(file) {
+                            const formData = new FormData();
+                            formData.append('image', file);
+                            const res = await api.post('/upload', formData);
+                            setStoreSettings({...storeSettings, heroBanners: [...storeSettings.heroBanners, res.data]});
+                          }
+                        }}
+                      />
+                      <label htmlFor="banner-upload" className="cursor-pointer flex flex-col items-center">
+                         <Plus className="text-gray-500 mb-2" />
+                         <span className="text-gray-500 text-xs font-bold uppercase tracking-widest">Add Banner</span>
+                      </label>
+                   </div>
+                </div>
+                <div className="flex justify-end pt-4 border-t border-white/5">
+                   <Button 
+                    onClick={async () => {
+                      try {
+                        await api.put('/settings', storeSettings);
+                        alert('Banners updated successfully!');
+                      } catch (err) { alert(err.message); }
+                    }}
+                    className="px-8"
+                   >
+                     Apply Banners
+                   </Button>
+                </div>
+              </div>
+
+              {/* Profile Card */}
+              <div className="glass border border-white/5 rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl pointer-events-none rounded-full"></div>
+                <div className="mb-8 border-b border-white/5 pb-6">
+                  <h3 className="text-xl font-black text-white mb-2">Admin Profile Settings</h3>
+                  <p className="text-gray-500 text-sm">Manage your personal admin account details and security.</p>
+                </div>
+
+                <form onSubmit={handleUpdateProfile} className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <Input 
+                      label="Full Name" 
+                      value={profileForm.name} 
+                      onChange={e => setProfileForm({...profileForm, name: e.target.value})}
+                      placeholder="Admin Name"
+                    />
+                    <Input 
+                      label="Email Address" 
+                      type="email"
+                      value={profileForm.email} 
+                      onChange={e => setProfileForm({...profileForm, email: e.target.value})}
+                      placeholder="admin@kobac.com"
+                    />
+                  </div>
+
+                  <div className="space-y-6 pt-4">
+                    <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                       <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Security Update</p>
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Input 
+                          label="New Password" 
+                          type="password"
+                          value={profileForm.password} 
+                          onChange={e => setProfileForm({...profileForm, password: e.target.value})}
+                          placeholder="••••••••"
+                        />
+                        <Input 
+                          label="Confirm Password" 
+                          type="password"
+                          value={profileForm.confirmPassword} 
+                          onChange={e => setProfileForm({...profileForm, confirmPassword: e.target.value})}
+                          placeholder="••••••••"
+                        />
+                       </div>
+                       <p className="text-[10px] text-gray-500 mt-2">Leave blank if you don't want to change the password.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-6">
+                    <Button type="submit" className="px-10 py-4 h-auto text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20">
+                      Save Profile Changes
+                    </Button>
+                  </div>
+                </form>
               </div>
             </div>
           )}

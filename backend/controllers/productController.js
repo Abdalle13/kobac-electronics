@@ -106,4 +106,22 @@ const updateProduct = async (req, res) => {
   }
 };
 
-export { getProducts, getProductById, createProduct, toggleProductStatus, updateProduct };
+// @desc    Delete a product
+// @route   DELETE /api/products/:id
+// @access  Private/Admin
+const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (product) {
+      await product.deleteOne();
+      res.json({ message: 'Product removed' });
+    } else {
+      res.status(404).json({ message: 'Product not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: Unable to delete product', error: error.message });
+  }
+};
+
+export { getProducts, getProductById, createProduct, toggleProductStatus, updateProduct, deleteProduct };
