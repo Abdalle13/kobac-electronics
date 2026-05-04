@@ -601,54 +601,7 @@ const AdminDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Recent Transactions */}
-                  <div className="glass border border-white/5 sm:rounded-3xl rounded-none -mx-4 sm:mx-0 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-                    <div className="flex justify-between items-center mb-8 relative z-10">
-                      <div>
-                        <h3 className="text-lg sm:text-xl font-black text-white tracking-tighter uppercase italic">Recent Transactions</h3>
-                        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest mt-1">Latest Store Activity</p>
-                      </div>
-                      <button onClick={() => setActiveTab('orders')} className="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-primary text-[10px] font-black uppercase tracking-widest transition-colors border border-white/5">View All</button>
-                    </div>
-                    <div className="overflow-x-auto relative z-10">
-                      <table className="w-full text-left">
-                        <thead className="text-gray-500 text-[10px] uppercase tracking-widest font-black">
-                          <tr className="border-b border-white/5">
-                            <th className="pb-4">Customer</th>
-                            <th className="pb-4">Amount</th>
-                            <th className="pb-4">Status</th>
-                            <th className="pb-4 text-right">Date</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                          {orders.slice(0, 5).map(o => (
-                            <tr key={o._id} className="hover:bg-white/[0.02] transition-colors group">
-                              <td className="py-4">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-white transition-colors border border-white/10">
-                                    {o.user?.name?.charAt(0) || 'G'}
-                                  </div>
-                                  <div>
-                                    <p className="text-xs text-white font-black">{o.user?.name || 'Guest'}</p>
-                                    <p className="text-[9px] text-gray-500 tracking-wider uppercase">{o._id.substring(0, 8)}</p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="py-4 text-xs text-white font-black">{formatCurrency(o.totalPrice)}</td>
-                              <td className="py-4">
-                                <Badge variant={o.isPaid ? 'success' : 'neutral'} className="text-[8px] px-2.5 py-1 font-black tracking-widest">
-                                  {o.isPaid ? 'PAID' : 'PENDING'}
-                                </Badge>
-                              </td>
-                              <td className="py-4 text-right text-[10px] text-gray-500 font-bold">
-                                {new Date(o.createdAt).toLocaleDateString()}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+
                 </div>
               )}
             </div>
