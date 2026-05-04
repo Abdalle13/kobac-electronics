@@ -19,11 +19,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+  origin: true, // Allow all origins to resolve issues across different devices/URLs
   credentials: true
 }));
 app.use(express.json({ limit: '20mb' }));
