@@ -12,6 +12,21 @@ import Badge from '../components/ui/Badge';
 import { logout } from '../redux/slices/authSlice';
 import { formatCurrency } from '../utils/formatter';
 
+const MOCK_MONTHLY_DATA = [
+  { date: 'Jan', amount: 4200 },
+  { date: 'Feb', amount: 6800 },
+  { date: 'Mar', amount: 5100 },
+  { date: 'Apr', amount: 9400 },
+  { date: 'May', amount: 7200 },
+  { date: 'Jun', amount: 11500 },
+  { date: 'Jul', amount: 8900 },
+  { date: 'Aug', amount: 13200 },
+  { date: 'Sep', amount: 10600 },
+  { date: 'Oct', amount: 15800 },
+  { date: 'Nov', amount: 12400 },
+  { date: 'Dec', amount: 18900 },
+];
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -312,90 +327,106 @@ const AdminDashboard = () => {
 
       {/* Mobile Header */}
       <div className="lg:hidden h-16 bg-black/60 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-6 z-[80] shrink-0">
-        <div className="flex items-center gap-2">
-           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-black text-black text-xl">K</div>
-           <span className="font-black tracking-tighter text-lg uppercase italic">Kobac</span>
+        <div className="flex items-center gap-2.5">
+          <span className="text-base font-black tracking-tighter text-white">KOBAC <span className="text-primary">Electronics</span></span>
         </div>
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-2 text-gray-400 hover:text-white transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/[0.06] text-gray-400 hover:text-white transition-colors"
         >
-          {isSidebarOpen ? <XCircle size={24} /> : <Menu size={24} />}
+          {isSidebarOpen ? <XCircle size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
       {/* Mobile Overlay */}
       {isSidebarOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[65] transition-opacity duration-500"
+        <div
+          className="lg:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[65]"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar - Premium Glassmorphism */}
+      {/* Sidebar */}
       <aside className={`
-        fixed inset-0 z-[70] lg:relative lg:inset-auto lg:z-10
-        w-full sm:w-72 bg-black/60 backdrop-blur-3xl border-r border-white/5 
-        flex flex-col transform transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
-        ${isSidebarOpen ? 'translate-x-0 opacity-100 pointer-events-auto' : '-translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto'}
+        fixed inset-y-0 left-0 z-[70] lg:relative lg:inset-auto lg:z-10
+        w-72 bg-[#080809]/95 backdrop-blur-3xl border-r border-white/[0.06]
+        flex flex-col transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
+        ${isSidebarOpen ? 'translate-x-0 opacity-100 pointer-events-auto' : '-translate-x-full lg:translate-x-0 opacity-100 pointer-events-none lg:pointer-events-auto'}
       `}>
-        {/* Mobile Sidebar Header */}
-        <div className="lg:hidden p-6 flex items-center justify-between border-b border-white/5">
-          <div className="flex items-center gap-3">
-             <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center font-black text-black text-lg">K</div>
-             <span className="font-black tracking-tighter text-lg uppercase italic">Kobac</span>
+
+        {/* Brand — aligned with header */}
+        <div className="h-16 lg:h-20 px-6 flex items-center justify-between border-b border-white/[0.06] shrink-0">
+          <div>
+            <span className="text-lg font-black tracking-tighter text-white">KOBAC <span className="text-primary">Electronics</span></span>
+            <p className="text-[10px] text-gray-500 font-bold tracking-[0.25em] uppercase mt-0.5">Admin Suite</p>
           </div>
-          <button onClick={() => setIsSidebarOpen(false)} className="p-2 text-gray-500 hover:text-white">
-             <XCircle size={24} />
+          <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] text-gray-500 hover:text-white transition-all">
+            <XCircle size={18} />
           </button>
         </div>
 
-        <div className="p-8 hidden lg:block">
-           <div className="flex items-center gap-3 mb-12 group cursor-pointer">
-              <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center font-black text-black text-2xl shadow-2xl shadow-primary/20 group-hover:scale-110 transition-transform">K</div>
-              <div>
-                <h1 className="font-black tracking-tighter text-xl leading-none uppercase italic">Kobac</h1>
-                <p className="text-[10px] text-gray-500 font-bold tracking-[0.2em] uppercase mt-1">Electronics</p>
-              </div>
-            </div>
+        {/* Nav Links — evenly spaced */}
+        <div className="flex-1 flex flex-col justify-evenly overflow-y-auto px-4 py-4">
+          <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] mb-2 px-2">Navigation</p>
+          <nav className="flex flex-col gap-1">
+            {[
+              { id: 'overview', icon: PieChart,    label: 'Overview' },
+              { id: 'products', icon: Package,     label: 'Products' },
+              { id: 'orders',   icon: ShoppingBag, label: 'Orders'   },
+              { id: 'users',    icon: Users,        label: 'Users'    },
+              { id: 'finance',  icon: DollarSign,  label: 'Payments' },
+              { id: 'settings', icon: Settings,    label: 'Settings' },
+            ].map(item => (
+              <button
+                key={item.id}
+                onClick={() => { setActiveTab(item.id); if (window.innerWidth < 1024) setIsSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3.5 px-3 py-3 rounded-2xl transition-all duration-200 group ${
+                  activeTab === item.id
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'text-gray-500 hover:text-white hover:bg-white/[0.04] border border-transparent'
+                }`}
+              >
+                <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                  activeTab === item.id ? 'bg-primary/15' : 'bg-white/[0.05] group-hover:bg-primary/10'
+                }`}>
+                  <item.icon className={`w-4 h-4 ${activeTab === item.id ? 'text-primary' : 'text-gray-500 group-hover:text-primary'}`} />
+                </span>
+                <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
+              </button>
+            ))}
+          </nav>
         </div>
 
-        <nav className="flex-1 px-6 space-y-1 relative z-10 lg:mt-0 mt-8">
-          {[
-            { id: 'overview', icon: PieChart, label: 'Overview' },
-            { id: 'products', icon: Package, label: 'Products' },
-            { id: 'orders', icon: ShoppingBag, label: 'Orders' },
-            { id: 'users', icon: Users, label: 'Users' },
-            { id: 'finance', icon: DollarSign, label: 'Payments' },
-            { id: 'settings', icon: Settings, label: 'Settings' }
-          ].map(item => (
-            <button
-              key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
-              }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group ${activeTab === item.id
-                ? 'bg-primary/10 text-primary border border-primary/20'
-                : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
-                }`}
-            >
-              <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-primary' : 'group-hover:scale-110 transition-transform'}`} />
-              <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
-            </button>
-          ))}
-        </nav>
+        {/* Mobile only — name/email card */}
+        <div className="lg:hidden px-4 pb-3 shrink-0">
+          <div className="flex items-center gap-3 bg-white/[0.04] border border-white/[0.07] rounded-2xl px-4 py-3">
+            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-black text-sm shadow-lg shadow-primary/25 shrink-0 overflow-hidden">
+              {userInfo?.image
+                ? <img src={userInfo.image} alt={userInfo.name} className="w-full h-full object-cover" />
+                : userInfo?.name?.charAt(0).toUpperCase() || 'A'}
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-sm font-bold text-white truncate">{userInfo?.name || 'Admin'}</p>
+              <p className="text-xs text-gray-500 truncate">{userInfo?.email || ''}</p>
+            </div>
+          </div>
+        </div>
 
-        <div className="p-8">
+        {/* Logout — pinned at bottom */}
+        <div className="px-4 pb-5 pt-2 border-t border-white/[0.06] shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500/70 hover:text-red-500 hover:bg-red-500/10 transition-all group border border-transparent hover:border-red-500/20"
+            className="w-full flex items-center gap-3.5 px-3 py-3 rounded-2xl transition-all duration-200 group text-red-500/60 hover:text-red-400 hover:bg-red-500/[0.07] border border-transparent hover:border-red-500/10"
           >
-            <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-white/[0.05] group-hover:bg-red-500/10 transition-colors">
+              <LogOut className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            </span>
             <span className="text-xs font-black uppercase tracking-widest">Logout</span>
           </button>
         </div>
       </aside>
+
+
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
@@ -502,50 +533,58 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                     
-                    <div className="h-[250px] sm:h-[350px] w-full relative z-10">
+                    <div className="h-[260px] sm:h-[360px] w-full relative z-10">
                       <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={dashboardStats.monthlySales.length > 0 ? dashboardStats.monthlySales : [{date: 'No Data', amount: 0}]}>
+                        <AreaChart
+                          data={dashboardStats.monthlySales.length > 0 ? dashboardStats.monthlySales : MOCK_MONTHLY_DATA}
+                          margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+                        >
                           <defs>
                             <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35}/>
                               <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
-                          <XAxis 
-                            dataKey="date" 
-                            axisLine={false} 
-                            tickLine={false} 
-                            tick={{ fill: '#4b5563', fontSize: 10, fontWeight: 800 }}
-                            dy={15}
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                          <XAxis
+                            dataKey="date"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: '#6b7280', fontSize: 10, fontWeight: 700 }}
+                            dy={12}
                           />
-                          <YAxis 
-                            hide 
+                          <YAxis
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: '#4b5563', fontSize: 9, fontWeight: 700 }}
+                            tickFormatter={(v) => `$${v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v}`}
+                            width={38}
                             domain={['auto', 'auto']}
                           />
-                          <Tooltip 
-                            cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 2 }}
-                            contentStyle={{ 
-                              backgroundColor: 'rgba(5, 5, 5, 0.95)', 
-                              border: '1px solid rgba(255,255,255,0.05)',
+                          <Tooltip
+                            cursor={{ stroke: 'rgba(59,130,246,0.15)', strokeWidth: 2 }}
+                            contentStyle={{
+                              backgroundColor: 'rgba(5,5,5,0.97)',
+                              border: '1px solid rgba(59,130,246,0.15)',
                               borderRadius: '16px',
                               backdropFilter: 'blur(20px)',
-                              boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
-                              padding: '12px'
+                              boxShadow: '0 20px 50px rgba(0,0,0,0.7)',
+                              padding: '12px 16px'
                             }}
-                            itemStyle={{ color: '#fff', fontSize: '14px', fontWeight: 900 }}
+                            itemStyle={{ color: '#fff', fontSize: '13px', fontWeight: 900 }}
                             labelStyle={{ color: '#9ca3af', fontSize: '10px', marginBottom: '6px', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '2px' }}
                             formatter={(value) => [formatCurrency(value), 'Revenue']}
                           />
-                          <Area 
-                            type="monotone" 
-                            dataKey="amount" 
-                            stroke="#3b82f6" 
-                            strokeWidth={3}
-                            fillOpacity={1} 
-                            fill="url(#colorRevenue)" 
-                            animationDuration={2500}
-                            activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#050505' }}
+                          <Area
+                            type="monotone"
+                            dataKey="amount"
+                            stroke="#3b82f6"
+                            strokeWidth={2.5}
+                            fillOpacity={1}
+                            fill="url(#colorRevenue)"
+                            animationDuration={2000}
+                            dot={false}
+                            activeDot={{ r: 5, stroke: '#3b82f6', strokeWidth: 2, fill: '#050505' }}
                           />
                         </AreaChart>
                       </ResponsiveContainer>
