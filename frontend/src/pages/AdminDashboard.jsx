@@ -133,9 +133,19 @@ const AdminDashboard = () => {
             monthlySales: chartData,
             loading: false
           }));
+
+          setFinanceData({
+            totalSales: summaryRes.data.totalSales || 0,
+            numOrders: summaryRes.data.numOrders || 0,
+            evcSales: summaryRes.data.evcSales || 0,
+            codSales: summaryRes.data.codSales || 0,
+            salesByDay: summaryRes.data.salesByDay || {},
+            loading: false
+          });
         } catch (error) {
           console.error('Error fetching stats:', error);
           setDashboardStats(prev => ({ ...prev, loading: false }));
+          setFinanceData(prev => ({ ...prev, loading: false }));
         }
       };
       fetchStats();
