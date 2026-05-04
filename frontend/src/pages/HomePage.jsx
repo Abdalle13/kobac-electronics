@@ -86,11 +86,13 @@ const HomePage = () => {
                   Explore Shop <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
-              <Link to="/register" className="w-full xs:w-auto">
-                <Button variant="ghost" className="w-full xs:w-auto px-10 py-4 text-xs font-black uppercase tracking-widest text-white border border-white/10 rounded-2xl hover:bg-white/5 backdrop-blur-md">
-                  Start Your Journey
-                </Button>
-              </Link>
+              {!userInfo && (
+                <Link to="/register" className="w-full xs:w-auto">
+                  <Button variant="ghost" className="w-full xs:w-auto px-10 py-4 text-xs font-black uppercase tracking-widest text-white border border-white/10 rounded-2xl hover:bg-white/5 backdrop-blur-md">
+                    Start Your Journey
+                  </Button>
+                </Link>
+              )}
             </div>
           </motion.div>
         </div>
