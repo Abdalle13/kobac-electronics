@@ -13,6 +13,7 @@ import RegisterPage from './pages/RegisterPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import ContactPage from './pages/ContactPage';
+import AboutPage from './pages/AboutPage';
 import { Toaster } from 'react-hot-toast';
 import PrivateRoute from './components/routing/PrivateRoute';
 import AdminRoute from './components/routing/AdminRoute';
@@ -61,6 +62,7 @@ const AppContent = () => {
           <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           
           {/* Private Routes */}

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ShoppingCart, User, Search, Menu, LogOut,
-  Package, ShieldCheck, Zap, X, Mail, Home, Store
+  Package, ShieldCheck, Zap, X, Mail, Home, Store, Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CartDrawer from './CartDrawer';
@@ -39,6 +39,7 @@ const Navbar = () => {
 
   const NAV_LINKS = [
     { to: '/', icon: Home, label: 'HOME' },
+    { to: '/about', icon: Info, label: 'ABOUT' },
     { to: '/shop', icon: Store, label: 'SHOP' },
     { to: '/contact', icon: Mail, label: 'SUPPORT' },
     ...(userInfo ? [{ to: '/my-orders', icon: Package, label: 'ORDERS' }] : []),
@@ -71,6 +72,7 @@ const Navbar = () => {
             ) : (
               <>
                 <Link to="/" className="hover:text-white transition-colors">Home</Link>
+                <Link to="/about" className="hover:text-white transition-colors">About</Link>
                 <Link to="/shop" className="hover:text-white transition-colors">Shop</Link>
                 <Link to="/contact" className="hover:text-white transition-colors">Support</Link>
                 {userInfo && <Link to="/my-orders" className="hover:text-white transition-colors">Orders</Link>}
