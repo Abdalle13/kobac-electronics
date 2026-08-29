@@ -66,11 +66,20 @@
    ```
 
 ### Seeding Data
-To populate the database with initial products and an admin user:
+To populate the database with sample products and two accounts:
 ```bash
 cd backend
 npm run data:import
 ```
+
+Seeded logins:
+
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| Admin | `admin@kobac.com` | `password123` |
+| Customer | `customer@test.com` | `password123` |
+
+Run `npm run data:destroy` to wipe the seeded data.
 
 ---
 

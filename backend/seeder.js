@@ -34,6 +34,10 @@ const importData = async () => {
     await Product.insertMany(sampleProducts);
 
     console.log('Data Imported!'.green.inverse);
+    console.log('');
+    console.log('  Admin login:    admin@kobac.com / password123'.cyan);
+    console.log('  Customer login: customer@test.com / password123'.cyan);
+    console.log('');
     process.exit();
   } catch (error) {
     console.error(`${error}`.red.inverse);
