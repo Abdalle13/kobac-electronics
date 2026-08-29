@@ -140,8 +140,8 @@ const Navbar = () => {
                   onClick={() => setIsUserMenuOpen((o) => !o)}
                   className="flex items-center gap-2 bg-surface border border-line rounded-full pl-1.5 pr-3 py-1.5 hover:bg-surface-2 transition-all ml-1"
                 >
-                  <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-[11px] font-bold text-on-primary overflow-hidden">
-                    {userInfo.image ? <img src={userInfo.image} alt={userInfo.name} className="w-full h-full object-cover" /> : userInfo.name.charAt(0).toUpperCase()}
+                  <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-[11px] font-bold text-on-primary">
+                    {userInfo.name.charAt(0).toUpperCase()}
                   </div>
                   <span className="text-xs font-medium text-muted max-w-[80px] truncate">{userInfo.name.split(' ')[0]}</span>
                 </button>

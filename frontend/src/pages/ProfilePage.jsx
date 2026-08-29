@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { Camera, Loader2 } from 'lucide-react';
 import { updateUserProfile } from '../redux/slices/authSlice';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import api from '../utils/api';
 
 const Card = ({ title, subtitle, children }) => (
   <div className="bg-surface border border-line rounded-2xl p-5 sm:p-7">
@@ -21,22 +19,11 @@ const ProfilePage = () => {
   const dispatch = useDispatch();
   const { userInfo, loading } = useSelector((s) => s.auth);
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [image, setImage] = useState('');
-  const [uploading, setUploading] = useState(false);
-
+  const [name, setName] = useState(userInfo?.name || '');
+  const [email, setEmail] = useState(userInfo?.email || '');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [savingPw, setSavingPw] = useState(false);
-
-  useEffect(() => {
-    if (userInfo) {
-      setName(userInfo.name || '');
-      setEmail(userInfo.email || '');
-      setImage(userInfo.image || '');
-    }
-  }, [userInfo]);
 
   const save = async (payload, onDone) => {
     try {
@@ -50,7 +37,7 @@ const ProfilePage = () => {
 
   const saveAccount = (e) => {
     e.preventDefault();
-    save({ name, email, image });
+    save({ name, email });
   };
 
   const savePassword = async (e) => {
@@ -58,28 +45,11 @@ const ProfilePage = () => {
     if (password.length < 6) return toast.error('Password must be at least 6 characters');
     if (password !== confirmPassword) return toast.error('Passwords do not match');
     setSavingPw(true);
-    await save({ name, email, image, password }, () => {
+    await save({ name, email, password }, () => {
       setPassword('');
       setConfirmPassword('');
     });
     setSavingPw(false);
-  };
-
-  const uploadImage = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const fd = new FormData();
-      fd.append('image', file);
-      const { data } = await api.post('/upload', fd);
-      setImage(data);
-      await save({ name, email, image: data });
-    } catch (err) {
-      toast.error(err.response?.data?.message || err.message);
-    } finally {
-      setUploading(false);
-    }
   };
 
   return (
@@ -88,18 +58,8 @@ const ProfilePage = () => {
 
       {/* Identity header */}
       <div className="bg-surface border border-line rounded-2xl p-5 sm:p-7 flex items-center gap-4">
-        <div className="relative shrink-0">
-          <div className="w-16 h-16 rounded-full overflow-hidden bg-primary flex items-center justify-center text-on-primary text-2xl font-bold">
-            {image ? <img src={image} alt={name} className="w-full h-full object-cover" /> : name.charAt(0).toUpperCase()}
-          </div>
-          <label
-            htmlFor="avatar"
-            className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-canvas border border-line flex items-center justify-center cursor-pointer hover:border-primary transition-colors"
-            title="Change photo"
-          >
-            {uploading ? <Loader2 size={13} className="animate-spin text-primary" /> : <Camera size={13} className="text-muted" />}
-            <input id="avatar" type="file" accept="image/*" className="hidden" onChange={uploadImage} />
-          </label>
+        <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-on-primary text-xl font-bold shrink-0">
+          {name.charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-fg truncate">{name}</p>

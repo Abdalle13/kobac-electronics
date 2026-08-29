@@ -53,10 +53,8 @@ const AdminSidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen, userInfo, on
 
       <div className="px-3 pb-3 shrink-0">
         <div className="flex items-center gap-3 bg-surface-2 border border-line rounded-xl px-3 py-2.5">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-semibold text-sm shrink-0 overflow-hidden">
-            {userInfo?.image
-              ? <img src={userInfo.image} alt={userInfo.name} className="w-full h-full object-cover" />
-              : userInfo?.name?.charAt(0).toUpperCase() || 'A'}
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-semibold text-sm shrink-0">
+            {userInfo?.name?.charAt(0).toUpperCase() || 'A'}
           </div>
           <div className="overflow-hidden flex-1">
             <p className="text-sm font-medium text-fg truncate">{userInfo?.name || 'Admin'}</p>
