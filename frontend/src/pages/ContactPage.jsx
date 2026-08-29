@@ -9,11 +9,11 @@ import toast from 'react-hot-toast';
 const FAQS = [
   {
     q: 'How long does delivery take?',
-    a: 'Orders within Mogadishu are usually delivered within 1–2 days. Other regions in Somalia typically take 2–5 days depending on location.',
+    a: 'Orders within Mogadishu are usually delivered within 1 to 2 days. Other regions in Somalia typically take 2 to 5 days depending on location.',
   },
   {
     q: 'Which payment methods do you accept?',
-    a: 'EVC Plus (mobile money) and Cash on Delivery. For EVC Plus you confirm the payment on your phone with your PIN — we never see or store it.',
+    a: 'EVC Plus (mobile money) and Cash on Delivery. For EVC Plus you confirm the payment on your phone with your PIN. We never see or store it.',
   },
   {
     q: 'Is delivery free?',
@@ -25,7 +25,7 @@ const FAQS = [
   },
   {
     q: 'Can I track my order?',
-    a: 'Yes — open "My Orders" in your account to see the status and delivery progress of every order.',
+    a: 'Yes. Open "My Orders" in your account to see the status and delivery progress of every order.',
   },
 ];
 
@@ -138,10 +138,10 @@ const ContactPage = () => {
               </div>
               <div className="space-y-1.5 text-sm">
                 <div className="flex justify-between text-muted">
-                  <span>Saturday – Thursday</span><span className="text-fg font-medium">8:00 – 22:00</span>
+                  <span>Saturday to Thursday</span><span className="text-fg font-medium">8:00 to 22:00</span>
                 </div>
                 <div className="flex justify-between text-muted">
-                  <span>Friday</span><span className="text-fg font-medium">14:00 – 22:00</span>
+                  <span>Friday</span><span className="text-fg font-medium">14:00 to 22:00</span>
                 </div>
               </div>
             </div>

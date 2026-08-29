@@ -12,11 +12,11 @@ const PrivacyPolicyPage = () => (
       <p>We only collect what we need to run the store and fulfil your orders:</p>
       <LegalList
         items={[
-          'Account details — your name, email address, and a securely hashed password. You may also add a profile photo.',
-          'Order details — the items you buy, your delivery address (street, district, city, landmark), and the phone number used at checkout.',
-          'Payment details — for EVC Plus we receive a transaction reference and the paying phone number from the payment gateway. We never see or store your EVC Plus PIN or any card numbers.',
-          'Content you submit — product reviews, ratings, wishlist items, and messages you send us through the contact form.',
-          'Basic technical data — your browser type and general usage of the site, used to keep it working and secure.',
+          'Account details: your name, email address, and a securely hashed password.',
+          'Order details: the items you buy, your delivery address (street, district, city, landmark), and the phone number used at checkout.',
+          'Payment details: for EVC Plus we receive a transaction reference and the paying phone number from the payment gateway. We never see or store your EVC Plus PIN or any card numbers.',
+          'Content you submit: product reviews, ratings, wishlist items, and messages you send us through the contact form.',
+          'Basic technical data: your browser type and general usage of the site, used to keep it working and secure.',
         ]}
       />
     </LegalSection>
@@ -53,10 +53,10 @@ const PrivacyPolicyPage = () => (
       <p>We rely on a small number of trusted providers to operate the store:</p>
       <LegalList
         items={[
-          'ImageKit — hosting and delivery of product images.',
-          'Our email provider — sending transactional emails.',
-          'MongoDB Atlas — secure database hosting.',
-          'Our hosting platform — running the website and API.',
+          'ImageKit: hosting and delivery of product images.',
+          'Our email provider: sending transactional emails.',
+          'MongoDB Atlas: secure database hosting.',
+          'Our hosting platform: running the website and API.',
         ]}
       />
       <p>These providers process data only as needed to provide their service to us.</p>
@@ -72,9 +72,9 @@ const PrivacyPolicyPage = () => (
     <LegalSection heading="7. Your Rights">
       <LegalList
         items={[
-          'Access and update — view and edit your name, email, and photo from your Profile page.',
-          'Delete — contact us to close your account and remove your personal data.',
-          'Unsubscribe — opt out of non-essential emails at any time; you will still receive essential order emails.',
+          'Access and update: view and edit your name and email from the Settings page.',
+          'Delete: contact us to close your account and remove your personal data.',
+          'Unsubscribe: opt out of non-essential emails at any time; you will still receive essential order emails.',
         ]}
       />
     </LegalSection>

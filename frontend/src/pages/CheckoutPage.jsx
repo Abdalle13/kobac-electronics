@@ -202,7 +202,7 @@ const CheckoutPage = () => {
                     icon={Smartphone}
                     tone="bg-primary/15 text-primary"
                     title="EVC Plus"
-                    subtitle="Mobile money — pay now from your phone"
+                    subtitle="Mobile money. Pay now from your phone"
                   />
                   <PaymentOption
                     selected={paymentMethod === 'Cash on Delivery'}
@@ -236,7 +236,7 @@ const CheckoutPage = () => {
                     />
                     <p className="text-[11px] text-muted flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-success shrink-0" />
-                      Simulated gateway — demo PIN is <span className="font-mono text-fg">1234</span>.
+                      Simulated gateway. Demo PIN is <span className="font-mono text-fg">1234</span>.
                     </p>
                   </div>
                 )}
@@ -272,7 +272,7 @@ const CheckoutPage = () => {
                   <p className="text-muted text-sm max-w-xs">
                     {evcStatus === 'pushing'
                       ? `A ${formatCurrency(totalPrice)} request was sent to ${evcNumber}. Approve it with your PIN.`
-                      : 'Payment approved — creating your order.'}
+                      : 'Payment approved. Creating your order.'}
                   </p>
                 </div>
               )}

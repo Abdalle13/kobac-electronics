@@ -64,7 +64,7 @@ const OverviewTab = () => {
       <div className="bg-surface border border-line rounded-2xl p-5 sm:p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h3 className="text-lg sm:text-xl font-bold text-fg tracking-tight">Revenue — last 7 days</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-fg tracking-tight">Revenue (last 7 days)</h3>
             <p className="text-xs text-muted mt-1">Paid orders by day</p>
           </div>
           <div className="flex items-center gap-2 text-primary bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/10">

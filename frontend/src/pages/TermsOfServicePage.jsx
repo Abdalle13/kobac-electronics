@@ -29,7 +29,7 @@ const TermsOfServicePage = () => (
     <LegalSection heading="3. Orders">
       <p>
         Placing an order is an offer to buy. We accept your order when we confirm it on-screen and by email. We may
-        decline or cancel an order — for example if an item is out of stock, payment cannot be verified, or we suspect
+        decline or cancel an order, for example if an item is out of stock, payment cannot be verified, or we suspect
         fraud. Stock is reserved only once an order is successfully created.
       </p>
     </LegalSection>

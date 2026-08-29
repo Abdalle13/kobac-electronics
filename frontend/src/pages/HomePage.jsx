@@ -57,14 +57,14 @@ const HomePage = () => {
   return (
     <div className="w-full">
       {/* ── Hero ─────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-16 pb-20 sm:pt-20 sm:pb-28 md:pt-24 md:pb-36 min-h-[68vh] sm:min-h-[78vh] flex items-center">
+      <section className="relative overflow-hidden pt-14 pb-16 sm:pt-20 sm:pb-28 md:pt-24 md:pb-36 min-h-[58vh] sm:min-h-[78vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/hero.png"
             alt="Premium Electronics"
-            className="w-full h-full object-cover opacity-40 mix-blend-overlay scale-110 sm:scale-100"
+            className="w-full h-full object-cover opacity-55 sm:opacity-40 mix-blend-overlay scale-105 sm:scale-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/85 to-black sm:bg-gradient-to-r sm:from-black sm:via-black/80 sm:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black sm:bg-gradient-to-r sm:from-black sm:via-black/80 sm:to-transparent" />
         </div>
 
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -81,8 +81,8 @@ const HomePage = () => {
               </span>{' '}
               across Somalia.
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-8 sm:mb-10 leading-relaxed max-w-md mx-auto sm:mx-0">
-              Genuine phones, laptops, watches and gaming gear — with fast local delivery
+            <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-7 sm:mb-10 leading-relaxed max-w-md mx-auto sm:mx-0">
+              Genuine phones, laptops, watches and gaming gear, with fast local delivery
               and EVC Plus checkout.
             </p>
             <div className="flex flex-col xs:flex-row gap-3 justify-center sm:justify-start">

@@ -63,7 +63,7 @@ const Navbar = () => {
           <Zap size={12} className="animate-pulse shrink-0" />
           <span className="truncate">
             Spend ${freeShippingThreshold}+ and get free delivery
-            <span className="hidden sm:inline"> — limited time</span>
+            <span className="hidden sm:inline"> (limited time)</span>
           </span>
         </span>
       </div>

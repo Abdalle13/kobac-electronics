@@ -68,7 +68,7 @@ const SettingsTab = () => {
     setSavingProfile(true);
     try {
       await api.put('/users/profile', { name: profile.name, email: profile.email, password: profile.password });
-      toast.success('Profile updated — some changes may require re-login');
+      toast.success('Profile updated. Some changes may require re-login');
       setProfile((p) => ({ ...p, password: '', confirmPassword: '' }));
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);
