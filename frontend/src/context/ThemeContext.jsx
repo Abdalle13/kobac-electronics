@@ -3,9 +3,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 
 const STORAGE_KEY = 'kobac-theme';
 
-// NOTE: default is 'dark' while pages are still being migrated to tokens.
-// Flip DEFAULT_THEME to 'light' in the final theming phase.
-const DEFAULT_THEME = 'dark';
+const DEFAULT_THEME = 'light';
 
 const ThemeContext = createContext({ theme: DEFAULT_THEME, toggleTheme: () => {}, setTheme: () => {} });
 

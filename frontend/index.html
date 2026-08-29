@@ -17,9 +17,9 @@
     (function () {
       try {
         var t = localStorage.getItem('kobac-theme');
-        document.documentElement.setAttribute('data-theme', t === 'light' || t === 'dark' ? t : 'dark');
+        document.documentElement.setAttribute('data-theme', t === 'light' || t === 'dark' ? t : 'light');
       } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'dark');
+        document.documentElement.setAttribute('data-theme', 'light');
       }
     })();
   </script>

@@ -51,7 +51,7 @@ const AppContent = () => {
   const shouldHideNavbar = hideChrome;
 
   return (
-    <div className="flex flex-col min-h-screen bg-[var(--color-background)]">
+    <div className="flex flex-col min-h-screen bg-canvas">
       <ScrollToTop />
       {!shouldHideNavbar && (
         <>
@@ -60,14 +60,14 @@ const AppContent = () => {
         </>
       )}
 
-      <Toaster 
-        position="top-right" 
+      <Toaster
+        position="top-right"
         toastOptions={{
-          className: 'bg-[#1a1a1c] border border-[var(--color-border)] text-white shadow-xl',
+          className: 'shadow-xl',
           style: {
-            background: '#1a1a1c',
-            color: '#fff',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'var(--tk-surface)',
+            color: 'var(--tk-text)',
+            border: '1px solid var(--tk-border)',
           },
           success: {
             iconTheme: { primary: '#10B981', secondary: '#fff' },
