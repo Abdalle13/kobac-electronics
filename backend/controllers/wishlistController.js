@@ -8,7 +8,6 @@ const getWishlist = async (req, res) => {
   const user = await User.findById(req.user._id).populate({
     path: 'wishlist',
     select: '-reviews',
-    match: { status: { $ne: 'Archived' } },
   });
 
   if (!user) {
@@ -16,7 +15,7 @@ const getWishlist = async (req, res) => {
     throw new Error('User not found');
   }
 
-  // Drop any nulls left by the match filter (archived/deleted products)
+  // Drop any nulls left by deleted products
   const items = (user.wishlist || []).filter(Boolean);
   res.json(items);
 };

@@ -18,7 +18,7 @@ const getProducts = async (req, res) => {
     const pageSize = Math.min(Math.max(Number(req.query.limit) || 12, 1), 100);
     const page = Math.max(Number(req.query.page) || 1, 1);
 
-    const filter = { status: { $ne: 'Archived' } };
+    const filter = {};
 
     if (req.query.keyword) {
       filter.name = { $regex: req.query.keyword, $options: 'i' };
@@ -72,7 +72,6 @@ const getBestSellers = async (req, res) => {
     const ids = ranked.map((r) => r._id);
     const products = await Product.find({
       _id: { $in: ids },
-      status: { $ne: 'Archived' },
     }).select('-reviews');
 
     // Preserve the sold-ranking order and attach the sold count
@@ -85,7 +84,6 @@ const getBestSellers = async (req, res) => {
     if (ordered.length < limit) {
       const fill = await Product.find({
         _id: { $nin: ordered.map((p) => p._id) },
-        status: { $ne: 'Archived' },
       })
         .select('-reviews')
         .sort({ createdAt: -1 })
@@ -108,7 +106,7 @@ const getRecentReviews = async (req, res) => {
     const limit = Math.min(Math.max(Number(req.query.limit) || 8, 1), 20);
 
     const rows = await Product.aggregate([
-      { $match: { status: { $ne: 'Archived' }, 'reviews.0': { $exists: true } } },
+      { $match: { 'reviews.0': { $exists: true } } },
       { $unwind: '$reviews' },
       { $match: { 'reviews.rating': { $gte: 4 } } },
       { $sort: { 'reviews.createdAt': -1 } },
@@ -137,7 +135,7 @@ const getRecentReviews = async (req, res) => {
 // @access  Public
 const getProductFilters = async (req, res) => {
   try {
-    const base = { status: { $ne: 'Archived' } };
+    const base = {};
     const [categories, brands, priceAgg] = await Promise.all([
       Product.distinct('category', base),
       Product.distinct('brand', base),
@@ -193,21 +191,6 @@ const createProduct = async (req, res) => {
 
   const createdProduct = await product.save();
   res.status(201).json(createdProduct);
-};
-
-// @desc    Toggle product status (Active/Archived)
-// @route   PUT /api/products/:id/status
-// @access  Private/Admin
-const toggleProductStatus = async (req, res) => {
-  const product = await Product.findById(req.params.id);
-
-  if (product) {
-    product.status = product.status === 'Active' ? 'Archived' : 'Active';
-    const updatedProduct = await product.save();
-    res.json({ message: `Product ${updatedProduct.status === 'Archived' ? 'archived' : 'reactivated'}`, product: updatedProduct });
-  } else {
-    res.status(404).json({ message: 'Product not found' });
-  }
 };
 
 // @desc    Update a product
@@ -354,7 +337,6 @@ export {
   getProductFilters,
   getProductById,
   createProduct,
-  toggleProductStatus,
   updateProduct,
   deleteProduct,
   createProductReview,

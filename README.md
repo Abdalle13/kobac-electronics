@@ -1,95 +1,134 @@
-# 🚀 KOBAC Electronics - Premium Tech Store
+# KOBAC Electronics
 
-**KOBAC Electronics** is a high-end, full-stack e-commerce platform designed for selling premium electronics. Built with the **MERN** stack (MongoDB, Express, React, Node.js), it features a sleek, modern UI, cloud-based image management, and a robust admin dashboard.
+A full-stack e-commerce store for premium electronics, built for the Somali market
+with EVC Plus mobile-money checkout and local delivery. MERN stack, with a light/dark
+theme, product reviews, a wishlist, transactional email, and a full admin dashboard.
 
----
-
-## ✨ Key Features
-
-### 🛒 Customer Experience
-- **Premium UI/UX**: Designed with a dark, futuristic aesthetic using Tailwind CSS and Framer Motion.
-- **Dynamic Shopping**: Browse products with advanced filtering and real-time search.
-- **Full Checkout Flow**: Secure cart management and simulated payment processing.
-- **Order Tracking**: Users can view their order history and delivery status in real-time.
-- **Mobile First**: Fully responsive design optimized for smartphones and tablets.
-
-### 🛠️ Admin Dashboard
-- **Product Management**: Create, edit, and archive products with technical specifications.
-- **Cloud Image Uploads**: Integrated with **ImageKit.io** for high-speed, global image delivery.
-- **Order Control**: Monitor all customer transactions and mark orders as "Paid" or "Delivered".
-- **User Management**: View and manage customer accounts.
-- **Analytics Overview**: Quick view of total revenue, orders, and user growth.
+**Live:** _add your Vercel URL here_ · **Repo:** https://github.com/Abdalle13/kobac-electronics
 
 ---
 
-## 🛠️ Technology Stack
+## Features
 
-| Layer | Technologies |
+### Storefront
+- Product catalogue with server-side **filtering** (category, brand, price, rating, in-stock), **sorting** and **pagination** — all reflected in the URL.
+- Product pages with an image gallery, specs, and **verified-purchase reviews & ratings**.
+- **Wishlist** tied to the user account.
+- Cart drawer and a two-step **checkout** (address → payment).
+- **EVC Plus** (simulated mobile-money gateway with PIN confirmation) and **Cash on Delivery**.
+- Order history and a delivery-progress timeline.
+- **Light / dark theme** with a toggle, remembered per browser.
+- Forgot / reset password by email.
+- Responsive down to small phones.
+
+### Admin dashboard (`/dashboard`)
+- **Overview** — revenue, orders, users, catalogue size, and a 7-day sales chart.
+- **Products** — create, edit and delete, with image upload.
+- **Orders** — mark paid / delivered / cancelled, view full order details.
+- **Users** — activate / deactivate accounts.
+- **Payments** — paid sales split by method, plus a daily history.
+- **Settings** — store name, support contact, free-shipping threshold and home banners. Changes propagate to the storefront live.
+
+### Backend
+- JWT auth, bcrypt password hashing, `helmet`, CORS allow-list, and rate-limited auth endpoints.
+- Order prices are **recomputed server-side** from the database — the client can't set them.
+- **Atomic stock reservation** so concurrent orders can't oversell.
+- Transactional email (welcome, order confirmation, payment received, delivered, password reset) via SMTP.
+
+---
+
+## Tech stack
+
+| Layer | Tools |
 | :--- | :--- |
-| **Frontend** | React 18, Vite, Redux Toolkit, Tailwind CSS, Framer Motion, Lucide Icons |
-| **Backend** | Node.js, Express.js, JWT Authentication, Multer |
-| **Database** | MongoDB Atlas (Cloud) |
-| **Images** | ImageKit.io SDK |
-| **Deployment** | Vercel (Frontend), Render (Backend) |
+| Frontend | React 19, Vite, Redux Toolkit, React Router, Tailwind CSS v4, Framer Motion, Recharts |
+| Backend | Node.js, Express 5, Mongoose 9, JSON Web Tokens, Nodemailer, Multer, Helmet |
+| Database | MongoDB Atlas |
+| Images | ImageKit.io |
+| Deployment | Vercel (frontend + backend serverless) |
 
 ---
 
-## 🚀 Getting Started
+## Getting started
 
 ### Prerequisites
-- Node.js installed
-- MongoDB Atlas Account
-- ImageKit.io Account
+- Node.js 18+
+- A MongoDB connection string (Atlas or local)
+- An ImageKit account (for product image uploads)
+- An SMTP account (Gmail app password works) for email
 
-### Installation
+### 1. Clone & install
+```bash
+git clone https://github.com/Abdalle13/kobac-electronics.git
+cd kobac-electronics
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Abdalle13/kobac-electronics.git
-   cd kobac-electronics
-   ```
+cd backend && npm install
+cd ../frontend && npm install
+```
 
-2. **Backend Setup**
-   ```bash
-   cd backend
-   npm install
-   # Create a .env file based on .env.example and add your credentials
-   npm run dev
-   ```
+### 2. Configure the backend
+Create `backend/.env` from `backend/.env.example`:
+```
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=your-mongodb-connection-string
+JWT_SECRET=any-long-random-string
+FRONTEND_URL=http://localhost:5173
 
-3. **Frontend Setup**
-   ```bash
-   cd ../frontend
-   npm install
-   # Create a .env file and add VITE_API_URL
-   npm run dev
-   ```
+IMAGEKIT_URL_ENDPOINT=...
+IMAGEKIT_PUBLIC_KEY=...
+IMAGEKIT_PRIVATE_KEY=...
 
-### Seeding Data
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=you@gmail.com
+EMAIL_PASS=your-app-password
+EMAIL_FROM=Kobac Electronics <you@gmail.com>
 
-> ⚠️ **Destructive.** `data:import` and `data:destroy` **delete all users, products and orders**
-> and replace them with the sample data. The script refuses to run if real orders exist —
-> pass `--force` to override.
+EVC_DEMO_PIN=1234
+```
 
-To load the sample catalogue and two demo accounts into a fresh database:
+### 3. Run
+```bash
+# terminal 1
+cd backend && npm run dev
+
+# terminal 2
+cd frontend && npm run dev
+```
+Frontend on `http://localhost:5173`, API proxied to `http://localhost:5000`.
+
+### 4. Seed sample data
 ```bash
 cd backend
 npm run data:import
 ```
 
-Seeded logins:
+This loads a sample catalogue and two demo accounts:
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
-| Admin | `admin@kobac.com` | `password123` |
+| Admin | `admin@gmail.com` | `password123` |
 | Customer | `customer@test.com` | `password123` |
 
-Run `npm run data:destroy` to wipe everything.
+`data:import` and `data:destroy` replace the whole database; they will not run over
+real order data unless you add `--force`.
 
 ---
 
+## EVC Plus demo checkout
 
-## 📄 License
-This project is for demonstration purposes. All rights reserved.
+The payment gateway is simulated. At checkout, a valid Somali mobile number and the
+demo PIN (`1234`) always succeed; any other PIN is rejected. No real money moves.
 
-**Developed with ❤️ by Abdalle**
+---
+
+## Deployment
+
+Frontend and backend both deploy to Vercel. Set the same environment variables on the
+backend project, and set `FRONTEND_URL` to your deployed frontend origin so CORS is
+locked down.
+
+---
+
+Built by [Abdalle Hussein](https://github.com/Abdalle13).

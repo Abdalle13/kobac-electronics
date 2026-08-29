@@ -73,12 +73,6 @@ const productSchema = mongoose.Schema(
       storage: { type: String },
       processor: { type: String }
     },
-    status: {
-      type: String,
-      required: true,
-      enum: ['Active', 'Archived'],
-      default: 'Active',
-    },
     reviews: [reviewSchema],
     rating: {
       type: Number,

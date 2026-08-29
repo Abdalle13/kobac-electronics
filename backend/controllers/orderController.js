@@ -49,7 +49,7 @@ const addOrderItems = async (req, res) => {
     }
 
     const updated = await Product.findOneAndUpdate(
-      { _id: item.product, status: 'Active', countInStock: { $gte: qty } },
+      { _id: item.product, countInStock: { $gte: qty } },
       { $inc: { countInStock: -qty } },
       { new: true }
     );
