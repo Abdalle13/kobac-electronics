@@ -109,7 +109,7 @@ const ContactPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10">
 
           {/* Contact info + hours */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4 order-2 lg:order-1">
             {contactCards.map((c) => {
               const Wrapper = c.href ? 'a' : 'div';
               return (
@@ -148,7 +148,7 @@ const ContactPage = () => {
           </div>
 
           {/* Form */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 order-1 lg:order-2">
             <div className="glass border border-line rounded-3xl p-6 sm:p-8">
               {status === 'sent' ? (
                 <div className="text-center py-10">

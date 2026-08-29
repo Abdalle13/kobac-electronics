@@ -29,7 +29,7 @@ const RATING_OPTIONS = [4, 3, 2, 1];
 const ShopPage = () => {
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { products, loading, error, page, pages, total, filters } = useSelector((state) => state.products);
+  const { products, loading, error, page, pages, filters } = useSelector((state) => state.products);
 
   const [panelOpen, setPanelOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
@@ -101,10 +101,8 @@ const ShopPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-fg tracking-tighter">All Products</h1>
-              <p className="text-muted text-xs sm:text-sm mt-1">
-                {loading ? 'Loading…' : `${total} product${total !== 1 ? 's' : ''}`}
-              </p>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg tracking-tight">All Products</h1>
+              <p className="text-muted text-xs sm:text-sm mt-1">Browse the full catalogue</p>
             </div>
             <div className="relative w-full sm:w-64">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
@@ -255,7 +253,6 @@ const ShopPage = () => {
         current={current}
         patch={patch}
         filters={filters}
-        total={total}
         clearAll={clearAll}
       />
     </div>
@@ -292,7 +289,7 @@ const PanelSection = ({ title, children }) => (
   </div>
 );
 
-const FilterPanel = ({ open, onClose, current, patch, filters, total, clearAll }) => {
+const FilterPanel = ({ open, onClose, current, patch, filters, clearAll }) => {
   const [brandSearch, setBrandSearch] = useState('');
 
   const brands = (filters.brands || []).filter((b) =>
@@ -394,8 +391,8 @@ const FilterPanel = ({ open, onClose, current, patch, filters, total, clearAll }
 
         <div className="px-5 py-4 border-t border-line shrink-0 flex gap-3">
           <Button variant="secondary" className="flex-1 text-sm" onClick={clearAll}>Clear all</Button>
-          <Button variant="primary" className="flex-1 text-sm font-bold" onClick={onClose}>
-            Show {total} result{total !== 1 ? 's' : ''}
+          <Button variant="primary" className="flex-1 text-sm font-semibold" onClick={onClose}>
+            Show results
           </Button>
         </div>
       </aside>
