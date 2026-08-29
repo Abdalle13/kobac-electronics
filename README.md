@@ -66,7 +66,12 @@
    ```
 
 ### Seeding Data
-To populate the database with sample products and two accounts:
+
+> ⚠️ **Destructive.** `data:import` and `data:destroy` **delete all users, products and orders**
+> and replace them with the sample data. The script refuses to run if real orders exist —
+> pass `--force` to override.
+
+To load the sample catalogue and two demo accounts into a fresh database:
 ```bash
 cd backend
 npm run data:import
@@ -76,10 +81,10 @@ Seeded logins:
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
-| Admin | `cabdale13yare@gmail.com` | `password123` |
+| Admin | `admin@kobac.com` | `password123` |
 | Customer | `customer@test.com` | `password123` |
 
-Run `npm run data:destroy` to wipe the seeded data.
+Run `npm run data:destroy` to wipe everything.
 
 ---
 
