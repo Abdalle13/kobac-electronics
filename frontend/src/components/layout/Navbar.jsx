@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
-  ShoppingCart, User, Search, Menu, LogOut,
+  ShoppingCart, Search, Menu, LogOut, Settings,
   Package, ShieldCheck, Zap, X, Mail, Home, Store, Info, Heart,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -50,7 +50,7 @@ const Navbar = () => {
     ...(userInfo ? [
       { to: '/wishlist', icon: Heart, label: 'Wishlist' },
       { to: '/my-orders', icon: Package, label: 'Orders' },
-      { to: '/profile', icon: User, label: 'Profile' },
+      { to: '/settings', icon: Settings, label: 'Settings' },
     ] : []),
     ...(isAdmin ? [{ to: '/dashboard', icon: ShieldCheck, label: 'Dashboard' }] : []),
   ];
@@ -76,17 +76,26 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-muted">
+          <div className="hidden lg:flex items-center gap-7 text-sm font-medium">
             {isAdmin ? (
               <Link to="/dashboard" className="text-primary hover:text-primary-hover transition-colors font-semibold">Admin Dashboard</Link>
             ) : (
-              <>
-                <Link to="/" className="hover:text-fg transition-colors">Home</Link>
-                <Link to="/shop" className="hover:text-fg transition-colors">Shop</Link>
-                <Link to="/about" className="hover:text-fg transition-colors">About</Link>
-                <Link to="/contact" className="hover:text-fg transition-colors">Support</Link>
-                {userInfo && <Link to="/my-orders" className="hover:text-fg transition-colors">Orders</Link>}
-              </>
+              [
+                { to: '/', label: 'Home' },
+                { to: '/shop', label: 'Shop' },
+                { to: '/about', label: 'About' },
+                { to: '/contact', label: 'Support' },
+                ...(userInfo ? [{ to: '/my-orders', label: 'Orders' }] : []),
+              ].map(({ to, label }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={to === '/'}
+                  className={({ isActive }) => `transition-colors ${isActive ? 'text-fg font-semibold' : 'text-muted hover:text-fg'}`}
+                >
+                  {label}
+                </NavLink>
+              ))
             )}
           </div>
 
@@ -157,8 +166,8 @@ const Navbar = () => {
                         transition={{ duration: 0.14 }}
                         className="absolute right-0 mt-3 w-52 bg-surface border border-line rounded-2xl shadow-xl z-50 overflow-hidden p-1.5"
                       >
-                        <Link to="/profile" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted hover:text-fg hover:bg-surface-2 transition-all">
-                          <User size={15} className="text-primary" /> Profile
+                        <Link to="/settings" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted hover:text-fg hover:bg-surface-2 transition-all">
+                          <Settings size={15} className="text-primary" /> Settings
                         </Link>
                         <Link to="/my-orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted hover:text-fg hover:bg-surface-2 transition-all">
                           <Package size={15} className="text-primary" /> Orders
@@ -198,15 +207,22 @@ const Navbar = () => {
 
         <nav className="flex-1 overflow-y-auto p-3">
           {navLinks.map(({ to, icon: Icon, label }) => (
-            <Link
+            <NavLink
               key={to}
               to={to}
+              end={to === '/'}
               onClick={closeMenu}
-              className="flex items-center gap-3.5 px-3 py-3 rounded-xl text-[15px] font-medium text-fg hover:bg-surface-2 transition-colors"
+              className={({ isActive }) => `flex items-center gap-3.5 px-3 py-3 rounded-xl text-[15px] transition-colors ${
+                isActive ? 'bg-primary/10 text-primary font-semibold' : 'text-fg font-medium hover:bg-surface-2'
+              }`}
             >
-              <Icon size={18} className="text-muted" />
-              {label}
-            </Link>
+              {({ isActive }) => (
+                <>
+                  <Icon size={18} className={isActive ? 'text-primary' : 'text-muted'} />
+                  {label}
+                </>
+              )}
+            </NavLink>
           ))}
         </nav>
 

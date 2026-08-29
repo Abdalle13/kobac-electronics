@@ -15,7 +15,7 @@ const Card = ({ title, subtitle, children }) => (
   </div>
 );
 
-const ProfilePage = () => {
+const SettingsPage = () => {
   const dispatch = useDispatch();
   const { userInfo, loading } = useSelector((s) => s.auth);
 
@@ -54,7 +54,7 @@ const ProfilePage = () => {
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6">
-      <h1 className="text-2xl sm:text-3xl font-bold text-fg tracking-tight">My Account</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-fg tracking-tight">Settings</h1>
 
       {/* Identity header */}
       <div className="bg-surface border border-line rounded-2xl p-5 sm:p-7 flex items-center gap-4">
@@ -92,4 +92,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default SettingsPage;

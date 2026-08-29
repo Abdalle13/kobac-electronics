@@ -1,97 +1,107 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
+const SOCIALS = [
+  { label: 'X', href: 'https://x.com/ApdulahiHu34594', path: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' },
+  { label: 'Instagram', href: 'https://www.instagram.com/zekovic__', node: <><rect width="20" height="20" x="2" y="2" rx="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></> },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@zekovic25', path: 'M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.5a8.17 8.17 0 0 0 4.78 1.52V6.56a4.86 4.86 0 0 1-1.01.13z' },
+];
+
+const FooterCol = ({ title, links }) => (
+  <div>
+    <h3 className="text-xs font-bold text-fg uppercase tracking-wide mb-4">{title}</h3>
+    <ul className="space-y-2.5 text-[13px] text-muted">
+      {links.map(({ to, label }) => (
+        <li key={label}>
+          <Link to={to} className="hover:text-fg transition-colors">{label}</Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 const Footer = () => {
   const year = new Date().getFullYear();
+  const { storeName } = useSelector((s) => s.settings);
 
   return (
     <footer className="border-t border-line bg-surface mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
 
-        {/* Top grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 mb-10 sm:mb-12">
-
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 mb-10">
           {/* Brand */}
-          <div className="sm:col-span-1">
-            <Link to="/" className="inline-block mb-3 sm:mb-4">
-              <span className="text-base sm:text-lg font-bold text-fg tracking-tight">
+          <div className="col-span-2 md:col-span-1">
+            <Link to="/" className="inline-block mb-3">
+              <span className="text-lg font-bold text-fg tracking-tight">
                 KOBAC <span className="text-primary">Electronics</span>
               </span>
             </Link>
-            <p className="text-muted text-sm leading-relaxed mb-4 sm:mb-5 max-w-xs">
-              Premium electronics and gadgets at your fingertips. Discover the future, today.
+            <p className="text-muted text-sm leading-relaxed mb-5 max-w-xs">
+              {storeName || 'Kobac Electronics'} — premium phones, laptops and gadgets with fast local delivery across Somalia.
             </p>
-            {/* Social Icons */}
-            <div className="flex gap-2.5 sm:gap-3">
-              {[
-                { label: 'X', href: 'https://x.com/ApdulahiHu34594', svg: <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /> },
-                { label: 'IG', href: 'https://www.instagram.com/zekovic__?igsh=cHdwMm93OGhwZ21o&utm_source=qr', svg: <><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></> },
-                { label: 'TK', href: 'https://www.tiktok.com/@zekovic25?_r=1&_t=ZS-95e2nvNNw5R', svg: <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.5a8.17 8.17 0 0 0 4.78 1.52V6.56a4.86 4.86 0 0 1-1.01.13z" /> },
-              ].map(({ label, href, svg }) => (
+            <div className="flex gap-2.5">
+              {SOCIALS.map(({ label, href, path, node }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-surface-2 border border-line flex items-center justify-center text-muted hover:text-fg hover:bg-primary/10 hover:border-primary/30 transition-all"
+                  className="w-9 h-9 rounded-xl bg-surface-2 border border-line flex items-center justify-center text-muted hover:text-fg hover:bg-primary/10 hover:border-primary/30 transition-all"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    {svg}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill={path ? 'currentColor' : 'none'} stroke={path ? 'none' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    {path ? <path d={path} /> : node}
                   </svg>
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Shop + Support in a 2-col row on mobile */}
-          <div className="grid grid-cols-2 gap-8 sm:contents">
-            {/* Shop */}
-            <div>
-              <h3 className="text-[10px] sm:text-[11px] font-bold text-fg uppercase tracking-wide mb-3 sm:mb-4">Shop</h3>
-              <ul className="space-y-2.5 sm:space-y-3 text-[12px] sm:text-[13px] text-muted">
-                {[
-                  { to: '/shop?category=Phone', label: 'Smartphones' },
-                  { to: '/shop?category=Laptop', label: 'Laptops' },
-                  { to: '/shop?category=Watch', label: 'Smartwatches' },
-                  { to: '/shop?category=Gaming', label: 'Gaming' },
-                  { to: '/shop', label: 'All Products' },
-                ].map(({ to, label }) => (
-                  <li key={to}>
-                    <Link to={to} className="hover:text-fg transition-colors">{label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h3 className="text-[10px] sm:text-[11px] font-bold text-fg uppercase tracking-wide mb-3 sm:mb-4">Support</h3>
-              <ul className="space-y-2.5 sm:space-y-3 text-[12px] sm:text-[13px] text-muted">
-                {[
-                  { to: '/contact', label: 'Contact Us' },
-                  { to: '/my-orders', label: 'Track Order' },
-                  { to: '/contact', label: 'Shipping Info' },
-                  { to: '/contact', label: 'Returns & Warranty' },
-                ].map(({ to, label }) => (
-                  <li key={label}>
-                    <Link to={to} className="hover:text-fg transition-colors">{label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <FooterCol
+            title="Shop"
+            links={[
+              { to: '/shop?category=Phone', label: 'Smartphones' },
+              { to: '/shop?category=Laptop', label: 'Laptops' },
+              { to: '/shop?category=Watch', label: 'Smartwatches' },
+              { to: '/shop?category=Gaming', label: 'Gaming' },
+              { to: '/shop', label: 'All Products' },
+            ]}
+          />
+          <FooterCol
+            title="Company"
+            links={[
+              { to: '/about', label: 'About Us' },
+              { to: '/contact', label: 'Contact' },
+              { to: '/privacy', label: 'Privacy Policy' },
+              { to: '/terms', label: 'Terms of Service' },
+            ]}
+          />
+          <FooterCol
+            title="Account"
+            links={[
+              { to: '/my-orders', label: 'My Orders' },
+              { to: '/wishlist', label: 'Wishlist' },
+              { to: '/settings', label: 'Settings' },
+              { to: '/contact', label: 'Support' },
+            ]}
+          />
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-line pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
-          <p className="text-[11px] sm:text-[12px] text-muted text-center sm:text-left">
-            © {year} Kobac Electronics. All rights reserved.
+        <div className="border-t border-line pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-[12px] text-muted">
+          <p>© {year} Kobac Electronics. All rights reserved.</p>
+          <p>
+            Designed &amp; built by{' '}
+            <a
+              href="https://github.com/Abdalle13"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-fg font-semibold hover:text-primary transition-colors"
+            >
+              Abdalle Hussein
+            </a>
           </p>
-          <div className="flex gap-4 sm:gap-5 text-[11px] sm:text-[12px] text-muted">
-            <Link to="/privacy" className="hover:text-fg transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-fg transition-colors">Terms of Service</Link>
-          </div>
         </div>
       </div>
     </footer>

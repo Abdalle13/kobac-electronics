@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import CartDrawer from './components/layout/CartDrawer';
@@ -23,7 +23,7 @@ import { Toaster } from 'react-hot-toast';
 import PrivateRoute from './components/routing/PrivateRoute';
 import AdminRoute from './components/routing/AdminRoute';
 import ScrollToTop from './components/routing/ScrollToTop';
-import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
 import WishlistPage from './pages/WishlistPage';
 import { fetchWishlist, clearWishlist } from './redux/slices/wishlistSlice';
 import { fetchSettings } from './redux/slices/settingsSlice';
@@ -97,7 +97,8 @@ const AppContent = () => {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/my-orders" element={<MyOrdersPage />} />
             <Route path="/order/:id" element={<OrderDetailPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/profile" element={<Navigate to="/settings" replace />} />
             <Route path="/wishlist" element={<WishlistPage />} />
           </Route>
 
