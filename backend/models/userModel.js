@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const userSchema = mongoose.Schema(
   {
@@ -38,6 +39,14 @@ const userSchema = mongoose.Schema(
       enum: ['ACTIVE', 'INACTIVE'],
       default: 'ACTIVE',
     },
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+      },
+    ],
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
   },
   {
     timestamps: true,
@@ -47,6 +56,15 @@ const userSchema = mongoose.Schema(
 // Match password to hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Generate a password-reset token: return the raw token (emailed to the user),
+// store only its hash + a 30-minute expiry on the document.
+userSchema.methods.getResetPasswordToken = function () {
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  this.resetPasswordToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+  this.resetPasswordExpires = Date.now() + 30 * 60 * 1000;
+  return rawToken;
 };
 
 // Encrypt password before saving

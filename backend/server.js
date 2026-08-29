@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import colors from 'colors';
 import cors from 'cors';
+import helmet from 'helmet';
 import connectDB from './config/db.js';
 import productRoutes from './routes/productRoutes.js';
 import path from 'path';
@@ -11,19 +12,51 @@ import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+import { authLimiter } from './middleware/rateLimiter.js';
+
+// Fail fast if the token secret is missing — no insecure fallback.
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET is not set. Add it to your environment before starting the server.');
+}
 
 // Connect to database
 connectDB();
 
 const app = express();
 
-// Middleware
+// Security headers
+app.use(helmet());
+
+// CORS — locked to FRONTEND_URL when configured, open otherwise (with a warning)
+const devOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+const allowlist = [process.env.FRONTEND_URL, ...devOrigins].filter(Boolean);
+
 app.use(cors({
-  origin: true, // Allow all origins to resolve issues across different devices/URLs
-  credentials: true
+  origin: (origin, cb) => {
+    // Requests with no Origin: curl, server-to-server, Vercel rewrites
+    if (!origin) return cb(null, true);
+    // Not configured -> stay permissive so nothing breaks (see boot warning)
+    if (!process.env.FRONTEND_URL) return cb(null, true);
+    if (allowlist.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
 }));
+
+if (!process.env.FRONTEND_URL && process.env.NODE_ENV === 'production') {
+  console.warn('WARNING: FRONTEND_URL not set — CORS is open to all origins. Set it in production.'.yellow.bold);
+}
+
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
+
+// Throttle auth endpoints (brute-force protection)
+app.use('/api/users/login', authLimiter);
+app.use('/api/users/register', authLimiter);
+app.use('/api/users/forgot-password', authLimiter);
+app.use('/api/users/reset-password', authLimiter);
+app.use('/api/contact', authLimiter);
 
 // Main Routes
 app.use('/api/products', productRoutes);
@@ -32,6 +65,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payment/evcplus', paymentRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Make the uploads folder static so it can be accessed in browser via /uploads
 const __dirname = path.resolve();

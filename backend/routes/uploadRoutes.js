@@ -2,6 +2,7 @@ import path from 'path';
 import express from 'express';
 import multer from 'multer';
 import ImageKit from 'imagekit';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -42,7 +43,7 @@ const upload = multer({
 // @desc    Upload single image to ImageKit
 // @route   POST /api/upload
 // @access  Private
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', protect, upload.single('image'), async (req, res) => {
   try {
     console.log('Upload request received');
     if (!req.file) {

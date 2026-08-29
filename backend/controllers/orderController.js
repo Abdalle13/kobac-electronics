@@ -1,42 +1,98 @@
 import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js';
+import Settings from '../models/settingsModel.js';
+import sendEmail from '../utils/sendEmail.js';
+import { orderConfirmationEmail, paymentReceivedEmail, orderDeliveredEmail } from '../utils/emailTemplates.js';
+
+const TAX_RATE = 0.05;
+const DEFAULT_SHIPPING_FEE = 15;
+const DEFAULT_FREE_SHIPPING_THRESHOLD = 400;
+const PAYMENT_METHODS = ['EVC Plus', 'Cash on Delivery'];
+
+const isOwner = (order, user) => order.user.toString() === user._id.toString();
+const isAdmin = (user) => user.role === 'Admin';
 
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
 const addOrderItems = async (req, res) => {
-  const {
-    orderItems,
-    shippingAddress,
-    paymentMethod,
-    itemsPrice,
-    taxPrice,
-    shippingPrice,
-    totalPrice,
-  } = req.body;
+  const { orderItems, shippingAddress, paymentMethod } = req.body;
 
-  if (orderItems && orderItems.length === 0) {
+  if (!orderItems || orderItems.length === 0) {
     res.status(400);
     throw new Error('No order items');
-  } else {
-    // 1. Verify that all products have enough stock before creating the order
-    for (const item of orderItems) {
-      const product = await Product.findById(item.product);
-      if (!product) {
-        return res.status(404).json({ message: `Product not found: ${item.name}` });
-      }
-      if (product.countInStock < item.qty) {
-        return res.status(400).json({ message: `Insufficient stock for ${item.name}` });
-      }
+  }
+
+  if (!PAYMENT_METHODS.includes(paymentMethod)) {
+    res.status(400);
+    throw new Error('Invalid payment method');
+  }
+
+  // 1. Atomically reserve stock AND read the authoritative price/name from the DB.
+  //    The { countInStock: { $gte: qty } } guard + $inc makes the check-and-decrement
+  //    a single operation, so two concurrent orders can't both pass and oversell.
+  const reserved = [];
+  const pricedItems = [];
+
+  const rollback = async () => {
+    for (const r of reserved) {
+      await Product.updateOne({ _id: r.product }, { $inc: { countInStock: r.qty } });
+    }
+  };
+
+  for (const item of orderItems) {
+    const qty = Number(item.qty);
+    if (!Number.isInteger(qty) || qty < 1) {
+      await rollback();
+      res.status(400);
+      throw new Error(`Invalid quantity for ${item.name || 'an item'}`);
     }
 
-    // 2. Create the Order
+    const updated = await Product.findOneAndUpdate(
+      { _id: item.product, status: 'Active', countInStock: { $gte: qty } },
+      { $inc: { countInStock: -qty } },
+      { new: true }
+    );
+
+    if (!updated) {
+      await rollback();
+      const exists = await Product.findById(item.product);
+      res.status(exists ? 400 : 404);
+      throw new Error(
+        exists ? `Insufficient stock for ${exists.name}` : 'One or more products are no longer available'
+      );
+    }
+
+    reserved.push({ product: updated._id, qty });
+    pricedItems.push({
+      name: updated.name,
+      qty,
+      image: updated.images?.[0] || item.image,
+      price: updated.price, // authoritative — never trust the client
+      product: updated._id,
+    });
+  }
+
+  // 2. Compute every monetary value server-side.
+  const itemsPrice = Number(
+    pricedItems.reduce((acc, i) => acc + i.price * i.qty, 0).toFixed(2)
+  );
+
+  let freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHOLD;
+  const settings = await Settings.findOne();
+  if (settings && typeof settings.freeShippingThreshold === 'number') {
+    freeShippingThreshold = settings.freeShippingThreshold;
+  }
+
+  const shippingPrice = itemsPrice >= freeShippingThreshold ? 0 : DEFAULT_SHIPPING_FEE;
+  const taxPrice = Number((TAX_RATE * itemsPrice).toFixed(2));
+  const totalPrice = Number((itemsPrice + shippingPrice + taxPrice).toFixed(2));
+
+  // 3. Persist (roll stock back if saving the order fails)
+  let createdOrder;
+  try {
     const order = new Order({
-      orderItems: orderItems.map((x) => ({
-        ...x,
-        product: x.product,
-        _id: undefined,
-      })),
+      orderItems: pricedItems,
       user: req.user._id,
       shippingAddress,
       paymentMethod,
@@ -45,43 +101,58 @@ const addOrderItems = async (req, res) => {
       shippingPrice,
       totalPrice,
     });
-
-    const createdOrder = await order.save();
-
-    // 3. Incrementally decrement stock for each ordered item
-    for (const item of orderItems) {
-      const product = await Product.findById(item.product);
-      product.countInStock -= item.qty;
-      await product.save();
-    }
-
-    res.status(201).json(createdOrder);
+    createdOrder = await order.save();
+  } catch (error) {
+    await rollback();
+    throw error;
   }
+
+  res.status(201).json(createdOrder);
+
+  // Fire the confirmation email after responding (sendEmail never throws)
+  const { subject, html } = orderConfirmationEmail(createdOrder, req.user);
+  await sendEmail({ to: req.user.email, subject, html });
 };
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
-// @access  Private
+// @access  Private (owner or admin)
 const getOrderById = async (req, res) => {
   const order = await Order.findById(req.params.id).populate(
     'user',
     'name email'
   );
 
-  if (order) {
-    res.json(order);
-  } else {
-    res.status(404).json({ message: 'Order not found' });
+  if (!order) {
+    res.status(404);
+    throw new Error('Order not found');
   }
+
+  if (order.user._id.toString() !== req.user._id.toString() && !isAdmin(req.user)) {
+    res.status(403);
+    throw new Error('Not authorized to view this order');
+  }
+
+  res.json(order);
 };
 
 // @desc    Update order to paid
 // @route   PUT /api/orders/:id/pay
-// @access  Private
+// @access  Private (owner only)
 const updateOrderToPaid = async (req, res) => {
   const order = await Order.findById(req.params.id);
 
   if (order) {
+    if (!isOwner(order, req.user)) {
+      res.status(403);
+      throw new Error('Not authorized to pay for this order');
+    }
+
+    if (order.isPaid) {
+      res.status(400);
+      throw new Error('Order is already paid');
+    }
+
     order.isPaid = true;
     order.paidAt = Date.now();
     order.status = 'Paid';
@@ -94,6 +165,9 @@ const updateOrderToPaid = async (req, res) => {
 
     const updatedOrder = await order.save();
     res.json(updatedOrder);
+
+    const { subject, html } = paymentReceivedEmail(updatedOrder, req.user);
+    await sendEmail({ to: req.user.email, subject, html });
   } else {
     res.status(404).json({ message: 'Order not found' });
   }
@@ -119,7 +193,7 @@ const getOrders = async (req, res) => {
 // @route   PUT /api/orders/:id/deliver
 // @access  Private/Admin
 const updateOrderToDelivered = async (req, res) => {
-  const order = await Order.findById(req.params.id);
+  const order = await Order.findById(req.params.id).populate('user', 'name email');
 
   if (order) {
     order.isDelivered = true;
@@ -128,6 +202,11 @@ const updateOrderToDelivered = async (req, res) => {
 
     const updatedOrder = await order.save();
     res.json(updatedOrder);
+
+    if (order.user?.email) {
+      const { subject, html } = orderDeliveredEmail(updatedOrder, order.user);
+      await sendEmail({ to: order.user.email, subject, html });
+    }
   } else {
     res.status(404).json({ message: 'Order not found' });
   }
@@ -137,7 +216,7 @@ const updateOrderToDelivered = async (req, res) => {
 // @route   PUT /api/orders/:id/payadmin
 // @access  Private/Admin
 const updateOrderToPaidAdmin = async (req, res) => {
-  const order = await Order.findById(req.params.id);
+  const order = await Order.findById(req.params.id).populate('user', 'name email');
 
   if (order) {
     order.isPaid = true;
@@ -150,27 +229,41 @@ const updateOrderToPaidAdmin = async (req, res) => {
 
     const updatedOrder = await order.save();
     res.json(updatedOrder);
+
+    if (order.user?.email) {
+      const { subject, html } = paymentReceivedEmail(updatedOrder, order.user);
+      await sendEmail({ to: order.user.email, subject, html });
+    }
   } else {
     res.status(404).json({ message: 'Order not found' });
   }
 };
 
-// @desc    Cancel order (Admin/Customer manual)
+// @desc    Cancel order (owner or admin)
 // @route   PUT /api/orders/:id/cancel
-// @access  Private
+// @access  Private (owner or admin)
 const cancelOrder = async (req, res) => {
   const order = await Order.findById(req.params.id);
 
   if (order) {
+    if (!isOwner(order, req.user) && !isAdmin(req.user)) {
+      res.status(403).json({ message: 'Not authorized to cancel this order' });
+      return;
+    }
+
     if (order.status === 'Cancelled') {
       res.status(400).json({ message: 'Order is already cancelled' });
+      return;
+    }
+
+    if (order.status === 'Delivered') {
+      res.status(400).json({ message: 'Delivered orders cannot be cancelled' });
       return;
     }
 
     order.status = 'Cancelled';
 
     // Restore stock
-    const Product = (await import('../models/productModel.js')).default;
     for (const item of order.orderItems) {
       const product = await Product.findById(item.product);
       if (product) {

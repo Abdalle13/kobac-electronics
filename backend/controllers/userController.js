@@ -1,5 +1,8 @@
+import crypto from 'crypto';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
+import sendEmail from '../utils/sendEmail.js';
+import { welcomeEmail, passwordResetEmail } from '../utils/emailTemplates.js';
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -55,6 +58,9 @@ const registerUser = async (req, res) => {
       image: user.image,
       token: generateToken(res, user._id),
     });
+
+    const { subject, html } = welcomeEmail(user.name);
+    await sendEmail({ to: user.email, subject, html });
   } else {
     res.status(400).json({ message: 'Invalid user data received' });
   }
@@ -146,4 +152,87 @@ const toggleUserStatus = async (req, res) => {
   }
 };
 
-export { authUser, registerUser, getUsers, getUserProfile, updateUserProfile, toggleUserStatus };
+// @desc    Request a password reset link
+// @route   POST /api/users/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  // Always return the same response — don't reveal whether an account exists.
+  const genericResponse = {
+    message: 'If an account exists for that email, a reset link has been sent.',
+  };
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  const user = await User.findOne({ email });
+  if (!user || user.status === 'INACTIVE') {
+    return res.json(genericResponse);
+  }
+
+  const rawToken = user.getResetPasswordToken();
+  await user.save();
+
+  const resetUrl = `${process.env.FRONTEND_URL || ''}/reset-password/${rawToken}`;
+  const { subject, html } = passwordResetEmail(user.name, resetUrl);
+  const result = await sendEmail({ to: user.email, subject, html });
+
+  if (result.error) {
+    // Roll back the token so a broken mailer doesn't lock the flow
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+    return res.status(500).json({ message: 'Could not send reset email. Please try again later.' });
+  }
+
+  res.json(genericResponse);
+};
+
+// @desc    Reset password using the emailed token
+// @route   PUT /api/users/reset-password/:token
+// @access  Public
+const resetPassword = async (req, res) => {
+  const { password } = req.body;
+
+  if (!password || password.length < 6) {
+    return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+  }
+
+  const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: 'Reset link is invalid or has expired' });
+  }
+
+  user.password = password; // pre('save') hook hashes it
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    image: user.image,
+    token: generateToken(res, user._id),
+  });
+};
+
+export {
+  authUser,
+  registerUser,
+  getUsers,
+  getUserProfile,
+  updateUserProfile,
+  toggleUserStatus,
+  forgotPassword,
+  resetPassword,
+};

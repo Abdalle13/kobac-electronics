@@ -1,5 +1,34 @@
 import mongoose from 'mongoose';
 
+const reviewSchema = mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    comment: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 1000,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const productSchema = mongoose.Schema(
   {
     user: {
@@ -49,6 +78,17 @@ const productSchema = mongoose.Schema(
       required: true,
       enum: ['Active', 'Archived'],
       default: 'Active',
+    },
+    reviews: [reviewSchema],
+    rating: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    numReviews: {
+      type: Number,
+      required: true,
+      default: 0,
     },
   },
   {
