@@ -50,6 +50,7 @@ const Navbar = () => {
     ...(userInfo ? [
       { to: '/wishlist', icon: Heart, label: 'Wishlist' },
       { to: '/my-orders', icon: Package, label: 'Orders' },
+      { to: '/profile', icon: User, label: 'Profile' },
     ] : []),
     ...(isAdmin ? [{ to: '/dashboard', icon: ShieldCheck, label: 'Dashboard' }] : []),
   ];

@@ -1,24 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { motion } from 'framer-motion';
-import { User, Mail, Lock, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Camera, Loader2 } from 'lucide-react';
 import { updateUserProfile } from '../redux/slices/authSlice';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-
 import api from '../utils/api';
 
+const Card = ({ title, subtitle, children }) => (
+  <div className="bg-surface border border-line rounded-2xl p-5 sm:p-7">
+    <div className="mb-5">
+      <h3 className="text-base font-bold text-fg">{title}</h3>
+      {subtitle && <p className="text-sm text-muted mt-0.5">{subtitle}</p>}
+    </div>
+    {children}
+  </div>
+);
+
 const ProfilePage = () => {
+  const dispatch = useDispatch();
+  const { userInfo, loading } = useSelector((s) => s.auth);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [image, setImage] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  const dispatch = useDispatch();
-  const { userInfo, loading, error } = useSelector((state) => state.auth);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [savingPw, setSavingPw] = useState(false);
 
   useEffect(() => {
     if (userInfo) {
@@ -28,33 +38,43 @@ const ProfilePage = () => {
     }
   }, [userInfo]);
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-
+  const save = async (payload, onDone) => {
     try {
-      await dispatch(updateUserProfile({ _id: userInfo._id, name, email, password, image })).unwrap();
-      toast.success('Profile Updated Successfully');
-      setPassword('');
-      setConfirmPassword('');
+      await dispatch(updateUserProfile({ _id: userInfo._id, ...payload })).unwrap();
+      toast.success('Saved');
+      onDone?.();
     } catch (err) {
-      toast.error(err || 'Failed to update profile');
+      toast.error(err || 'Could not save changes');
     }
   };
 
-  const uploadFileHandler = async (e) => {
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append('image', file);
-    setUploading(true);
+  const saveAccount = (e) => {
+    e.preventDefault();
+    save({ name, email, image });
+  };
 
+  const savePassword = async (e) => {
+    e.preventDefault();
+    if (password.length < 6) return toast.error('Password must be at least 6 characters');
+    if (password !== confirmPassword) return toast.error('Passwords do not match');
+    setSavingPw(true);
+    await save({ name, email, image, password }, () => {
+      setPassword('');
+      setConfirmPassword('');
+    });
+    setSavingPw(false);
+  };
+
+  const uploadImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
     try {
-      const { data } = await api.post('/upload', formData);
+      const fd = new FormData();
+      fd.append('image', file);
+      const { data } = await api.post('/upload', fd);
       setImage(data);
-      toast.success('Image uploaded! Click Update Profile to save.');
+      await save({ name, email, image: data });
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);
     } finally {
@@ -63,105 +83,51 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto pt-8 pb-16 px-4 sm:px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass border border-line rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden"
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -z-10"></div>
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6">
+      <h1 className="text-2xl sm:text-3xl font-bold text-fg tracking-tight">My Account</h1>
 
-        <div className="text-center mb-10">
-          <div className="relative w-24 h-24 mx-auto mb-4 group cursor-pointer">
-            <label htmlFor="image-upload" className="w-full h-full rounded-full overflow-hidden block border-2 border-primary/30 group-hover:border-primary transition-colors cursor-pointer relative shadow-lg">
-              {image ? (
-                <img src={image} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-3xl font-bold text-white">
-                  {userInfo?.name?.charAt(0).toUpperCase()}
-                </div>
-              )}
-              {uploading && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-white text-sm font-semibold">Change</span>
-              </div>
-            </label>
-            <input
-              type="file"
-              id="image-upload"
-              accept="image/*"
-              className="hidden"
-              onChange={uploadFileHandler}
-            />
+      {/* Identity header */}
+      <div className="bg-surface border border-line rounded-2xl p-5 sm:p-7 flex items-center gap-4">
+        <div className="relative shrink-0">
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-primary flex items-center justify-center text-on-primary text-2xl font-bold">
+            {image ? <img src={image} alt={name} className="w-full h-full object-cover" /> : name.charAt(0).toUpperCase()}
           </div>
-          <div className="mb-4">
-            <label htmlFor="image-upload" className="inline-block text-xs font-bold text-primary uppercase tracking-wide cursor-pointer hover:text-fg transition-colors bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 hover:bg-primary/20">
-              Choose Image
-            </label>
-          </div>
-          <h2 className="text-3xl font-bold text-fg mb-2">My Profile</h2>
-          <p className="text-muted">Update your account details and picture.</p>
-        </div>
-
-        <form onSubmit={submitHandler} className="space-y-6">
-          <Input
-            label="Full Name"
-            type="text"
-            icon={User}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            placeholder="Enter your name"
-          />
-
-          <Input
-            label="Email Address"
-            type="email"
-            icon={Mail}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="Enter your email"
-          />
-
-          <div className="pt-4 border-t border-line">
-            <h3 className="text-sm font-medium text-muted mb-4 uppercase tracking-wider">Change Password</h3>
-            <div className="space-y-6">
-              <Input
-                label="New Password"
-                type="password"
-                icon={Lock}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter new password (optional)"
-              />
-              <Input
-                label="Confirm New Password"
-                type="password"
-                icon={CheckCircle}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
-              />
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full mt-8"
-            disabled={loading}
+          <label
+            htmlFor="avatar"
+            className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-canvas border border-line flex items-center justify-center cursor-pointer hover:border-primary transition-colors"
+            title="Change photo"
           >
-            {loading ? 'Updating...' : 'Update Profile'}
-          </Button>
+            {uploading ? <Loader2 size={13} className="animate-spin text-primary" /> : <Camera size={13} className="text-muted" />}
+            <input id="avatar" type="file" accept="image/*" className="hidden" onChange={uploadImage} />
+          </label>
+        </div>
+        <div className="min-w-0">
+          <p className="font-semibold text-fg truncate">{name}</p>
+          <p className="text-sm text-muted truncate">{email}</p>
+        </div>
+      </div>
 
-          {error && <div className="text-danger text-center text-sm">{error}</div>}
+      {/* Account details */}
+      <Card title="Account details" subtitle="Your name and email address.">
+        <form onSubmit={saveAccount} className="space-y-4">
+          <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
+          <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <div className="flex justify-end">
+            <Button type="submit" disabled={loading}>{loading ? 'Saving…' : 'Save changes'}</Button>
+          </div>
         </form>
-      </motion.div>
+      </Card>
+
+      {/* Password */}
+      <Card title="Password" subtitle="Set a new password for signing in.">
+        <form onSubmit={savePassword} className="space-y-4">
+          <Input label="New Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" />
+          <Input label="Confirm New Password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          <div className="flex justify-end">
+            <Button type="submit" disabled={savingPw || !password}>{savingPw ? 'Updating…' : 'Update password'}</Button>
+          </div>
+        </form>
+      </Card>
     </div>
   );
 };
