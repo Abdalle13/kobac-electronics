@@ -14,6 +14,7 @@ const CheckoutPage = () => {
   const { cartItems } = useSelector(state => state.cart);
   const { userInfo } = useSelector(state => state.auth);
   const { error, loading } = useSelector(state => state.order);
+  const { freeShippingThreshold } = useSelector(state => state.settings);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -35,7 +36,7 @@ const CheckoutPage = () => {
   const [evcError, setEvcError] = useState('');
 
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const shippingPrice = itemsPrice >= 400 ? 0 : 15;
+  const shippingPrice = itemsPrice >= freeShippingThreshold ? 0 : 15;
   const taxPrice = Number((0.05 * itemsPrice).toFixed(2)); // 5% tax
   const totalPrice = itemsPrice + shippingPrice + taxPrice;
 

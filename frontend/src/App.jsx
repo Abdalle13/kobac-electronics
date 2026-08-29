@@ -26,12 +26,17 @@ import ScrollToTop from './components/routing/ScrollToTop';
 import ProfilePage from './pages/ProfilePage';
 import WishlistPage from './pages/WishlistPage';
 import { fetchWishlist, clearWishlist } from './redux/slices/wishlistSlice';
+import { fetchSettings } from './redux/slices/settingsSlice';
 // Will import other pages as we build them
 
 const AppContent = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(fetchSettings());
+  }, [dispatch]);
 
   useEffect(() => {
     if (userInfo) {
