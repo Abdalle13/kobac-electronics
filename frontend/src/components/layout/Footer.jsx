@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Heart } from 'lucide-react';
 
 const SOCIALS = [
   { label: 'X', href: 'https://x.com/ApdulahiHu34594', path: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' },
@@ -91,8 +92,10 @@ const Footer = () => {
         {/* Bottom bar */}
         <div className="border-t border-line pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-[12px] text-muted">
           <p>© {year} Kobac Electronics. All rights reserved.</p>
-          <p>
-            Designed &amp; built by{' '}
+          <p className="flex items-center gap-1.5">
+            Designed &amp; built with
+            <Heart size={13} className="text-danger fill-danger" />
+            by{' '}
             <a
               href="https://github.com/Abdalle13"
               target="_blank"
