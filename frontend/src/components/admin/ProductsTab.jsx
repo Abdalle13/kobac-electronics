@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
-import { Plus, Edit, Trash2, Archive, ArchiveRestore } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import { fetchProducts } from '../../redux/slices/productSlice';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/formatter';
@@ -29,16 +29,6 @@ const ProductsTab = ({ search }) => {
     }
   };
 
-  const toggleStatus = async (id) => {
-    try {
-      const { data } = await api.put(`/products/${id}/status`);
-      toast.success(data.message || 'Status updated');
-      dispatch(fetchProducts({ limit: 1000 }));
-    } catch (err) {
-      toast.error(err.response?.data?.message || err.message);
-    }
-  };
-
   return (
     <div>
       <div className="flex justify-end mb-6">
@@ -47,11 +37,11 @@ const ProductsTab = ({ search }) => {
         </Button>
       </div>
 
-      <AdminTable columns={['Product', 'Price', 'Category', { label: 'Stock', className: 'hidden lg:table-cell' }, 'Status', { label: 'Actions', className: 'text-right' }]}>
+      <AdminTable columns={['Product', 'Price', 'Category', { label: 'Stock', className: 'hidden lg:table-cell' }, { label: 'Actions', className: 'text-right' }]}>
         {loading ? (
-          <EmptyRow colSpan={6}>Loading…</EmptyRow>
+          <EmptyRow colSpan={5}>Loading…</EmptyRow>
         ) : rows.length === 0 ? (
-          <EmptyRow colSpan={6}>No products found.</EmptyRow>
+          <EmptyRow colSpan={5}>No products found.</EmptyRow>
         ) : rows.map((p) => (
           <tr key={p._id} className="hover:bg-surface-2 transition-colors">
             <td className="p-4">
@@ -68,15 +58,9 @@ const ProductsTab = ({ search }) => {
             <td className="p-4 hidden lg:table-cell">
               <span className={p.countInStock > 0 ? 'text-success font-semibold' : 'text-danger font-semibold'}>{p.countInStock}</span>
             </td>
-            <td className="p-4">
-              <Badge variant={p.status === 'Active' ? 'success' : 'neutral'}>{p.status || 'Active'}</Badge>
-            </td>
             <td className="p-4 text-right whitespace-nowrap">
               <button onClick={() => setModal(p)} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Edit">
                 <Edit className="w-4 h-4" />
-              </button>
-              <button onClick={() => toggleStatus(p._id)} className="p-2 text-muted hover:bg-surface-2 hover:text-fg rounded-lg transition-colors" title={p.status === 'Active' ? 'Archive' : 'Restore'}>
-                {p.status === 'Active' ? <Archive className="w-4 h-4" /> : <ArchiveRestore className="w-4 h-4" />}
               </button>
               <button onClick={() => remove(p._id)} className="p-2 text-danger hover:bg-danger/10 rounded-lg transition-colors" title="Delete">
                 <Trash2 className="w-4 h-4" />
