@@ -57,7 +57,7 @@ const HomePage = () => {
   return (
     <div className="w-full">
       {/* ── Hero ─────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-14 pb-16 sm:pt-12 sm:pb-32 md:pt-16 md:pb-40 min-h-[78vh] sm:min-h-[85vh] flex items-center">
+      <section className="relative overflow-hidden pt-16 pb-20 sm:pt-20 sm:pb-28 md:pt-24 md:pb-36 min-h-[68vh] sm:min-h-[78vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/hero.png"
@@ -71,31 +71,30 @@ const HomePage = () => {
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
             className="text-center sm:text-left max-w-2xl mx-auto sm:mx-0"
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-[9px] sm:text-sm font-semibold mb-5 sm:mb-8">
-              <Zap size={12} className="animate-pulse" /> Kobac Exclusive 2026
-            </div>
-            <h1 className="text-[2.75rem] xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-5 sm:mb-8 text-white leading-[0.9] sm:leading-[0.85] uppercase italic">
-              SMARTER <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 not-italic">
-                BEYOND
-              </span>
+            <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 sm:mb-7 text-white leading-[1.05]">
+              Premium tech,{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">
+                delivered
+              </span>{' '}
+              across Somalia.
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-8 sm:mb-12 leading-relaxed max-w-sm sm:max-w-md mx-auto sm:mx-0 font-medium">
-              Discover the next generation of tech. We bring you the world's most advanced electronics, delivered straight to your door. <span className="text-blue-300">Tayo iyo Hal-abuur.</span>
+            <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-8 sm:mb-10 leading-relaxed max-w-md mx-auto sm:mx-0">
+              Genuine phones, laptops, watches and gaming gear — with fast local delivery
+              and EVC Plus checkout.
             </p>
-            <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 justify-center sm:justify-start">
+            <div className="flex flex-col xs:flex-row gap-3 justify-center sm:justify-start">
               <Link to="/shop" className="w-full xs:w-auto">
-                <Button className="w-full xs:w-auto px-8 sm:px-10 py-3.5 sm:py-4 text-sm font-semibold flex items-center justify-center gap-2 rounded-2xl shadow-2xl shadow-blue-600/20 hover:scale-105 transition-transform active:scale-95">
-                  Explore Shop <ArrowRight className="w-4 h-4" />
+                <Button className="w-full xs:w-auto px-8 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 rounded-xl hover:scale-[1.03] transition-transform active:scale-95">
+                  Shop Now <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
               {!userInfo && (
                 <Link to="/register" className="w-full xs:w-auto">
-                  <Button variant="ghost" className="w-full xs:w-auto px-8 sm:px-10 py-3.5 sm:py-4 text-sm font-semibold text-white border border-white/20 rounded-2xl hover:bg-white/10 hover:text-white backdrop-blur-md">
-                    Start Your Journey
+                  <Button variant="ghost" className="w-full xs:w-auto px-8 py-3.5 text-sm font-semibold text-white border border-white/25 rounded-xl hover:bg-white/10 hover:text-white">
+                    Create Account
                   </Button>
                 </Link>
               )}
