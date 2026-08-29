@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
-import { ArrowRight, Zap, Shield, Truck, Mail, Star, Quote, Flame } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Truck, Mail, Star, Quote } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
@@ -57,14 +57,14 @@ const HomePage = () => {
   return (
     <div className="w-full">
       {/* ── Hero ─────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-14 pb-16 sm:pt-20 sm:pb-28 md:pt-24 md:pb-36 min-h-[58vh] sm:min-h-[78vh] flex items-center">
+      <section className="relative overflow-hidden py-16 sm:py-24 md:py-32 min-h-[calc(100dvh-6.5rem)] sm:min-h-[80vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/hero.png"
             alt="Premium Electronics"
-            className="w-full h-full object-cover opacity-55 sm:opacity-40 mix-blend-overlay scale-105 sm:scale-100"
+            className="w-full h-full object-cover opacity-60 sm:opacity-40 mix-blend-overlay"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black sm:bg-gradient-to-r sm:from-black sm:via-black/80 sm:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/75 to-black sm:bg-gradient-to-r sm:from-black sm:via-black/80 sm:to-transparent" />
         </div>
 
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -108,10 +108,7 @@ const HomePage = () => {
         <section className="py-14 sm:py-20 md:py-24 bg-canvas">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10 sm:mb-14">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
-                <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-fg tracking-tight">Best Sellers</h2>
-              </div>
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-fg tracking-tight mb-3">Best Sellers</h2>
               <p className="text-muted max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
                 The products our customers order the most.
               </p>

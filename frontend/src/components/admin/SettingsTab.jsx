@@ -89,7 +89,7 @@ const SettingsTab = () => {
               onChange={(e) => setStore({ ...store, freeShippingThreshold: Number(e.target.value) })} placeholder="400" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Input label="Support Email" type="email" value={store.supportEmail} onChange={(e) => setStore({ ...store, supportEmail: e.target.value })} placeholder="support@kobac.com" />
+            <Input label="Support Email" type="email" value={store.supportEmail} onChange={(e) => setStore({ ...store, supportEmail: e.target.value })} placeholder="support@gmail.com" />
             <Input label="Support Phone" value={store.supportPhone} onChange={(e) => setStore({ ...store, supportPhone: e.target.value })} placeholder="+252 61 XXXXXXX" />
           </div>
           <div className="flex justify-end">
