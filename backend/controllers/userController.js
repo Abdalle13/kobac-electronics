@@ -23,7 +23,6 @@ const authUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      image: user.image,
       token: generateToken(res, user._id),
     });
   } else {
@@ -55,7 +54,6 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      image: user.image,
       token: generateToken(res, user._id),
     });
 
@@ -87,7 +85,6 @@ const getUserProfile = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      image: user.image,
     });
   } else {
     res.status(404).json({ message: 'User not found' });
@@ -103,9 +100,6 @@ const updateUserProfile = async (req, res) => {
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
-    if (req.body.image !== undefined) {
-      user.image = req.body.image;
-    }
 
     if (req.body.password) {
       user.password = req.body.password;
@@ -118,7 +112,6 @@ const updateUserProfile = async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
-      image: updatedUser.image,
       token: generateToken(res, updatedUser._id),
     });
   } else {
@@ -221,7 +214,6 @@ const resetPassword = async (req, res) => {
     name: user.name,
     email: user.email,
     role: user.role,
-    image: user.image,
     token: generateToken(res, user._id),
   });
 };
