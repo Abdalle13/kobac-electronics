@@ -8,7 +8,7 @@ const Input = ({ label, id, error, icon: Icon, type, className = '', ...props })
   return (
     <div className={`flex flex-col mb-5 ${className}`}>
       {label && (
-        <label htmlFor={id} className="mb-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-muted">
+        <label htmlFor={id} className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-muted">
           {label}
         </label>
       )}

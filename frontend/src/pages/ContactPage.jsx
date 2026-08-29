@@ -94,7 +94,7 @@ const ContactPage = () => {
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl sm:text-5xl font-black text-fg tracking-tighter mb-4"
+            className="text-4xl sm:text-5xl font-bold text-fg tracking-tight mb-4"
           >
             Get in touch
           </motion.h1>
@@ -124,7 +124,7 @@ const ContactPage = () => {
                     <c.icon className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-muted uppercase tracking-widest">{c.title}</p>
+                    <p className="text-[11px] font-bold text-muted uppercase tracking-wide">{c.title}</p>
                     <p className="text-fg font-semibold truncate">{c.value}</p>
                   </div>
                 </Wrapper>
@@ -134,7 +134,7 @@ const ContactPage = () => {
             <div className="glass border border-line rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Clock className="w-4 h-4 text-primary" />
-                <p className="text-[11px] font-bold text-muted uppercase tracking-widest">Support Hours</p>
+                <p className="text-[11px] font-bold text-muted uppercase tracking-wide">Support Hours</p>
               </div>
               <div className="space-y-1.5 text-sm">
                 <div className="flex justify-between text-muted">
@@ -190,7 +190,7 @@ const ContactPage = () => {
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     />
                     <div className="flex flex-col mb-5">
-                      <label className="mb-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-muted">Message</label>
+                      <label className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-muted">Message</label>
                       <textarea
                         rows="6"
                         required
@@ -224,7 +224,7 @@ const ContactPage = () => {
 
         {/* FAQ */}
         <div className="mt-16 sm:mt-24 max-w-3xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-black text-fg tracking-tighter text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-fg tracking-tight text-center mb-8">
             Frequently asked questions
           </h2>
           <div className="space-y-3">

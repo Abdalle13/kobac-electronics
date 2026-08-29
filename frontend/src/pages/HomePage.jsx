@@ -74,10 +74,10 @@ const HomePage = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-center sm:text-left max-w-2xl mx-auto sm:mx-0"
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-[9px] sm:text-xs font-black uppercase tracking-[0.2em] mb-5 sm:mb-8">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-[9px] sm:text-sm font-semibold mb-5 sm:mb-8">
               <Zap size={12} className="animate-pulse" /> Kobac Exclusive 2026
             </div>
-            <h1 className="text-[2.75rem] xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-5 sm:mb-8 text-white leading-[0.9] sm:leading-[0.85] uppercase italic">
+            <h1 className="text-[2.75rem] xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-5 sm:mb-8 text-white leading-[0.9] sm:leading-[0.85] uppercase italic">
               SMARTER <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 not-italic">
                 BEYOND
@@ -88,13 +88,13 @@ const HomePage = () => {
             </p>
             <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 justify-center sm:justify-start">
               <Link to="/shop" className="w-full xs:w-auto">
-                <Button className="w-full xs:w-auto px-8 sm:px-10 py-3.5 sm:py-4 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 rounded-2xl shadow-2xl shadow-blue-600/20 hover:scale-105 transition-transform active:scale-95">
+                <Button className="w-full xs:w-auto px-8 sm:px-10 py-3.5 sm:py-4 text-sm font-semibold flex items-center justify-center gap-2 rounded-2xl shadow-2xl shadow-blue-600/20 hover:scale-105 transition-transform active:scale-95">
                   Explore Shop <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
               {!userInfo && (
                 <Link to="/register" className="w-full xs:w-auto">
-                  <Button variant="ghost" className="w-full xs:w-auto px-8 sm:px-10 py-3.5 sm:py-4 text-xs font-black uppercase tracking-widest text-white border border-white/20 rounded-2xl hover:bg-white/10 hover:text-white backdrop-blur-md">
+                  <Button variant="ghost" className="w-full xs:w-auto px-8 sm:px-10 py-3.5 sm:py-4 text-sm font-semibold text-white border border-white/20 rounded-2xl hover:bg-white/10 hover:text-white backdrop-blur-md">
                     Start Your Journey
                   </Button>
                 </Link>
@@ -111,7 +111,7 @@ const HomePage = () => {
             <div className="text-center mb-10 sm:mb-14">
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
-                <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-fg tracking-tighter">BEST SELLERS</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-fg tracking-tight">Best Sellers</h2>
               </div>
               <p className="text-muted max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
                 The products our customers order the most.
@@ -126,7 +126,7 @@ const HomePage = () => {
 
             <div className="flex justify-center mt-10 sm:mt-12">
               <Link to="/shop">
-                <Button variant="secondary" className="px-8 py-3 text-xs font-black uppercase tracking-widest rounded-2xl flex items-center gap-2">
+                <Button variant="secondary" className="px-8 py-3 text-sm font-semibold rounded-2xl flex items-center gap-2">
                   View All Products <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -139,7 +139,7 @@ const HomePage = () => {
       <section className="py-14 sm:py-20 bg-surface border-y border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-fg tracking-tighter mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-fg tracking-tight mb-4">
               Why choose us?
             </h2>
             <p className="text-muted max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
@@ -169,7 +169,7 @@ const HomePage = () => {
       {/* ── Testimonials — Marquee ────────────────── */}
       <section className="py-14 sm:py-20 bg-canvas overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 sm:mb-12 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-fg tracking-tighter">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg tracking-tight">
             Trusted by customers across Somalia
           </h2>
           <p className="text-muted text-xs sm:text-sm mt-2">Real reviews from real people.</p>

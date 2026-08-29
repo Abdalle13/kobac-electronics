@@ -80,14 +80,14 @@ const OrderDetailPage = () => {
                   </div>
                 </div>
               </div>
-              <Badge variant={order.status === 'Delivered' ? 'success' : order.status === 'Cancelled' ? 'danger' : 'primary'} className="px-4 py-1.5 text-sm uppercase font-bold tracking-widest">
+              <Badge variant={order.status === 'Delivered' ? 'success' : order.status === 'Cancelled' ? 'danger' : 'primary'} className="px-4 py-1.5 text-sm uppercase font-bold tracking-wide">
                 {order.status || (order.isDelivered ? 'Delivered' : order.isPaid ? 'Paid' : 'Processing')}
               </Badge>
             </div>
 
             <div className="p-0 overflow-x-auto">
               <table className="w-full text-left min-w-[500px]">
-                <thead className="bg-surface-2 text-muted text-[10px] uppercase font-bold tracking-[0.2em] border-b border-line">
+                <thead className="bg-surface-2 text-muted text-[10px] uppercase font-bold tracking-wide border-b border-line">
                   <tr>
                     <th className="p-6">Product Item</th>
                     <th className="p-6 text-center">Quantity</th>
@@ -106,7 +106,7 @@ const OrderDetailPage = () => {
                           />
                           <div>
                             <Link to={`/product/${item.product}`} className="text-fg font-bold hover:text-primary transition-colors line-clamp-1">{item.name}</Link>
-                            <p className="text-xs text-muted font-mono tracking-tighter">{formatCurrency(item.price)} per unit</p>
+                            <p className="text-xs text-muted font-mono tracking-tight">{formatCurrency(item.price)} per unit</p>
                           </div>
                         </div>
                       </td>
@@ -125,7 +125,7 @@ const OrderDetailPage = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
             <div className="glass border border-line rounded-3xl p-5 sm:p-8 ">
-              <h3 className="text-xs font-bold text-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+              <h3 className="text-xs font-bold text-muted uppercase tracking-wide mb-6 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" /> Delivery Destination
               </h3>
               <div className="space-y-2 text-fg">
@@ -150,7 +150,7 @@ const OrderDetailPage = () => {
             </div>
 
             <div className="glass border border-line rounded-3xl p-5 sm:p-8 ">
-              <h3 className="text-xs font-bold text-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+              <h3 className="text-xs font-bold text-muted uppercase tracking-wide mb-6 flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-primary" /> Payment Method
               </h3>
               <div className="space-y-4">
@@ -192,7 +192,7 @@ const OrderDetailPage = () => {
               </div>
               <div className="flex justify-between items-end pt-2">
                 <span className="text-muted font-bold">Total Payable</span>
-                <span className="text-3xl font-black text-fg">{formatCurrency(order.totalPrice)}</span>
+                <span className="text-3xl font-bold text-fg">{formatCurrency(order.totalPrice)}</span>
               </div>
             </div>
           </div>

@@ -129,7 +129,7 @@ const CartDrawer = ({ isOpen, setIsOpen }) => {
           <div className="px-4 sm:px-5 py-4 border-t border-line bg-surface shrink-0">
             <div className="flex justify-between items-center mb-3">
               <span className="text-sm text-muted font-medium">Subtotal</span>
-              <span className="text-xl font-black text-fg">{formatCurrency(cartTotal)}</span>
+              <span className="text-xl font-bold text-fg">{formatCurrency(cartTotal)}</span>
             </div>
             <p className="text-[10px] text-muted/70 mb-3">Shipping and taxes calculated at checkout.</p>
             <Button variant="primary" className="w-full py-3.5 text-sm font-bold" onClick={handleCheckout}>

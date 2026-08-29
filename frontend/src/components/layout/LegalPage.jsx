@@ -5,7 +5,7 @@ const LegalPage = ({ title, lastUpdated, intro, children }) => (
     <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
 
     <div className="max-w-3xl mx-auto px-4 sm:px-6 relative z-10">
-      <h1 className="text-3xl sm:text-4xl font-black text-fg tracking-tighter mb-2">{title}</h1>
+      <h1 className="text-3xl sm:text-4xl font-bold text-fg tracking-tight mb-2">{title}</h1>
       <p className="text-muted text-sm mb-10">Last updated: {lastUpdated}</p>
 
       {intro && <p className="text-muted leading-relaxed text-[15px] mb-10">{intro}</p>}

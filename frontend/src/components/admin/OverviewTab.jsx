@@ -15,7 +15,7 @@ const StatCard = ({ icon: Icon, label, value, tone }) => (
       </div>
       <h3 className="text-muted font-semibold tracking-wider text-[10px] uppercase">{label}</h3>
     </div>
-    <p className="text-2xl sm:text-3xl font-black text-fg">{value}</p>
+    <p className="text-2xl sm:text-3xl font-bold text-fg">{value}</p>
   </div>
 );
 
@@ -64,12 +64,12 @@ const OverviewTab = () => {
       <div className="bg-surface border border-line rounded-2xl p-5 sm:p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h3 className="text-lg sm:text-xl font-black text-fg tracking-tighter uppercase italic">Revenue (last 7 days)</h3>
-            <p className="text-[10px] sm:text-xs text-muted uppercase tracking-widest mt-1">Paid orders by day</p>
+            <h3 className="text-lg sm:text-xl font-bold text-fg tracking-tight">Revenue — last 7 days</h3>
+            <p className="text-xs text-muted mt-1">Paid orders by day</p>
           </div>
           <div className="flex items-center gap-2 text-primary bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/10">
             <Activity size={14} />
-            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest">Live</span>
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wide">Live</span>
           </div>
         </div>
 

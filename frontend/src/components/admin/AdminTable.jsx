@@ -8,7 +8,7 @@ export const AdminTable = ({ columns, minWidth = 700, children }) => (
   <div className="bg-surface border border-line rounded-2xl overflow-x-auto">
     <table className="w-full text-left border-collapse" style={{ minWidth }}>
       <thead>
-        <tr className="bg-surface-2 border-b border-line text-muted text-xs uppercase tracking-widest font-bold">
+        <tr className="bg-surface-2 border-b border-line text-muted text-xs uppercase tracking-wide font-bold">
           {columns.map((c, i) => {
             const label = typeof c === 'string' ? c : c.label;
             const className = typeof c === 'string' ? '' : c.className || '';

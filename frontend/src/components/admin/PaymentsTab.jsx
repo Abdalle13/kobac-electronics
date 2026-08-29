@@ -23,24 +23,24 @@ const PaymentsTab = () => {
     <div className="space-y-6 sm:space-y-8">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         <div className="bg-surface border border-line rounded-2xl p-6">
-          <p className="text-muted text-xs font-black uppercase tracking-widest mb-2">Total Paid Sales</p>
-          <p className="text-3xl sm:text-4xl font-black text-fg">{formatCurrency(totalSales)}</p>
+          <p className="text-muted text-sm font-semibold mb-2">Total Paid Sales</p>
+          <p className="text-3xl sm:text-4xl font-bold text-fg">{formatCurrency(totalSales)}</p>
           <p className="text-[10px] text-primary mt-2 font-bold uppercase tracking-wider">From {numOrders} orders</p>
         </div>
         <div className="bg-surface border border-line rounded-2xl p-6">
-          <p className="text-muted text-xs font-black uppercase tracking-widest mb-2">EVC Plus Sales</p>
-          <p className="text-2xl sm:text-3xl font-black text-primary">{formatCurrency(evcSales)}</p>
+          <p className="text-muted text-sm font-semibold mb-2">EVC Plus Sales</p>
+          <p className="text-2xl sm:text-3xl font-bold text-primary">{formatCurrency(evcSales)}</p>
           <Bar value={evcSales} total={totalSales} tone="bg-primary" />
         </div>
         <div className="bg-surface border border-line rounded-2xl p-6">
-          <p className="text-muted text-xs font-black uppercase tracking-widest mb-2">Cash on Delivery</p>
-          <p className="text-2xl sm:text-3xl font-black text-success">{formatCurrency(codSales)}</p>
+          <p className="text-muted text-sm font-semibold mb-2">Cash on Delivery</p>
+          <p className="text-2xl sm:text-3xl font-bold text-success">{formatCurrency(codSales)}</p>
           <Bar value={codSales} total={totalSales} tone="bg-success" />
         </div>
       </div>
 
       <div className="bg-surface border border-line rounded-2xl p-6 sm:p-8">
-        <h3 className="text-lg font-black text-fg mb-6 tracking-tight">Sales History (Paid)</h3>
+        <h3 className="text-lg font-bold text-fg mb-6 tracking-tight">Sales History (Paid)</h3>
         <div className="space-y-3">
           {Object.keys(salesByDay).length === 0 ? (
             <p className="text-muted text-sm italic">No sales history yet.</p>
@@ -52,7 +52,7 @@ const PaymentsTab = () => {
                 </div>
                 <span className="text-muted font-bold text-sm">{date}</span>
               </div>
-              <span className="text-fg font-black">{formatCurrency(amount)}</span>
+              <span className="text-fg font-bold">{formatCurrency(amount)}</span>
             </div>
           ))}
         </div>

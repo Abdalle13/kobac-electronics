@@ -24,7 +24,7 @@ const AboutPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-fg tracking-tighter mb-4 sm:mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-fg tracking-tight mb-4 sm:mb-6">
               About <span className="text-primary">KOBAC</span>
             </h1>
             <p className="text-muted text-lg md:text-xl leading-relaxed">
@@ -43,7 +43,7 @@ const AboutPage = () => {
             transition={{ duration: 0.6 }}
             className="space-y-6"
           >
-            <h2 className="text-3xl font-black text-fg tracking-tight">Our Story</h2>
+            <h2 className="text-3xl font-bold text-fg tracking-tight">Our Story</h2>
             <div className="w-20 h-1.5 bg-primary rounded-full"></div>
             <p className="text-muted leading-relaxed">
               Founded with a vision to revolutionize the electronics market in the region, Kobac Electronics started as a small dream to provide authentic devices to tech enthusiasts. 
@@ -100,15 +100,15 @@ const AboutPage = () => {
               <div className={`w-16 h-16 mx-auto rounded-full ${stat.bg} ${stat.color} flex items-center justify-center mb-6`}>
                 <stat.icon size={28} />
               </div>
-              <h3 className="text-4xl font-black text-fg mb-2">{stat.value}</h3>
-              <p className="text-sm font-bold text-muted uppercase tracking-widest">{stat.label}</p>
+              <h3 className="text-4xl font-bold text-fg mb-2">{stat.value}</h3>
+              <p className="text-sm font-bold text-muted uppercase tracking-wide">{stat.label}</p>
             </motion.div>
           ))}
         </div>
 
         {/* Values Section */}
         <div className="text-center max-w-4xl mx-auto">
-          <h2 className="text-3xl font-black text-fg tracking-tight mb-6">Why Choose Us?</h2>
+          <h2 className="text-3xl font-bold text-fg tracking-tight mb-6">Why Choose Us?</h2>
           <p className="text-muted mb-12">We don't just sell electronics; we sell peace of mind.</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">

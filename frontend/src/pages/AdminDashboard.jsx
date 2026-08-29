@@ -44,7 +44,7 @@ const AdminDashboard = () => {
     <div className="flex flex-col lg:flex-row w-full h-screen overflow-hidden bg-canvas text-fg">
       {/* Mobile header */}
       <div className="lg:hidden h-16 bg-surface border-b border-line flex items-center justify-between px-5 z-[80] shrink-0">
-        <span className="text-base font-black tracking-tighter text-fg">KOBAC <span className="text-primary">Electronics</span></span>
+        <span className="text-base font-bold tracking-tight text-fg">KOBAC <span className="text-primary">Electronics</span></span>
         <button onClick={() => setSidebarOpen(true)} className="w-9 h-9 flex items-center justify-center rounded-full bg-surface-2 text-muted hover:text-fg transition-colors">
           <Menu size={20} />
         </button>

@@ -284,7 +284,7 @@ const PageBtn = ({ children, active, disabled, onClick }) => (
 
 const PanelSection = ({ title, children }) => (
   <div className="py-5 border-b border-line">
-    <p className="text-[11px] font-bold text-muted uppercase tracking-[0.15em] mb-3">{title}</p>
+    <p className="text-[11px] font-bold text-muted uppercase tracking-wide mb-3">{title}</p>
     {children}
   </div>
 );

@@ -76,7 +76,7 @@ const MyOrdersPage = () => {
               <div className="flex flex-col md:flex-row justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="text-xs font-mono text-muted uppercase tracking-tighter">Order #{order._id.substring(order._id.length - 8)}</span>
+                    <span className="text-xs font-mono text-muted uppercase tracking-tight">Order #{order._id.substring(order._id.length - 8)}</span>
                     <Badge variant={order.isPaid ? 'primary' : 'neutral'}>
                       {order.isPaid ? 'Paid' : 'Payment Pending'}
                     </Badge>

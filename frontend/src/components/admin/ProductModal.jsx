@@ -81,7 +81,7 @@ const ProductModal = ({ product, onClose }) => {
           <Input label="Brand" required value={form.brand} onChange={set('brand')} />
           <Input label="Category" placeholder="Phone, Laptop, Gaming…" required value={form.category} onChange={set('category')} />
           <div className="flex flex-col mb-5">
-            <label className="mb-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-muted">Product Image</label>
+            <label className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-muted">Product Image</label>
             <input
               type="file"
               accept="image/*"
@@ -95,7 +95,7 @@ const ProductModal = ({ product, onClose }) => {
         </div>
 
         <div className="flex flex-col mb-5">
-          <label className="mb-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-muted">Description</label>
+          <label className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-muted">Description</label>
           <textarea
             required
             value={form.description}

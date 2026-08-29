@@ -47,8 +47,8 @@ const RegisterPage = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface-2 border border-line mb-4 overflow-hidden">
             <img src="/favicon.svg" alt="Kobac Logo" className="w-10 h-10 object-contain" />
           </div>
-          <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-2">Kobac Electronics</h2>
-          <h1 className="text-3xl font-black text-fg tracking-tighter">Create Account</h1>
+          <h2 className="text-sm font-semibold text-primary mb-2">Kobac Electronics</h2>
+          <h1 className="text-3xl font-bold text-fg tracking-tight">Create Account</h1>
           <p className="text-muted text-sm mt-2">Join us to experience the best tech in Somalia.</p>
         </div>
         
@@ -104,7 +104,7 @@ const RegisterPage = () => {
           
           <Button 
             type="submit" 
-            className="w-full !mt-8 py-4 h-auto text-sm font-black uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(0,102,255,0.3)] hover:shadow-[0_0_30px_rgba(0,102,255,0.5)] transition-all"
+            className="w-full !mt-8 py-4 h-auto text-sm font-semibold rounded-xl shadow-[0_0_20px_rgba(0,102,255,0.3)] hover:shadow-[0_0_30px_rgba(0,102,255,0.5)] transition-all"
             disabled={loading}
           >
             {loading ? 'Creating...' : 'Register'}

@@ -10,7 +10,7 @@ import Button from '../ui/Button';
 const Card = ({ title, subtitle, children }) => (
   <div className="bg-surface border border-line rounded-3xl p-6 sm:p-8">
     <div className="mb-6 border-b border-line pb-5">
-      <h3 className="text-lg font-black text-fg mb-1">{title}</h3>
+      <h3 className="text-lg font-bold text-fg mb-1">{title}</h3>
       {subtitle && <p className="text-muted text-sm">{subtitle}</p>}
     </div>
     {children}
@@ -93,7 +93,7 @@ const SettingsTab = () => {
             <Input label="Support Phone" value={store.supportPhone} onChange={(e) => setStore({ ...store, supportPhone: e.target.value })} placeholder="+252 61 XXXXXXX" />
           </div>
           <div className="flex justify-end">
-            <Button disabled={savingStore} onClick={() => persist(store, setSavingStore, 'Store settings saved')} className="px-8 text-xs font-black uppercase tracking-widest">
+            <Button disabled={savingStore} onClick={() => persist(store, setSavingStore, 'Store settings saved')} className="px-8 text-sm font-semibold">
               {savingStore ? 'Saving…' : 'Save Store Info'}
             </Button>
           </div>
@@ -115,7 +115,7 @@ const SettingsTab = () => {
           ))}
           <label htmlFor="banner-upload" className="flex flex-col items-center justify-center border-2 border-dashed border-line rounded-xl aspect-video bg-surface-2 cursor-pointer hover:border-primary/40 transition-colors">
             <Plus className="text-muted mb-2" />
-            <span className="text-muted text-xs font-bold uppercase tracking-widest">Add Banner</span>
+            <span className="text-muted text-sm font-semibold">Add Banner</span>
             <input type="file" id="banner-upload" hidden onChange={uploadBanner} />
           </label>
         </div>
@@ -133,7 +133,7 @@ const SettingsTab = () => {
             <Input label="Email Address" type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} />
           </div>
           <div className="p-4 rounded-2xl bg-surface-2 border border-line">
-            <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Change Password</p>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-primary mb-4">Change Password</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input label="New Password" type="password" value={profile.password} onChange={(e) => setProfile({ ...profile, password: e.target.value })} placeholder="••••••••" />
               <Input label="Confirm Password" type="password" value={profile.confirmPassword} onChange={(e) => setProfile({ ...profile, confirmPassword: e.target.value })} placeholder="••••••••" />
@@ -141,7 +141,7 @@ const SettingsTab = () => {
             <p className="text-[10px] text-muted mt-2">Leave blank to keep your current password.</p>
           </div>
           <div className="flex justify-end">
-            <Button type="submit" disabled={savingProfile} className="px-10 text-xs font-black uppercase tracking-widest">
+            <Button type="submit" disabled={savingProfile} className="px-10 text-sm font-semibold">
               {savingProfile ? 'Saving…' : 'Save Profile Changes'}
             </Button>
           </div>

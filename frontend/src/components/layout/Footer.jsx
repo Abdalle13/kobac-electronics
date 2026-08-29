@@ -14,7 +14,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="sm:col-span-1">
             <Link to="/" className="inline-block mb-3 sm:mb-4">
-              <span className="text-base sm:text-lg font-black text-fg tracking-tight">
+              <span className="text-base sm:text-lg font-bold text-fg tracking-tight">
                 KOBAC <span className="text-primary">Electronics</span>
               </span>
             </Link>
@@ -48,7 +48,7 @@ const Footer = () => {
           <div className="grid grid-cols-2 gap-8 sm:contents">
             {/* Shop */}
             <div>
-              <h3 className="text-[10px] sm:text-[11px] font-bold text-fg uppercase tracking-[0.15em] mb-3 sm:mb-4">Shop</h3>
+              <h3 className="text-[10px] sm:text-[11px] font-bold text-fg uppercase tracking-wide mb-3 sm:mb-4">Shop</h3>
               <ul className="space-y-2.5 sm:space-y-3 text-[12px] sm:text-[13px] text-muted">
                 {[
                   { to: '/shop?category=Phone', label: 'Smartphones' },
@@ -66,7 +66,7 @@ const Footer = () => {
 
             {/* Support */}
             <div>
-              <h3 className="text-[10px] sm:text-[11px] font-bold text-fg uppercase tracking-[0.15em] mb-3 sm:mb-4">Support</h3>
+              <h3 className="text-[10px] sm:text-[11px] font-bold text-fg uppercase tracking-wide mb-3 sm:mb-4">Support</h3>
               <ul className="space-y-2.5 sm:space-y-3 text-[12px] sm:text-[13px] text-muted">
                 {[
                   { to: '/contact', label: 'Contact Us' },

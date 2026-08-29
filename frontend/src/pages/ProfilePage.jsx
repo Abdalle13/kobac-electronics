@@ -88,7 +88,7 @@ const ProfilePage = () => {
                 </div>
               )}
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-white text-xs font-bold uppercase tracking-widest">Change</span>
+                <span className="text-white text-sm font-semibold">Change</span>
               </div>
             </label>
             <input
@@ -100,7 +100,7 @@ const ProfilePage = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="image-upload" className="inline-block text-xs font-bold text-primary uppercase tracking-widest cursor-pointer hover:text-fg transition-colors bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 hover:bg-primary/20">
+            <label htmlFor="image-upload" className="inline-block text-xs font-bold text-primary uppercase tracking-wide cursor-pointer hover:text-fg transition-colors bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 hover:bg-primary/20">
               Choose Image
             </label>
           </div>
