@@ -67,7 +67,7 @@ const ProfilePage = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass border border-white/5 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden"
+        className="glass border border-line rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -z-10"></div>
@@ -100,12 +100,12 @@ const ProfilePage = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="image-upload" className="inline-block text-xs font-bold text-primary uppercase tracking-widest cursor-pointer hover:text-white transition-colors bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 hover:bg-primary/20">
+            <label htmlFor="image-upload" className="inline-block text-xs font-bold text-primary uppercase tracking-widest cursor-pointer hover:text-fg transition-colors bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 hover:bg-primary/20">
               Choose Image
             </label>
           </div>
-          <h2 className="text-3xl font-bold text-white mb-2">My Profile</h2>
-          <p className="text-gray-400">Update your account details and picture.</p>
+          <h2 className="text-3xl font-bold text-fg mb-2">My Profile</h2>
+          <p className="text-muted">Update your account details and picture.</p>
         </div>
 
         <form onSubmit={submitHandler} className="space-y-6">
@@ -129,8 +129,8 @@ const ProfilePage = () => {
             placeholder="Enter your email"
           />
 
-          <div className="pt-4 border-t border-white/10">
-            <h3 className="text-sm font-medium text-gray-400 mb-4 uppercase tracking-wider">Change Password</h3>
+          <div className="pt-4 border-t border-line">
+            <h3 className="text-sm font-medium text-muted mb-4 uppercase tracking-wider">Change Password</h3>
             <div className="space-y-6">
               <Input
                 label="New Password"
@@ -159,7 +159,7 @@ const ProfilePage = () => {
             {loading ? 'Updating...' : 'Update Profile'}
           </Button>
 
-          {error && <div className="text-red-500 text-center text-sm">{error}</div>}
+          {error && <div className="text-danger text-center text-sm">{error}</div>}
         </form>
       </motion.div>
     </div>

@@ -22,7 +22,7 @@ const OrderDetailPage = () => {
     return (
       <div className="max-w-5xl mx-auto px-4 py-20 flex flex-col items-center justify-center min-h-[60vh]">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-gray-400 font-medium">Fetching order manifest...</p>
+        <p className="text-muted font-medium">Fetching order manifest...</p>
       </div>
     );
   }
@@ -30,10 +30,10 @@ const OrderDetailPage = () => {
   if (error) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-20 text-center">
-        <div className="bg-red-500/10 border border-red-500/30 rounded-3xl p-10 inline-block">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Order Not Found</h2>
-          <p className="text-gray-400 mb-6">{error}</p>
+        <div className="bg-danger/10 border border-danger/30 rounded-3xl p-10 inline-block">
+          <AlertCircle className="w-16 h-16 text-danger mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-fg mb-2">Order Not Found</h2>
+          <p className="text-muted mb-6">{error}</p>
           <Link to="/my-orders">
             <Button>Back to My Orders</Button>
           </Link>
@@ -49,7 +49,7 @@ const OrderDetailPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 w-full">
-      <Link to="/my-orders" className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-8 group">
+      <Link to="/my-orders" className="flex items-center gap-2 text-muted hover:text-fg transition-colors mb-8 group">
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         <span className="text-sm font-medium tracking-wide uppercase">Back to My Orders</span>
       </Link>
@@ -62,18 +62,18 @@ const OrderDetailPage = () => {
       >
         {/* Left Column: Order Manifest */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="glass border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
-            <div className="p-8 border-b border-white/5 bg-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="glass border border-line rounded-3xl overflow-hidden shadow-2xl">
+            <div className="p-8 border-b border-line bg-surface-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-white mb-1 tracking-tight">
+                <h1 className="text-2xl font-bold text-fg mb-1 tracking-tight">
                   Order #{order._id?.substring(order._id.length - 12).toUpperCase() || 'UNKNOWN'}
                 </h1>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
+                <div className="flex items-center gap-4 text-sm text-muted">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
                     {new Date(order.createdAt).toLocaleDateString()}
                   </div>
-                  <div className="w-1 h-1 bg-gray-700 rounded-full"></div>
+                  <div className="w-1 h-1 bg-surface-2 rounded-full"></div>
                   <div className="flex items-center gap-1">
                     <Package className="w-4 h-4" />
                     {order.orderItems.length} items
@@ -87,7 +87,7 @@ const OrderDetailPage = () => {
 
             <div className="p-0 overflow-x-auto">
               <table className="w-full text-left min-w-[500px]">
-                <thead className="bg-[#0A0A0B] text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em] border-b border-white/5">
+                <thead className="bg-surface-2 text-muted text-[10px] uppercase font-bold tracking-[0.2em] border-b border-line">
                   <tr>
                     <th className="p-6">Product Item</th>
                     <th className="p-6 text-center">Quantity</th>
@@ -96,24 +96,24 @@ const OrderDetailPage = () => {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {order.orderItems.map((item) => (
-                    <tr key={item.product} className="hover:bg-white/5 transition-colors group">
+                    <tr key={item.product} className="hover:bg-surface-2 transition-colors group">
                       <td className="p-6">
                         <div className="flex items-center gap-4">
                           <img 
                             src={item.image || '/placeholder.jpg'} 
                             alt={item.name} 
-                            className="w-16 h-16 rounded-2xl object-cover border border-white/5 group-hover:border-primary/50 transition-colors"
+                            className="w-16 h-16 rounded-2xl object-cover border border-line group-hover:border-primary/50 transition-colors"
                           />
                           <div>
-                            <Link to={`/product/${item.product}`} className="text-white font-bold hover:text-primary transition-colors line-clamp-1">{item.name}</Link>
-                            <p className="text-xs text-gray-500 font-mono tracking-tighter">{formatCurrency(item.price)} per unit</p>
+                            <Link to={`/product/${item.product}`} className="text-fg font-bold hover:text-primary transition-colors line-clamp-1">{item.name}</Link>
+                            <p className="text-xs text-muted font-mono tracking-tighter">{formatCurrency(item.price)} per unit</p>
                           </div>
                         </div>
                       </td>
                       <td className="p-6 text-center">
-                        <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-white font-bold">{item.qty}</span>
+                        <span className="px-3 py-1 bg-surface-2 border border-line rounded-lg text-fg font-bold">{item.qty}</span>
                       </td>
-                      <td className="p-6 text-right text-white font-bold">
+                      <td className="p-6 text-right text-fg font-bold">
                         {formatCurrency(item.price * item.qty)}
                       </td>
                     </tr>
@@ -124,37 +124,37 @@ const OrderDetailPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="glass border border-white/5 rounded-3xl p-8 bg-gradient-to-br from-white/5 to-transparent">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+            <div className="glass border border-line rounded-3xl p-8 ">
+              <h3 className="text-xs font-bold text-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" /> Delivery Destination
               </h3>
-              <div className="space-y-2 text-white">
+              <div className="space-y-2 text-fg">
                 <p className="font-bold text-lg">{order.user?.name || 'Customer'}</p>
-                <p className="text-gray-400">
-                  <span className="text-gray-500 font-medium mr-2">Street:</span>
+                <p className="text-muted">
+                  <span className="text-muted font-medium mr-2">Street:</span>
                   {order.shippingAddress?.streetName || 'No street provided'}
                 </p>
-                <p className="text-gray-400">
-                  <span className="text-gray-500 font-medium mr-2">City:</span>
+                <p className="text-muted">
+                  <span className="text-muted font-medium mr-2">City:</span>
                   {order.shippingAddress?.city}
                 </p>
-                <p className="text-gray-400">
-                  <span className="text-gray-500 font-medium mr-2">District:</span>
+                <p className="text-muted">
+                  <span className="text-muted font-medium mr-2">District:</span>
                   {order.shippingAddress?.district}
                 </p>
-                <p className="text-gray-400">
-                  <span className="text-gray-500 font-medium mr-2">Landmark:</span>
+                <p className="text-muted">
+                  <span className="text-muted font-medium mr-2">Landmark:</span>
                   {order.shippingAddress?.landmark}
                 </p>
               </div>
             </div>
 
-            <div className="glass border border-white/5 rounded-3xl p-8 bg-gradient-to-br from-white/5 to-transparent">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+            <div className="glass border border-line rounded-3xl p-8 ">
+              <h3 className="text-xs font-bold text-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-primary" /> Payment Method
               </h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center text-white">
+                <div className="flex justify-between items-center text-fg">
                    <p className="font-bold">{order.paymentMethod}</p>
                    {order.isPaid ? (
                       <Badge variant="success" className="text-[10px] px-2 py-0.5">VERIFIED</Badge>
@@ -162,10 +162,10 @@ const OrderDetailPage = () => {
                       <Badge variant="neutral" className="text-[10px] px-2 py-0.5">UNPAID</Badge>
                    )}
                 </div>
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                   <p className="text-gray-400 text-xs mb-1">Status</p>
-                   <p className="text-white font-bold">{order.isPaid ? 'Payment Received' : 'Awaiting Payment'}</p>
-                   {order.isPaid && <p className="text-[10px] text-gray-500 mt-1">{new Date(order.paidAt).toLocaleString()}</p>}
+                <div className="p-4 rounded-2xl bg-surface-2 border border-line">
+                   <p className="text-muted text-xs mb-1">Status</p>
+                   <p className="text-fg font-bold">{order.isPaid ? 'Payment Received' : 'Awaiting Payment'}</p>
+                   {order.isPaid && <p className="text-[10px] text-muted mt-1">{new Date(order.paidAt).toLocaleString()}</p>}
                 </div>
               </div>
             </div>
@@ -174,58 +174,58 @@ const OrderDetailPage = () => {
 
         {/* Right Column: Order Timeline & Summary */}
         <div className="space-y-8">
-          <div className="glass border border-white/5 rounded-3xl p-8 relative overflow-hidden group">
+          <div className="glass border border-line rounded-3xl p-8 relative overflow-hidden group">
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <h3 className="text-lg font-bold text-white mb-6 relative z-10">Order Summary</h3>
+            <h3 className="text-lg font-bold text-fg mb-6 relative z-10">Order Summary</h3>
             <div className="space-y-4 relative z-10">
-              <div className="flex justify-between text-gray-400">
+              <div className="flex justify-between text-muted">
                 <span>Items Subtotal</span>
-                <span className="text-white font-mono">{formatCurrency(order.itemsPrice)}</span>
+                <span className="text-fg font-mono">{formatCurrency(order.itemsPrice)}</span>
               </div>
-              <div className="flex justify-between text-gray-400">
+              <div className="flex justify-between text-muted">
                 <span>Shipping Fees</span>
-                <span className="text-white font-mono">{formatCurrency(order.shippingPrice)}</span>
+                <span className="text-fg font-mono">{formatCurrency(order.shippingPrice)}</span>
               </div>
-              <div className="flex justify-between text-gray-400 pb-4 border-b border-white/5">
+              <div className="flex justify-between text-muted pb-4 border-b border-line">
                 <span>Tax (5%)</span>
-                <span className="text-white font-mono">{formatCurrency(order.taxPrice)}</span>
+                <span className="text-fg font-mono">{formatCurrency(order.taxPrice)}</span>
               </div>
               <div className="flex justify-between items-end pt-2">
-                <span className="text-gray-400 font-bold">Total Payable</span>
-                <span className="text-3xl font-black text-white">{formatCurrency(order.totalPrice)}</span>
+                <span className="text-muted font-bold">Total Payable</span>
+                <span className="text-3xl font-black text-fg">{formatCurrency(order.totalPrice)}</span>
               </div>
             </div>
           </div>
 
-          <div className="glass border border-white/5 rounded-3xl p-8">
-            <h3 className="text-lg font-bold text-white mb-6">Delivery Progress</h3>
+          <div className="glass border border-line rounded-3xl p-8">
+            <h3 className="text-lg font-bold text-fg mb-6">Delivery Progress</h3>
             <div className="space-y-8 relative">
-              <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-white/5"></div>
+              <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-surface-2"></div>
               
               <div className="flex gap-4 relative">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${order.isPaid ? 'bg-green-500 text-white' : 'bg-gray-800 text-gray-500'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${order.isPaid ? 'bg-success text-white' : 'bg-surface-2 text-muted'}`}>
                    <CheckCircle2 size={14} />
                 </div>
                 <div>
-                   <p className={`text-sm font-bold ${order.isPaid ? 'text-white' : 'text-gray-500'}`}>Order Paid</p>
+                   <p className={`text-sm font-bold ${order.isPaid ? 'text-fg' : 'text-muted'}`}>Order Paid</p>
                    {order.isPaid ? (
-                     <p className="text-[10px] text-gray-500 mt-1">{new Date(order.paidAt).toLocaleString()}</p>
+                     <p className="text-[10px] text-muted mt-1">{new Date(order.paidAt).toLocaleString()}</p>
                    ) : (
-                     <p className="text-[10px] text-gray-500 mt-1">Pending verification</p>
+                     <p className="text-[10px] text-muted mt-1">Pending verification</p>
                    )}
                 </div>
               </div>
 
               <div className="flex gap-4 relative">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${order.isDelivered ? 'bg-green-500 text-white' : 'bg-gray-800 text-gray-500'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${order.isDelivered ? 'bg-success text-white' : 'bg-surface-2 text-muted'}`}>
                    <Truck size={14} />
                 </div>
                 <div>
-                   <p className={`text-sm font-bold ${order.isDelivered ? 'text-white' : 'text-gray-500'}`}>Shipment Delivered</p>
+                   <p className={`text-sm font-bold ${order.isDelivered ? 'text-fg' : 'text-muted'}`}>Shipment Delivered</p>
                    {order.isDelivered ? (
-                     <p className="text-[10px] text-gray-500 mt-1">{new Date(order.deliveredAt).toLocaleString()}</p>
+                     <p className="text-[10px] text-muted mt-1">{new Date(order.deliveredAt).toLocaleString()}</p>
                    ) : (
-                     <p className="text-[10px] text-gray-500 mt-1">Estimated delivery: 2-3 days</p>
+                     <p className="text-[10px] text-muted mt-1">Estimated delivery: 2-3 days</p>
                    )}
                 </div>
               </div>
@@ -234,10 +234,10 @@ const OrderDetailPage = () => {
 
           <div className="p-8 rounded-3xl bg-primary/10 border border-primary/20 text-center">
              <Package className="w-10 h-10 text-primary mx-auto mb-3" />
-             <h4 className="text-sm font-bold text-white mb-2">Need Help with this Order?</h4>
-             <p className="text-xs text-gray-400 mb-4 px-4">Our support team is available 24/7 to assist with your technical questions.</p>
+             <h4 className="text-sm font-bold text-fg mb-2">Need Help with this Order?</h4>
+             <p className="text-xs text-muted mb-4 px-4">Our support team is available 24/7 to assist with your technical questions.</p>
              <Link to="/contact">
-               <Button size="sm" variant="ghost" className="w-full text-xs font-bold border-primary/30 text-white hover:bg-primary/20">Contact Support</Button>
+               <Button size="sm" variant="ghost" className="w-full text-xs font-bold border-primary/30 text-fg hover:bg-primary/20">Contact Support</Button>
              </Link>
           </div>
         </div>

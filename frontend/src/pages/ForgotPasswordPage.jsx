@@ -25,22 +25,22 @@ const ForgotPasswordPage = () => {
       <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="glass border border-white/[0.08] p-8 sm:p-10 rounded-3xl max-w-md w-full shadow-2xl relative z-10">
+      <div className="glass border border-line p-8 sm:p-10 rounded-3xl max-w-md w-full shadow-2xl relative z-10">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 border border-white/10 mb-4 overflow-hidden">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface-2 border border-line mb-4 overflow-hidden">
             <img src="/favicon.svg" alt="Kobac Logo" className="w-10 h-10 object-contain" />
           </div>
           <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-2">Kobac Electronics</h2>
-          <h1 className="text-3xl font-black text-white tracking-tighter">Reset Password</h1>
-          <p className="text-gray-500 text-sm mt-2">Enter your email and we'll send you a reset link.</p>
+          <h1 className="text-3xl font-black text-fg tracking-tighter">Reset Password</h1>
+          <p className="text-muted text-sm mt-2">Enter your email and we'll send you a reset link.</p>
         </div>
 
         {message ? (
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-500/15 text-green-400 mb-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-success/15 text-success mb-4">
               <MailCheck className="w-7 h-7" />
             </div>
-            <p className="text-gray-300 text-sm mb-8">{message}</p>
+            <p className="text-muted text-sm mb-8">{message}</p>
             <Link to="/login">
               <Button variant="secondary" className="w-full">Back to Sign In</Button>
             </Link>
@@ -48,7 +48,7 @@ const ForgotPasswordPage = () => {
         ) : (
           <>
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-6 text-[11px] font-bold uppercase tracking-wider text-center">
+              <div className="bg-danger/10 border border-danger/30 text-danger px-4 py-3 rounded-xl mb-6 text-[11px] font-bold uppercase tracking-wider text-center">
                 {error}
               </div>
             )}
@@ -73,8 +73,8 @@ const ForgotPasswordPage = () => {
               </Button>
             </form>
 
-            <div className="mt-8 pt-8 border-t border-white/5 text-center">
-              <Link to="/login" className="inline-flex items-center gap-2 text-[13px] text-gray-500 hover:text-white transition-colors">
+            <div className="mt-8 pt-8 border-t border-line text-center">
+              <Link to="/login" className="inline-flex items-center gap-2 text-[13px] text-muted hover:text-fg transition-colors">
                 <ArrowLeft className="w-3.5 h-3.5" /> Back to Sign In
               </Link>
             </div>

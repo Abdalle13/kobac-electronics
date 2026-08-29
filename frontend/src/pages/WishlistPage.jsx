@@ -17,10 +17,10 @@ const WishlistPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full flex-grow">
       <div className="flex items-center gap-3 mb-8">
-        <Heart className="w-6 h-6 text-red-400 fill-red-400" />
-        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">My Wishlist</h1>
+        <Heart className="w-6 h-6 text-danger fill-danger" />
+        <h1 className="text-2xl sm:text-3xl font-black text-fg tracking-tighter">My Wishlist</h1>
         {items.length > 0 && (
-          <span className="text-sm text-gray-500">({items.length})</span>
+          <span className="text-sm text-muted">({items.length})</span>
         )}
       </div>
 
@@ -31,16 +31,16 @@ const WishlistPage = () => {
           ))}
         </div>
       ) : error ? (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
+        <div className="p-4 bg-danger/10 border border-danger/20 rounded-xl text-danger text-sm text-center">
           {error}
         </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 sm:py-28 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-5">
-            <Heart size={26} className="text-gray-600" />
+          <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-line flex items-center justify-center mb-5">
+            <Heart size={26} className="text-muted" />
           </div>
-          <h2 className="text-lg font-bold text-white mb-2">Your wishlist is empty</h2>
-          <p className="text-gray-500 text-sm mb-6 max-w-xs">
+          <h2 className="text-lg font-bold text-fg mb-2">Your wishlist is empty</h2>
+          <p className="text-muted text-sm mb-6 max-w-xs">
             Tap the heart on any product to save it here for later.
           </p>
           <Link to="/shop">

@@ -38,26 +38,26 @@ const MyOrdersPage = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 py-12 w-full flex-grow">
       <div className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">My Orders</h1>
-        <p className="text-gray-400">Track and manage your current and past purchases.</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-fg mb-2">My Orders</h1>
+        <p className="text-muted">Track and manage your current and past purchases.</p>
       </div>
 
       {loading ? (
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-32 bg-[var(--color-surface)]/50 rounded-2xl animate-pulse"></div>
+            <div key={i} className="h-32 bg-surface/50 rounded-2xl animate-pulse"></div>
           ))}
         </div>
       ) : error ? (
-        <div className="p-6 bg-red-500/10 border border-red-500/30 rounded-2xl text-red-500 flex items-center gap-3">
+        <div className="p-6 bg-danger/10 border border-danger/30 rounded-2xl text-danger flex items-center gap-3">
           <AlertCircle className="w-6 h-6" />
           <p>{error}</p>
         </div>
       ) : orders.length === 0 ? (
-        <div className="text-center py-20 bg-[var(--color-surface)]/30 border border-dashed border-[var(--color-border)] rounded-3xl">
-          <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">No orders found</h2>
-          <p className="text-gray-500 mb-8">You haven't placed any orders yet.</p>
+        <div className="text-center py-20 bg-surface/50 border border-dashed border-line rounded-3xl">
+          <Package className="w-16 h-16 text-muted mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-fg mb-2">No orders found</h2>
+          <p className="text-muted mb-8">You haven't placed any orders yet.</p>
           <Button onClick={() => navigate('/shop')}>Start Shopping</Button>
         </div>
       ) : (
@@ -71,12 +71,12 @@ const MyOrdersPage = () => {
             <motion.div 
               key={order._id} 
               variants={itemVariants}
-              className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 hover:border-[var(--color-primary)]/50 transition-colors"
+              className="bg-surface border border-line rounded-2xl p-6 hover:border-primary/50 transition-colors"
             >
               <div className="flex flex-col md:flex-row justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="text-xs font-mono text-gray-500 uppercase tracking-tighter">Order #{order._id.substring(order._id.length - 8)}</span>
+                    <span className="text-xs font-mono text-muted uppercase tracking-tighter">Order #{order._id.substring(order._id.length - 8)}</span>
                     <Badge variant={order.isPaid ? 'primary' : 'neutral'}>
                       {order.isPaid ? 'Paid' : 'Payment Pending'}
                     </Badge>
@@ -88,32 +88,32 @@ const MyOrdersPage = () => {
                         key={idx} 
                         src={item.image || '/placeholder.jpg'} 
                         alt={item.name} 
-                        className="w-12 h-12 rounded-lg object-cover border border-gray-800 flex-shrink-0"
+                        className="w-12 h-12 rounded-lg object-cover border border-line flex-shrink-0"
                       />
                     ))}
                     {order.orderItems.length > 4 && (
-                      <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center text-xs text-gray-400">
+                      <div className="w-12 h-12 rounded-lg bg-surface-2 flex items-center justify-center text-xs text-muted">
                         +{order.orderItems.length - 4}
                       </div>
                     )}
                   </div>
 
                   <div className="flex flex-wrap gap-y-2 gap-x-6 text-sm">
-                    <div className="flex items-center gap-2 text-gray-400">
+                    <div className="flex items-center gap-2 text-muted">
                       <Clock className="w-4 h-4" />
                       {new Date(order.createdAt).toLocaleDateString()}
                     </div>
-                    <div className="flex items-center gap-2 text-gray-400">
-                      <CheckCircle2 className="w-4 h-4 text-green-500" />
-                      Status: <span className="text-white">{order.isDelivered ? 'Delivered' : 'In Transit'}</span>
+                    <div className="flex items-center gap-2 text-muted">
+                      <CheckCircle2 className="w-4 h-4 text-success" />
+                      Status: <span className="text-fg">{order.isDelivered ? 'Delivered' : 'In Transit'}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col justify-between items-end">
                   <div className="text-right">
-                    <p className="text-xs text-gray-500 mb-1">Total Amount</p>
-                    <p className="text-2xl font-bold text-white">{formatCurrency(order.totalPrice)}</p>
+                    <p className="text-xs text-muted mb-1">Total Amount</p>
+                    <p className="text-2xl font-bold text-fg">{formatCurrency(order.totalPrice)}</p>
                   </div>
                   <Button 
                     variant="secondary" 
