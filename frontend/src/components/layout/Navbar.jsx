@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ShoppingCart, User, Search, Menu, LogOut,
-  Package, ShieldCheck, Zap, X, Mail, Home, Store, Info
+  Package, ShieldCheck, Zap, X, Mail, Home, Store, Info, Heart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CartDrawer from './CartDrawer';
@@ -21,6 +21,7 @@ const Navbar = () => {
 
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
+  const { items: wishlistItems } = useSelector((state) => state.wishlist);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -42,7 +43,10 @@ const Navbar = () => {
     { to: '/about', icon: Info, label: 'ABOUT' },
     { to: '/shop', icon: Store, label: 'SHOP' },
     { to: '/contact', icon: Mail, label: 'SUPPORT' },
-    ...(userInfo ? [{ to: '/my-orders', icon: Package, label: 'ORDERS' }] : []),
+    ...(userInfo ? [
+      { to: '/wishlist', icon: Heart, label: 'WISHLIST' },
+      { to: '/my-orders', icon: Package, label: 'ORDERS' },
+    ] : []),
     ...(userInfo?.role?.toLowerCase() === 'admin' ? [{ to: '/dashboard', icon: ShieldCheck, label: 'DASHBOARD', highlight: true }] : []),
   ];
 
@@ -107,6 +111,22 @@ const Navbar = () => {
                   <Button size="sm" className="text-[11px] font-black tracking-widest px-5 py-2 rounded-full shadow-lg shadow-primary/20">Sign Up</Button>
                 </Link>
               </div>
+            )}
+
+            {/* Wishlist */}
+            {userInfo && (
+              <Link
+                to="/wishlist"
+                className="relative text-gray-400 hover:text-white transition-colors p-1.5 sm:p-2 hidden sm:block"
+                aria-label="Wishlist"
+              >
+                <Heart size={22} />
+                {wishlistItems.length > 0 && (
+                  <span className="absolute top-0 right-0 sm:top-0.5 sm:right-0.5 bg-primary text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full text-white ring-2 ring-[#0D0D0F]">
+                    {wishlistItems.length}
+                  </span>
+                )}
+              </Link>
             )}
 
             {/* Cart */}

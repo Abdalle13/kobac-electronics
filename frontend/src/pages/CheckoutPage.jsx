@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, ChevronRight, CreditCard, Banknote, Smartphone } from 'lucide-react';
+import { CheckCircle2, ChevronRight, CreditCard, Banknote, Smartphone, ShieldCheck, Loader2, XCircle } from 'lucide-react';
 import { clearCart } from '../redux/slices/cartSlice';
 import { createOrder, payOrder, resetOrder } from '../redux/slices/orderSlice';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { useEffect } from 'react';
 import { formatCurrency } from '../utils/formatter';
+import api from '../utils/api';
 
 const CheckoutPage = () => {
   const { cartItems } = useSelector(state => state.cart);
   const { userInfo } = useSelector(state => state.auth);
-  const { order, success, error, loading } = useSelector(state => state.order);
+  const { error, loading } = useSelector(state => state.order);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -26,7 +27,12 @@ const CheckoutPage = () => {
   });
   const [paymentMethod, setPaymentMethod] = useState('EVC Plus');
   const [evcNumber, setEvcNumber] = useState('');
+  const [evcPin, setEvcPin] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // EVC Plus gateway flow: idle -> pushing -> confirming
+  const [evcStatus, setEvcStatus] = useState('idle');
+  const [evcError, setEvcError] = useState('');
 
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const shippingPrice = itemsPrice >= 400 ? 0 : 15;
@@ -60,46 +66,77 @@ const CheckoutPage = () => {
     setStep(2);
   };
 
+  const buildOrderData = () => ({
+    orderItems: cartItems.map(item => ({
+      name: item.name,
+      qty: item.qty,
+      image: item.images[0],
+      price: item.price,
+      product: item._id
+    })),
+    shippingAddress: {
+      streetName: shipping.streetName,
+      city: shipping.city,
+      district: shipping.district,
+      landmark: shipping.landmark
+    },
+    paymentMethod: paymentMethod,
+    itemsPrice,
+    shippingPrice,
+    taxPrice,
+    totalPrice,
+  });
+
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
+    setEvcError('');
 
-    const orderData = {
-      orderItems: cartItems.map(item => ({
-        name: item.name,
-        qty: item.qty,
-        image: item.images[0],
-        price: item.price,
-        product: item._id
-      })),
-      shippingAddress: {
-        streetName: shipping.streetName,
-        city: shipping.city,
-        district: shipping.district,
-        landmark: shipping.landmark
-      },
-      paymentMethod: paymentMethod,
-      itemsPrice,
-      shippingPrice,
-      taxPrice,
-      totalPrice,
-    };
+    // Cash on Delivery: just place the order, no gateway.
+    if (paymentMethod !== 'EVC Plus') {
+      const resultAction = await dispatch(createOrder(buildOrderData()));
+      if (createOrder.fulfilled.match(resultAction)) setIsSuccess(true);
+      return;
+    }
 
-    const resultAction = await dispatch(createOrder(orderData));
-    if (createOrder.fulfilled.match(resultAction)) {
-      const createdOrder = resultAction.payload;
+    // EVC Plus: run the payment gateway FIRST, only create the order once it clears.
+    try {
+      setEvcStatus('pushing');
+      const { data } = await api.post('/payment/evcplus', {
+        phoneNumber: evcNumber,
+        amount: totalPrice,
+        pin: evcPin,
+      });
 
-      if (paymentMethod === 'EVC Plus') {
-        // Mock EVC Plus Payment call
-        const paymentResult = {
-          transactionId: 'EVC-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-          status: 'COMPLETED',
-          update_time: new Date().toISOString(),
-          payer_phone: evcNumber
-        };
-        await dispatch(payOrder({ id: createdOrder._id, paymentResult }));
+      setEvcStatus('confirming');
+      const resultAction = await dispatch(createOrder(buildOrderData()));
+      if (!createOrder.fulfilled.match(resultAction)) {
+        setEvcStatus('idle');
+        setEvcError(resultAction.payload || 'Order-ka lama abuuri karin.');
+        return;
       }
 
+      const createdOrder = resultAction.payload;
+      const paymentResult = {
+        transactionId: data?.params?.transactionId || 'EVC-UNKNOWN',
+        status: data?.state === 'APPROVED' ? 'COMPLETED' : (data?.state || 'COMPLETED'),
+        update_time: data?.params?.timestamp || new Date().toISOString(),
+        payer_phone: data?.params?.accountNo || evcNumber,
+      };
+      await dispatch(payOrder({ id: createdOrder._id, paymentResult }));
+
+      setEvcStatus('idle');
       setIsSuccess(true);
+    } catch (err) {
+      setEvcStatus('idle');
+      if (err.response?.data?.message) {
+        // The gateway responded with a decline (wrong PIN, no funds, declined...)
+        setEvcError(err.response.data.message);
+      } else if (err.response) {
+        setEvcError(`Khalad server ah (${err.response.status}). Fadlan mar kale isku day.`);
+      } else {
+        // No response at all — backend unreachable / proxy down
+        setEvcError('Lama gaari karo server-ka lacag bixinta. Hubi in backend-ku shaqeynayo.');
+      }
     }
   };
 
@@ -194,7 +231,7 @@ const CheckoutPage = () => {
           )}
 
           {step === 2 && (
-            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 md:p-8 shadow-xl">
+            <div className="relative bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 md:p-8 shadow-xl">
               <h2 className="text-2xl font-bold text-white mb-6">Payment Method</h2>
               <form onSubmit={handlePaymentSubmit}>
 
@@ -243,28 +280,62 @@ const CheckoutPage = () => {
                     </h3>
                     <Input
                       label="Mobile Number"
-                      placeholder="e.g. 061XXXXXXX"
+                      placeholder="e.g. 0619XXXXXX"
                       type="tel"
                       required
                       value={evcNumber}
                       onChange={(e) => setEvcNumber(e.target.value)}
                     />
+                    <Input
+                      label="EVC Plus PIN"
+                      placeholder="4-digit PIN"
+                      type="password"
+                      inputMode="numeric"
+                      maxLength={4}
+                      required
+                      value={evcPin}
+                      onChange={(e) => setEvcPin(e.target.value.replace(/\D/g, ''))}
+                    />
+                    <p className="text-[11px] text-gray-500 flex items-center gap-1.5 -mt-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
+                      Simulated gateway — demo PIN is <span className="text-gray-300 font-mono">1234</span>.
+                    </p>
                   </div>
                 )}
 
-                {error && (
-                  <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500 text-sm">
-                    {error}
+                {(evcError || error) && (
+                  <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500 text-sm flex items-start gap-2">
+                    <XCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                    <span>{evcError || error}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between pt-4 border-t border-[var(--color-border)]">
-                  <Button type="button" variant="ghost" onClick={() => setStep(1)} disabled={loading}>Go Back</Button>
-                  <Button type="submit" className="w-full sm:w-auto px-8" disabled={loading}>
-                    {loading ? 'Processing...' : 'Place Order'}
+                  <Button type="button" variant="ghost" onClick={() => setStep(1)} disabled={loading || evcStatus !== 'idle'}>Go Back</Button>
+                  <Button type="submit" className="w-full sm:w-auto px-8" disabled={loading || evcStatus !== 'idle'}>
+                    {evcStatus === 'pushing' ? 'Sending request...'
+                      : evcStatus === 'confirming' ? 'Confirming payment...'
+                      : loading ? 'Processing...'
+                      : 'Place Order'}
                   </Button>
                 </div>
               </form>
+
+              {evcStatus !== 'idle' && (
+                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center text-center p-8 z-20">
+                  <div className="w-14 h-14 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-4">
+                    <Loader2 className="w-7 h-7 text-blue-400 animate-spin" />
+                  </div>
+                  <h3 className="text-white font-bold text-lg mb-1">
+                    {evcStatus === 'pushing' ? 'Check your phone' : 'Finalising your order'}
+                  </h3>
+                  <p className="text-gray-400 text-sm max-w-xs">
+                    {evcStatus === 'pushing'
+                      ? `A payment request for ${formatCurrency(totalPrice)} was sent to ${evcNumber}. Enter your EVC Plus PIN to approve.`
+                      : 'Payment approved. Creating your order...'}
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>

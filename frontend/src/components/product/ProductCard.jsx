@@ -5,6 +5,8 @@ import { useDispatch } from 'react-redux';
 import { addToCart, toggleCart } from '../../redux/slices/cartSlice';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
+import StarRating from '../ui/StarRating';
+import WishlistButton from './WishlistButton';
 import { formatCurrency } from '../../utils/formatter';
 
 const ProductCard = ({ product }) => {
@@ -40,12 +42,21 @@ const ProductCard = ({ product }) => {
         <div className="absolute top-2 left-2">
           <Badge variant="neutral" className="text-[9px] sm:text-[10px] px-1.5 py-0.5 sm:px-2">{product.category}</Badge>
         </div>
+        <div className="absolute bottom-2 right-2">
+          <WishlistButton product={product} />
+        </div>
       </div>
 
       {/* Info */}
       <div className="p-3 sm:p-4">
         <h3 className="font-semibold text-sm sm:text-base text-white mb-0.5 truncate">{product.name}</h3>
-        <p className="text-xs text-[var(--color-text-secondary)] mb-3 truncate">{product.brand}</p>
+        <p className="text-xs text-[var(--color-text-secondary)] mb-2 truncate">{product.brand}</p>
+
+        <div className="mb-3 h-4">
+          {product.numReviews > 0 && (
+            <StarRating value={product.rating} size={13} count={product.numReviews} />
+          )}
+        </div>
 
         <div className="flex items-center justify-between gap-2">
           <span className="text-base sm:text-xl font-bold text-white">

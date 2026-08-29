@@ -86,7 +86,7 @@ const AdminDashboard = () => {
       navigate('/login');
       return;
     }
-    dispatch(fetchProducts(''));
+    dispatch(fetchProducts({ limit: 1000 }));
   }, [dispatch, userInfo, navigate]);
 
   useEffect(() => {
@@ -110,7 +110,7 @@ const AdminDashboard = () => {
     if (userInfo && userInfo.role === 'Admin') {
       // Fetch everything needed for the overview immediately
       dispatch(listOrders());
-      dispatch(fetchProducts(''));
+      dispatch(fetchProducts({ limit: 1000 }));
       
       const fetchStats = async () => {
         try {
@@ -200,7 +200,7 @@ const AdminDashboard = () => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await api.delete(`/products/${id}`);
-        dispatch(fetchProducts(''));
+        dispatch(fetchProducts({ limit: 1000 }));
       } catch (err) {
         console.error(err);
       }
@@ -246,7 +246,7 @@ const AdminDashboard = () => {
       }
 
       setShowProductModal(false);
-      dispatch(fetchProducts(''));
+      dispatch(fetchProducts({ limit: 1000 }));
     } catch (err) {
       console.error(err);
       alert('Error saving product: ' + (err.response?.data?.message || err.message));
@@ -282,7 +282,7 @@ const AdminDashboard = () => {
   const handleToggleProductStatus = async (id) => {
     try {
       await api.put(`/products/${id}/status`);
-      dispatch(fetchProducts(''));
+      dispatch(fetchProducts({ limit: 1000 }));
     } catch (err) {
       console.error(err);
       alert('Error updating product status: ' + (err.response?.data?.message || err.message));

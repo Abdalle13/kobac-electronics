@@ -1,19 +1,20 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
-import { ArrowRight, Zap, Shield, Truck, Mail, Star, Quote } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Truck, Mail, Star, Quote, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { fetchProducts } from '../redux/slices/productSlice';
+import api from '../utils/api';
 import ProductCard from '../components/product/ProductCard';
 import Button from '../components/ui/Button';
 import toast from 'react-hot-toast';
 
 const HomePage = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.auth);
-  const { products, loading, error } = useSelector((state) => state.products);
+
+  const [bestSellers, setBestSellers] = useState([]);
+  const [recentReviews, setRecentReviews] = useState([]);
 
   useEffect(() => {
     if (userInfo && userInfo.role && userInfo.role.toLowerCase() === 'admin') {
@@ -22,22 +23,16 @@ const HomePage = () => {
   }, [userInfo, navigate]);
 
   useEffect(() => {
-    dispatch(fetchProducts(''));
-  }, [dispatch]);
+    api.get('/products/best-sellers?limit=4')
+      .then((res) => setBestSellers(res.data))
+      .catch(() => {});
 
-  const newArrivals = products.slice(0, 4);
+    api.get('/products/reviews/recent?limit=8')
+      .then((res) => setRecentReviews(res.data))
+      .catch(() => {});
+  }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 }
-  };
-
-  const REVIEWS = [
+  const FALLBACK_REVIEWS = [
     { name: 'Abdirahman Hassan', location: 'Mogadishu', review: 'Kobac Electronics delivers exactly what they promise. I ordered an iPhone and it arrived quickly and in perfect condition. Very impressed!', rating: 5, product: 'iPhone 15 Pro Max' },
     { name: 'Fadumo Yusuf', location: 'Hargeisa', review: 'The MacBook Pro I bought here is absolutely amazing. The quality is genuine and the service was professional. I will definitely order again.', rating: 5, product: 'MacBook Pro 16-inch' },
     { name: 'Saciid Maxamed', location: 'Mogadishu', review: 'Amazing store! Got my Sony headphones within two days. The sound quality is incredible. Kobac is my number one choice for electronics.', rating: 5, product: 'Sony WH-1000XM5' },
@@ -47,6 +42,17 @@ const HomePage = () => {
     { name: 'Ifrah Warsame', location: 'Hargeisa', review: 'Excellent customer experience. The iPad Pro I ordered is exactly as described. Clean, fast, and premium. This is my go-to tech store now.', rating: 5, product: 'iPad Pro 12.9-inch' },
     { name: 'Axmed Jaamac', location: 'Mogadishu', review: 'The Nintendo Switch OLED came in perfect condition. My kids are enjoying it so much. Thank you Kobac Electronics!', rating: 5, product: 'Nintendo Switch OLED' },
   ];
+
+  // Use real reviews once there are enough to fill the marquee, otherwise fall back
+  const testimonials = recentReviews.length >= 3
+    ? recentReviews.map((r) => ({
+        name: r.name,
+        location: 'Verified Buyer',
+        review: r.comment,
+        rating: r.rating,
+        product: r.productName,
+      }))
+    : FALLBACK_REVIEWS;
 
   return (
     <div className="w-full">
@@ -98,54 +104,36 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── New Arrivals ──────────────────────────── */}
-      <section className="py-14 sm:py-20 md:py-24 bg-gradient-to-b from-[#0A0A0B] to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8 sm:mb-12">
-            <div>
-              <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white tracking-tighter">NEW ARRIVALS</h2>
-              <p className="text-gray-500 text-sm sm:text-base mt-1">The latest drops from the world's most innovative brands.</p>
-            </div>
-            <Link to="/shop" className="group flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-widest text-white hover:text-blue-400 transition-colors shrink-0 ml-4">
-              <span className="hidden xs:inline">Discover All</span>
-              <div className="p-1.5 sm:p-2 rounded-full border border-white/10 group-hover:border-blue-500/50 group-hover:translate-x-1 transition-all">
-                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
+      {/* ── Best Sellers ──────────────────────────── */}
+      {bestSellers.length > 0 && (
+        <section className="py-14 sm:py-20 md:py-24 bg-gradient-to-b from-[#0A0A0B] to-black">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10 sm:mb-14">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
+                <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white tracking-tighter">BEST SELLERS</h2>
               </div>
-            </Link>
-          </div>
+              <p className="text-gray-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+                The products our customers order the most.
+              </p>
+            </div>
 
-          {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="animate-shimmer h-60 sm:h-80 rounded-xl" />
+              {bestSellers.map((product) => (
+                <ProductCard key={product._id} product={product} />
               ))}
             </div>
-          ) : error ? (
-            <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-center text-sm">
-              {error}
+
+            <div className="flex justify-center mt-10 sm:mt-12">
+              <Link to="/shop">
+                <Button variant="ghost" className="px-8 py-3 text-xs font-black uppercase tracking-widest text-white border border-white/10 rounded-2xl hover:bg-white/5 flex items-center gap-2">
+                  View All Products <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
             </div>
-          ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-80px' }}
-              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"
-            >
-              {newArrivals.map((product) => (
-                <motion.div key={product._id} variants={itemVariants}>
-                  <ProductCard product={product} />
-                </motion.div>
-              ))}
-              {newArrivals.length === 0 && !loading && (
-                <div className="col-span-full py-10 text-center text-gray-500 text-sm">
-                  No products yet. Add some from the dashboard!
-                </div>
-              )}
-            </motion.div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* ── Features ─────────────────────────────── */}
       <section className="py-14 sm:py-20 bg-[var(--color-surface)]/30 border-y border-[var(--color-border)]">
@@ -192,7 +180,7 @@ const HomePage = () => {
           <div className="pointer-events-none absolute right-0 top-0 h-full w-16 sm:w-32 z-10 bg-gradient-to-l from-[#0A0A0B] to-transparent" />
 
           <div className="flex gap-3 sm:gap-5 animate-marquee-left w-max">
-            {[...REVIEWS, ...REVIEWS].map((t, i) => (
+            {[...testimonials, ...testimonials].map((t, i) => (
               <div key={i} className="w-[250px] sm:w-[300px] flex-shrink-0 flex flex-col bg-[#111113] border border-white/[0.07] hover:border-primary/25 rounded-2xl p-4 sm:p-5 gap-3 transition-colors duration-300">
                 <div className="flex items-center justify-between">
                   <div className="flex gap-0.5">

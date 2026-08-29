@@ -89,8 +89,8 @@ const Footer = () => {
             © {year} Kobac Electronics. All rights reserved.
           </p>
           <div className="flex gap-4 sm:gap-5 text-[11px] sm:text-[12px] text-gray-600">
-            <Link to="/contact" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/contact" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

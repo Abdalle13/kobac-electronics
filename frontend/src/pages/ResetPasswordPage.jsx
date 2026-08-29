@@ -1,42 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../redux/slices/authSlice';
+import toast from 'react-hot-toast';
+import { Lock } from 'lucide-react';
+import { resetPassword, clearAuthStatus } from '../redux/slices/authSlice';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { Mail, Lock, Zap } from 'lucide-react';
 
-const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
+const ResetPasswordPage = () => {
+  const { token } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { loading, error } = useSelector((state) => state.auth);
 
-  const { userInfo, loading, error } = useSelector((state) => state.auth);
-
-  // redirect to where the user was trying to go or home
-  const redirect = location.search ? location.search.split('=')[1] : '/';
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [localError, setLocalError] = useState('');
 
   useEffect(() => {
-    if (userInfo) {
-      if (!location.search && userInfo.role && userInfo.role.toLowerCase() === 'admin') {
-        navigate('/dashboard');
-      } else {
-        navigate(redirect);
-      }
-    }
-  }, [userInfo, navigate, redirect, location.search]);
+    dispatch(clearAuthStatus());
+  }, [dispatch]);
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    dispatch(login({ email, password }));
+    setLocalError('');
+
+    if (password.length < 6) {
+      setLocalError('Password must be at least 6 characters long');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setLocalError('Passwords do not match');
+      return;
+    }
+
+    const result = await dispatch(resetPassword({ token, password }));
+    if (resetPassword.fulfilled.match(result)) {
+      toast.success('Password updated. You are now signed in.');
+      navigate('/');
+    }
   };
 
   return (
     <div className="flex-grow flex items-center justify-center px-4 py-12 w-full relative">
-      {/* Abstract background elements for premium feel */}
       <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
 
@@ -46,28 +52,19 @@ const LoginPage = () => {
             <img src="/favicon.svg" alt="Kobac Logo" className="w-10 h-10 object-contain" />
           </div>
           <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-2">Kobac Electronics</h2>
-          <h1 className="text-3xl font-black text-white tracking-tighter">Sign In</h1>
-          <p className="text-gray-500 text-sm mt-2">Welcome back! Please enter your details.</p>
+          <h1 className="text-3xl font-black text-white tracking-tighter">New Password</h1>
+          <p className="text-gray-500 text-sm mt-2">Choose a new password for your account.</p>
         </div>
-        
-        {error && (
+
+        {(localError || error) && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-6 text-[11px] font-bold uppercase tracking-wider text-center">
-            {error}
+            {localError || error}
           </div>
         )}
 
-        <form onSubmit={submitHandler} className="space-y-2">
-          <Input 
-            label="Email Address"
-            type="email" 
-            placeholder="example@gmail.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            icon={Mail}
-          />
+        <form onSubmit={submitHandler} className="space-y-1">
           <Input
-            label="Password"
+            label="New Password"
             type="password"
             placeholder="••••••••"
             value={password}
@@ -75,26 +72,29 @@ const LoginPage = () => {
             required
             icon={Lock}
           />
-
-          <div className="flex justify-end -mt-1">
-            <Link to="/forgot-password" className="text-[12px] text-gray-500 hover:text-primary transition-colors font-medium">
-              Forgot password?
-            </Link>
-          </div>
+          <Input
+            label="Confirm Password"
+            type="password"
+            placeholder="••••••••"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            icon={Lock}
+          />
 
           <Button
-            type="submit" 
+            type="submit"
             className="w-full !mt-8 py-4 h-auto text-sm font-black uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(0,102,255,0.3)] hover:shadow-[0_0_30px_rgba(0,102,255,0.5)] transition-all"
             disabled={loading}
           >
-            {loading ? 'Signing In...' : 'Sign In'}
+            {loading ? 'Updating...' : 'Update Password'}
           </Button>
         </form>
 
         <div className="mt-8 pt-8 border-t border-white/5 text-center text-[13px] text-gray-500">
-          New Customer?{' '}
-          <Link to={redirect ? `/register?redirect=${redirect}` : '/register'} className="text-white font-bold hover:text-primary transition-colors">
-            Register Here
+          Remembered it?{' '}
+          <Link to="/login" className="text-white font-bold hover:text-primary transition-colors">
+            Sign In
           </Link>
         </div>
       </div>
@@ -102,4 +102,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ResetPasswordPage;
