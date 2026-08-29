@@ -1,29 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Mail, Lock } from 'lucide-react';
 import { login } from '../redux/slices/authSlice';
-import AuthLayout from '../components/layout/AuthLayout';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
+import { Mail, Lock, Zap } from 'lucide-react';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const redirect = searchParams.get('redirect') || '';
+  const location = useLocation();
 
-  const { userInfo, loading, error } = useSelector((s) => s.auth);
+  const { userInfo, loading, error } = useSelector((state) => state.auth);
+
+  // redirect to where the user was trying to go or home
+  const redirect = location.search ? location.search.split('=')[1] : '/';
 
   useEffect(() => {
     if (userInfo) {
-      if (redirect) navigate(`/${redirect}`);
-      else navigate(userInfo.role?.toLowerCase() === 'admin' ? '/dashboard' : '/');
+      if (!location.search && userInfo.role && userInfo.role.toLowerCase() === 'admin') {
+        navigate('/dashboard');
+      } else {
+        navigate(redirect);
+      }
     }
-  }, [userInfo, navigate, redirect]);
+  }, [userInfo, navigate, redirect, location.search]);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -31,39 +35,70 @@ const LoginPage = () => {
   };
 
   return (
-    <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to your Kobac Electronics account."
-      footer={
-        <>
-          New here?{' '}
-          <Link to={redirect ? `/register?redirect=${redirect}` : '/register'} className="text-fg font-semibold hover:text-primary transition-colors">
-            Create an account
-          </Link>
-        </>
-      }
-    >
-      {error && (
-        <div className="bg-danger/10 border border-danger/30 text-danger px-4 py-2.5 rounded-xl mb-5 text-sm text-center">
-          {error}
+    <div className="flex-grow flex items-center justify-center px-4 py-12 w-full relative">
+      {/* Abstract background elements for premium feel */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="glass border border-line p-8 sm:p-10 rounded-3xl max-w-md w-full shadow-2xl relative z-10">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface-2 border border-line mb-4 overflow-hidden">
+            <img src="/favicon.svg" alt="Kobac Logo" className="w-10 h-10 object-contain" />
+          </div>
+          <h2 className="text-sm font-semibold text-primary mb-2">Kobac Electronics</h2>
+          <h1 className="text-3xl font-bold text-fg tracking-tight">Sign In</h1>
+          <p className="text-muted text-sm mt-2">Welcome back! Please enter your details.</p>
         </div>
-      )}
+        
+        {error && (
+          <div className="bg-danger/10 border border-danger/30 text-danger px-4 py-3 rounded-xl mb-6 text-[11px] font-bold uppercase tracking-wider text-center">
+            {error}
+          </div>
+        )}
 
-      <form onSubmit={submitHandler} className="space-y-1">
-        <Input label="Email Address" type="email" placeholder="you@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} required icon={Mail} />
-        <Input label="Password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required icon={Lock} />
+        <form onSubmit={submitHandler} className="space-y-2">
+          <Input 
+            label="Email Address"
+            type="email" 
+            placeholder="example@gmail.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            icon={Mail}
+          />
+          <Input
+            label="Password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            icon={Lock}
+          />
 
-        <div className="flex justify-end pt-1">
-          <Link to="/forgot-password" className="text-xs text-muted hover:text-primary transition-colors font-medium">
-            Forgot password?
+          <div className="flex justify-end -mt-1">
+            <Link to="/forgot-password" className="text-[12px] text-muted hover:text-primary transition-colors font-medium">
+              Forgot password?
+            </Link>
+          </div>
+
+          <Button
+            type="submit" 
+            className="w-full !mt-8 py-4 h-auto text-sm font-semibold rounded-xl shadow-[0_0_20px_rgba(0,102,255,0.3)] hover:shadow-[0_0_30px_rgba(0,102,255,0.5)] transition-all"
+            disabled={loading}
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
+          </Button>
+        </form>
+
+        <div className="mt-8 pt-8 border-t border-line text-center text-[13px] text-muted">
+          New Customer?{' '}
+          <Link to={redirect ? `/register?redirect=${redirect}` : '/register'} className="text-fg font-bold hover:text-primary transition-colors">
+            Register Here
           </Link>
         </div>
-
-        <Button type="submit" className="w-full !mt-6 py-3.5 text-sm font-semibold rounded-xl" disabled={loading}>
-          {loading ? 'Signing in…' : 'Sign in'}
-        </Button>
-      </form>
-    </AuthLayout>
+      </div>
+    </div>
   );
 };
 
