@@ -64,7 +64,7 @@ const HomePage = () => {
             alt="Premium Electronics"
             className="w-full h-full object-cover opacity-40 mix-blend-overlay scale-110 sm:scale-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0B]/80 via-[#0A0A0B]/85 to-[#0A0A0B] sm:bg-gradient-to-r sm:from-[#0A0A0B] sm:via-[#0A0A0B]/80 sm:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/85 to-black sm:bg-gradient-to-r sm:from-black sm:via-black/80 sm:to-transparent" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -74,17 +74,17 @@ const HomePage = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-center sm:text-left max-w-2xl mx-auto sm:mx-0"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8">
               <Zap size={12} className="animate-pulse" /> Kobac Exclusive 2026
             </div>
             <h1 className="text-6xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 sm:mb-8 text-white leading-[0.85] uppercase italic">
               SMARTER <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-[#0066FF] not-italic">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 not-italic">
                 BEYOND
               </span>
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-gray-400 mb-10 sm:mb-12 leading-relaxed max-w-sm sm:max-w-md mx-auto sm:mx-0 font-medium">
-              Discover the next generation of tech. We bring you the world's most advanced electronics, delivered straight to your door. <span className="text-blue-400/80">Tayo iyo Hal-abuur.</span>
+            <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-10 sm:mb-12 leading-relaxed max-w-sm sm:max-w-md mx-auto sm:mx-0 font-medium">
+              Discover the next generation of tech. We bring you the world's most advanced electronics, delivered straight to your door. <span className="text-blue-300">Tayo iyo Hal-abuur.</span>
             </p>
             <div className="flex flex-col xs:flex-row gap-4 justify-center sm:justify-start">
               <Link to="/shop" className="w-full xs:w-auto">
@@ -94,7 +94,7 @@ const HomePage = () => {
               </Link>
               {!userInfo && (
                 <Link to="/register" className="w-full xs:w-auto">
-                  <Button variant="ghost" className="w-full xs:w-auto px-10 py-4 text-xs font-black uppercase tracking-widest text-white border border-white/10 rounded-2xl hover:bg-white/5 backdrop-blur-md">
+                  <Button variant="ghost" className="w-full xs:w-auto px-10 py-4 text-xs font-black uppercase tracking-widest text-white border border-white/20 rounded-2xl hover:bg-white/10 hover:text-white backdrop-blur-md">
                     Start Your Journey
                   </Button>
                 </Link>
@@ -106,14 +106,14 @@ const HomePage = () => {
 
       {/* ── Best Sellers ──────────────────────────── */}
       {bestSellers.length > 0 && (
-        <section className="py-14 sm:py-20 md:py-24 bg-gradient-to-b from-[#0A0A0B] to-black">
+        <section className="py-14 sm:py-20 md:py-24 bg-canvas">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10 sm:mb-14">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
-                <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white tracking-tighter">BEST SELLERS</h2>
+                <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
+                <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-fg tracking-tighter">BEST SELLERS</h2>
               </div>
-              <p className="text-gray-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+              <p className="text-muted max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
                 The products our customers order the most.
               </p>
             </div>
@@ -126,7 +126,7 @@ const HomePage = () => {
 
             <div className="flex justify-center mt-10 sm:mt-12">
               <Link to="/shop">
-                <Button variant="ghost" className="px-8 py-3 text-xs font-black uppercase tracking-widest text-white border border-white/10 rounded-2xl hover:bg-white/5 flex items-center gap-2">
+                <Button variant="secondary" className="px-8 py-3 text-xs font-black uppercase tracking-widest rounded-2xl flex items-center gap-2">
                   View All Products <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -136,13 +136,13 @@ const HomePage = () => {
       )}
 
       {/* ── Features ─────────────────────────────── */}
-      <section className="py-14 sm:py-20 bg-[var(--color-surface)]/30 border-y border-[var(--color-border)]">
+      <section className="py-14 sm:py-20 bg-surface border-y border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-fg tracking-tighter mb-4">
               Why choose us?
             </h2>
-            <p className="text-gray-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+            <p className="text-muted max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
               We provide authentic electronics with reliable support and localized delivery services across Somalia.
             </p>
           </div>
@@ -152,13 +152,13 @@ const HomePage = () => {
               { icon: Shield, title: 'Secure Payments', desc: 'Multiple payment options including EVC Plus and Cash On Delivery.' },
               { icon: Zap, title: 'Premium Quality', desc: 'We only source industry-leading brands and guaranteed products.' },
             ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex sm:flex-col flex-row items-center sm:items-center sm:text-center text-left gap-4 sm:gap-0 p-4 sm:p-6 bg-[#0a0a0b] border border-[var(--color-border)] rounded-2xl hover:border-[#0066FF]/50 transition-colors">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[#0066FF]/10 text-[#0066FF] rounded-full flex items-center justify-center flex-shrink-0 sm:mb-4">
+              <div key={title} className="flex sm:flex-col flex-row items-center sm:items-center sm:text-center text-left gap-4 sm:gap-0 p-4 sm:p-6 bg-canvas border border-line rounded-2xl hover:border-primary/50 transition-colors">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center flex-shrink-0 sm:mb-4">
                   <Icon className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-xl font-bold text-white sm:mb-2">{title}</h3>
-                  <p className="text-[var(--color-text-secondary)] text-sm">{desc}</p>
+                  <h3 className="text-base sm:text-xl font-bold text-fg sm:mb-2">{title}</h3>
+                  <p className="text-muted text-sm">{desc}</p>
                 </div>
               </div>
             ))}
@@ -167,35 +167,35 @@ const HomePage = () => {
       </section>
 
       {/* ── Testimonials — Marquee ────────────────── */}
-      <section className="py-14 sm:py-20 bg-[#0A0A0B] overflow-hidden">
+      <section className="py-14 sm:py-20 bg-canvas overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 sm:mb-12 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-fg tracking-tighter">
             Trusted by customers across Somalia
           </h2>
-          <p className="text-gray-500 text-xs sm:text-sm mt-2">Real reviews from real people.</p>
+          <p className="text-muted text-xs sm:text-sm mt-2">Real reviews from real people.</p>
         </div>
 
         <div className="relative">
-          <div className="pointer-events-none absolute left-0 top-0 h-full w-16 sm:w-32 z-10 bg-gradient-to-r from-[#0A0A0B] to-transparent" />
-          <div className="pointer-events-none absolute right-0 top-0 h-full w-16 sm:w-32 z-10 bg-gradient-to-l from-[#0A0A0B] to-transparent" />
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-16 sm:w-32 z-10 bg-gradient-to-r from-canvas to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-16 sm:w-32 z-10 bg-gradient-to-l from-canvas to-transparent" />
 
           <div className="flex gap-3 sm:gap-5 animate-marquee-left w-max">
             {[...testimonials, ...testimonials].map((t, i) => (
-              <div key={i} className="w-[250px] sm:w-[300px] flex-shrink-0 flex flex-col bg-[#111113] border border-white/[0.07] hover:border-primary/25 rounded-2xl p-4 sm:p-5 gap-3 transition-colors duration-300">
+              <div key={i} className="w-[250px] sm:w-[300px] flex-shrink-0 flex flex-col bg-surface border border-line hover:border-primary/25 rounded-2xl p-4 sm:p-5 gap-3 transition-colors duration-300">
                 <div className="flex items-center justify-between">
                   <div className="flex gap-0.5">
-                    {[...Array(t.rating)].map((_, j) => <Star key={j} size={10} className="fill-yellow-400 text-yellow-400" />)}
+                    {[...Array(t.rating)].map((_, j) => <Star key={j} size={10} className="fill-amber-400 text-amber-400" />)}
                   </div>
                   <Quote size={12} className="text-primary/25" />
                 </div>
-                <p className="text-gray-400 text-[12px] sm:text-[13px] leading-relaxed flex-1">"{t.review}"</p>
-                <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">
+                <p className="text-muted text-[12px] sm:text-[13px] leading-relaxed flex-1">"{t.review}"</p>
+                <div className="flex items-center gap-2 pt-3 border-t border-line">
                   <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs flex-shrink-0">
                     {t.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-[11px] sm:text-[12px] font-bold text-white leading-tight">{t.name}</p>
-                    <p className="text-[9px] sm:text-[10px] text-gray-600">{t.location} · {t.product}</p>
+                    <p className="text-[11px] sm:text-[12px] font-bold text-fg leading-tight">{t.name}</p>
+                    <p className="text-[9px] sm:text-[10px] text-muted">{t.location} · {t.product}</p>
                   </div>
                 </div>
               </div>
@@ -205,15 +205,15 @@ const HomePage = () => {
       </section>
 
       {/* ── Newsletter ────────────────────────────── */}
-      <section className="py-14 sm:py-20 border-t border-[var(--color-border)] relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0066FF]/5 z-0" />
+      <section className="py-14 sm:py-20 border-t border-line relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary/5 z-0" />
         <div className="max-w-lg mx-auto px-4 sm:px-6 relative z-10 text-center">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-5 sm:mb-6">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-5 sm:mb-6">
             <Mail size={22} className="sm:hidden" />
             <Mail size={32} className="hidden sm:block" />
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">Stay in the Loop</h2>
-          <p className="text-[var(--color-text-secondary)] text-sm sm:text-base mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg mb-3 sm:mb-4">Stay in the Loop</h2>
+          <p className="text-muted text-sm sm:text-base mb-6 sm:mb-8">
             Subscribe for deals, new arrivals, and tech news!
           </p>
           <form
@@ -227,14 +227,14 @@ const HomePage = () => {
             <input
               type="email"
               placeholder="Enter your email address"
-              className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary/50 focus:bg-white/5 transition-colors"
+              className="w-full bg-surface border border-line rounded-xl px-4 py-3.5 text-sm text-fg focus:outline-none focus:border-primary/50 transition-colors"
               required
             />
             <Button type="submit" className="w-full py-3.5 font-bold">
               Subscribe
             </Button>
           </form>
-          <p className="text-[10px] text-gray-600 mt-4">We respect your privacy. Unsubscribe at any time.</p>
+          <p className="text-[10px] text-muted mt-4">We respect your privacy. Unsubscribe at any time.</p>
         </div>
       </section>
     </div>

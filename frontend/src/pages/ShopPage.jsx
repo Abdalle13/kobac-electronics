@@ -4,11 +4,10 @@ import { useSearchParams } from 'react-router-dom';
 import { fetchProducts, fetchProductFilters } from '../redux/slices/productSlice';
 import ProductCard from '../components/product/ProductCard';
 import StarRating from '../components/ui/StarRating';
-import {
-  SlidersHorizontal, X, Search, ChevronLeft, ChevronRight,
-  Smartphone, Laptop, Watch, Headphones, Tablet, Gamepad2, Package,
-} from 'lucide-react';
 import Button from '../components/ui/Button';
+import {
+  SlidersHorizontal, X, Search, ChevronLeft, ChevronRight, ChevronDown, Check,
+} from 'lucide-react';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest' },
@@ -19,7 +18,7 @@ const SORT_OPTIONS = [
 ];
 
 const PRICE_RANGES = [
-  { label: 'All Prices', min: '', max: '' },
+  { label: 'Any price', min: '', max: '' },
   { label: 'Under $500', min: '', max: '500' },
   { label: '$500 – $1,000', min: '500', max: '1000' },
   { label: 'Over $1,000', min: '1000', max: '' },
@@ -27,26 +26,15 @@ const PRICE_RANGES = [
 
 const RATING_OPTIONS = [4, 3, 2, 1];
 
-const categoryIcon = (cat = '') => {
-  const c = cat.toLowerCase();
-  if (c.includes('phone')) return Smartphone;
-  if (c.includes('laptop')) return Laptop;
-  if (c.includes('watch')) return Watch;
-  if (c.includes('headphone')) return Headphones;
-  if (c.includes('tablet')) return Tablet;
-  if (c.includes('game') || c.includes('gaming')) return Gamepad2;
-  return Package;
-};
-
 const ShopPage = () => {
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const { products, loading, error, page, pages, total, filters } = useSelector((state) => state.products);
 
-  const [showFilters, setShowFilters] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(searchParams.get('keyword') || '');
 
-  // Current filter values straight from the URL (URL is the single source of truth)
   const current = useMemo(() => ({
     keyword: searchParams.get('keyword') || '',
     category: searchParams.get('category') || '',
@@ -59,7 +47,6 @@ const ShopPage = () => {
     page: Number(searchParams.get('page')) || 1,
   }), [searchParams]);
 
-  // Merge a change into the URL; any filter change resets to page 1
   const patch = (updates) => {
     const next = new URLSearchParams(searchParams);
     Object.entries(updates).forEach(([key, value]) => {
@@ -84,83 +71,67 @@ const ShopPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch, searchParams]);
 
-  // Debounce the search box into the URL
   useEffect(() => {
     const t = setTimeout(() => {
-      if (searchInput !== current.keyword) {
-        patch({ keyword: searchInput || undefined });
-      }
+      if (searchInput !== current.keyword) patch({ keyword: searchInput || undefined });
     }, 350);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput]);
 
-  const hasActiveFilters =
-    current.category || current.brand || current.minPrice || current.maxPrice ||
-    current.minRating || current.inStock || current.keyword;
+  const activeFilterCount =
+    (current.brand ? 1 : 0) +
+    (current.minPrice || current.maxPrice ? 1 : 0) +
+    (current.minRating ? 1 : 0) +
+    (current.inStock ? 1 : 0);
+
+  const hasActive = activeFilterCount > 0 || current.category || current.keyword;
 
   const activePriceLabel = PRICE_RANGES.find(
     (r) => String(r.min) === current.minPrice && String(r.max) === current.maxPrice
   )?.label;
 
   const categories = ['', ...(filters.categories || [])];
+  const currentSortLabel = SORT_OPTIONS.find((o) => o.value === current.sort)?.label || 'Newest';
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] w-full">
-
-      {/* Page Header */}
-      <div className="border-b border-white/[0.06] bg-[#0D0D0F]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
+    <div className="min-h-screen bg-canvas w-full">
+      {/* Header */}
+      <div className="border-b border-line bg-surface/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter">All Products</h1>
-              <p className="text-gray-500 text-xs sm:text-sm mt-1">
-                {loading ? 'Loading...' : `${total} product${total !== 1 ? 's' : ''} found`}
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-fg tracking-tighter">All Products</h1>
+              <p className="text-muted text-xs sm:text-sm mt-1">
+                {loading ? 'Loading…' : `${total} product${total !== 1 ? 's' : ''}`}
               </p>
             </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              {/* Search bar */}
-              <div className="relative flex-1 sm:w-56 md:w-64">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-primary/40 transition-all"
-                />
-              </div>
-
-              {/* Sort */}
-              <select
-                value={current.sort}
-                onChange={(e) => patch({ sort: e.target.value === 'newest' ? undefined : e.target.value })}
-                className="bg-white/[0.05] border border-white/[0.08] rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-primary/40 transition-all cursor-pointer shrink-0"
-              >
-                {SORT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value} className="bg-[#111]">{o.label}</option>
-                ))}
-              </select>
+            <div className="relative w-full sm:w-64">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+              <input
+                type="text"
+                placeholder="Search products…"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full bg-canvas border border-line rounded-xl pl-9 pr-4 py-2.5 text-sm text-fg placeholder-muted/60 focus:outline-none focus:border-primary/50 transition-all"
+              />
             </div>
           </div>
 
-          {/* Category Pill Row */}
-          <div className="flex gap-2 overflow-x-auto pb-1 mt-4 sm:mt-5 scrollbar-hide">
+          {/* Category tabs */}
+          <div className="flex gap-2 overflow-x-auto pb-1 mt-4 scrollbar-hide">
             {categories.map((cat) => {
-              const Icon = cat ? categoryIcon(cat) : null;
               const isActive = current.category === cat;
               return (
                 <button
                   key={cat || 'all'}
                   onClick={() => patch({ category: cat || undefined })}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-[12px] sm:text-[13px] font-semibold whitespace-nowrap transition-all shrink-0 ${
+                  className={`px-3.5 sm:px-4 py-2 rounded-full text-[12px] sm:text-[13px] font-semibold whitespace-nowrap transition-all shrink-0 ${
                     isActive
-                      ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                      : 'bg-white/[0.05] border border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/[0.08]'
+                      ? 'bg-primary text-on-primary shadow-sm shadow-primary/25'
+                      : 'bg-canvas border border-line text-muted hover:text-fg hover:border-primary/40'
                   }`}
                 >
-                  {Icon && <Icon size={12} />}
                   {cat || 'All'}
                 </button>
               );
@@ -169,225 +140,281 @@ const ShopPage = () => {
         </div>
       </div>
 
-      {/* Main Layout */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 flex flex-col md:flex-row gap-6 md:gap-8">
-
-        {/* Mobile filter toggle */}
-        <div className="md:hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between gap-3 mb-4">
           <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/[0.08] text-gray-300 text-sm font-medium hover:bg-white/[0.08] transition-all"
+            onClick={() => setPanelOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface border border-line text-fg text-sm font-semibold hover:border-primary/40 transition-all"
           >
-            <SlidersHorizontal size={14} className="text-primary" />
-            {showFilters ? 'Hide Filters' : 'Filters'}
-            {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-primary ml-1" />}
+            <SlidersHorizontal size={15} className="text-primary" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="ml-0.5 w-5 h-5 rounded-full bg-primary text-on-primary text-[11px] font-bold flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
-        </div>
 
-        {/* Sidebar */}
-        <aside className={`w-full md:w-52 lg:w-60 flex-shrink-0 ${showFilters ? 'block' : 'hidden'} md:block`}>
-          <div className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-5 sticky top-24 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal size={13} className="text-primary" />
-                <span className="text-[12px] font-bold text-white uppercase tracking-wider">Filters</span>
-              </div>
-              {hasActiveFilters && (
-                <button onClick={clearAll} className="text-[10px] text-gray-500 hover:text-red-400 transition-colors font-medium">
-                  Clear all
-                </button>
-              )}
-            </div>
-
-            {/* Price */}
-            <div>
-              <p className="text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-2">Price Range</p>
-              <div className="flex flex-col gap-1">
-                {PRICE_RANGES.map((range) => {
-                  const isActive = String(range.min) === current.minPrice && String(range.max) === current.maxPrice;
-                  return (
+          {/* Sort */}
+          <div className="relative">
+            <button
+              onClick={() => setSortOpen((o) => !o)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface border border-line text-fg text-sm font-medium hover:border-primary/40 transition-all"
+            >
+              <span className="text-muted hidden sm:inline">Sort:</span> {currentSortLabel}
+              <ChevronDown size={15} className={`text-muted transition-transform ${sortOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {sortOpen && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setSortOpen(false)} />
+                <div className="absolute right-0 mt-2 w-52 bg-surface border border-line rounded-xl shadow-xl z-40 overflow-hidden p-1">
+                  {SORT_OPTIONS.map((o) => (
                     <button
-                      key={range.label}
-                      onClick={() => patch({ minPrice: range.min || undefined, maxPrice: range.max || undefined })}
-                      className={`text-left px-3 py-2 rounded-xl text-[13px] transition-all ${
-                        isActive
-                          ? 'bg-primary/10 text-primary font-semibold border border-primary/20'
-                          : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'
+                      key={o.value}
+                      onClick={() => { patch({ sort: o.value === 'newest' ? undefined : o.value }); setSortOpen(false); }}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm text-left transition-colors ${
+                        current.sort === o.value ? 'bg-primary/10 text-primary font-semibold' : 'text-muted hover:text-fg hover:bg-surface-2'
                       }`}
                     >
-                      {range.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Brand */}
-            {filters.brands?.length > 0 && (
-              <div>
-                <p className="text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-2">Brand</p>
-                <div className="flex flex-col gap-1 max-h-52 overflow-y-auto scrollbar-hide">
-                  <button
-                    onClick={() => patch({ brand: undefined })}
-                    className={`text-left px-3 py-2 rounded-xl text-[13px] transition-all ${
-                      !current.brand ? 'bg-primary/10 text-primary font-semibold border border-primary/20' : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'
-                    }`}
-                  >
-                    All Brands
-                  </button>
-                  {filters.brands.map((brand) => (
-                    <button
-                      key={brand}
-                      onClick={() => patch({ brand })}
-                      className={`text-left px-3 py-2 rounded-xl text-[13px] transition-all ${
-                        current.brand === brand ? 'bg-primary/10 text-primary font-semibold border border-primary/20' : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'
-                      }`}
-                    >
-                      {brand}
+                      {o.label}
+                      {current.sort === o.value && <Check size={14} />}
                     </button>
                   ))}
                 </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Active chips */}
+        {hasActive && (
+          <div className="flex items-center gap-2 mb-5 flex-wrap">
+            {current.keyword && <Chip label={`"${current.keyword}"`} onClear={() => { setSearchInput(''); patch({ keyword: undefined }); }} />}
+            {current.category && <Chip label={current.category} onClear={() => patch({ category: undefined })} primary />}
+            {current.brand && <Chip label={current.brand} onClear={() => patch({ brand: undefined })} />}
+            {activePriceLabel && activePriceLabel !== 'Any price' && (
+              <Chip label={activePriceLabel} onClear={() => patch({ minPrice: undefined, maxPrice: undefined })} />
+            )}
+            {current.minRating && <Chip label={`${current.minRating}★ & up`} onClear={() => patch({ minRating: undefined })} />}
+            {current.inStock && <Chip label="In stock" onClear={() => patch({ inStock: undefined })} />}
+            <button onClick={clearAll} className="text-xs font-semibold text-muted hover:text-danger transition-colors ml-1">
+              Clear all
+            </button>
+          </div>
+        )}
+
+        {/* Grid */}
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+            {[...Array(8)].map((_, i) => <div key={i} className="animate-shimmer h-60 sm:h-80 rounded-2xl" />)}
+          </div>
+        ) : error ? (
+          <div className="p-4 bg-danger/10 border border-danger/20 rounded-xl text-danger text-sm text-center">{error}</div>
+        ) : products.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 sm:py-28 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-surface border border-line flex items-center justify-center mb-4">
+              <Search size={22} className="text-muted" />
+            </div>
+            <h2 className="text-base sm:text-lg font-bold text-fg mb-2">No products found</h2>
+            <p className="text-muted text-sm mb-5 max-w-xs">Try adjusting your filters or search.</p>
+            <Button variant="secondary" onClick={clearAll} className="text-sm">Clear all filters</Button>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+              {products.map((p) => <ProductCard key={p._id} product={p} />)}
+            </div>
+
+            {pages > 1 && (
+              <div className="flex items-center justify-center gap-1.5 mt-10">
+                <PageBtn disabled={page <= 1} onClick={() => patch({ page: Math.max(page - 1, 1) })}>
+                  <ChevronLeft size={16} />
+                </PageBtn>
+                {Array.from({ length: pages }, (_, i) => i + 1)
+                  .filter((n) => n === 1 || n === pages || Math.abs(n - page) <= 1)
+                  .map((n, idx, arr) => (
+                    <React.Fragment key={n}>
+                      {idx > 0 && n - arr[idx - 1] > 1 && <span className="text-muted px-1">…</span>}
+                      <PageBtn active={n === page} onClick={() => patch({ page: n })}>{n}</PageBtn>
+                    </React.Fragment>
+                  ))}
+                <PageBtn disabled={page >= pages} onClick={() => patch({ page: Math.min(page + 1, pages) })}>
+                  <ChevronRight size={16} />
+                </PageBtn>
               </div>
             )}
-
-            {/* Rating */}
-            <div>
-              <p className="text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-2">Rating</p>
-              <div className="flex flex-col gap-1">
-                {RATING_OPTIONS.map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => patch({ minRating: current.minRating === String(r) ? undefined : r })}
-                    className={`flex items-center gap-2 text-left px-3 py-2 rounded-xl text-[13px] transition-all ${
-                      current.minRating === String(r)
-                        ? 'bg-primary/10 font-semibold border border-primary/20'
-                        : 'hover:bg-white/[0.05] border border-transparent'
-                    }`}
-                  >
-                    <StarRating value={r} size={12} />
-                    <span className="text-gray-400">& up</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* In stock */}
-            <label className="flex items-center gap-2.5 cursor-pointer px-1">
-              <input
-                type="checkbox"
-                checked={current.inStock}
-                onChange={(e) => patch({ inStock: e.target.checked ? 'true' : undefined })}
-                className="w-4 h-4 accent-primary rounded"
-              />
-              <span className="text-[13px] text-gray-300">In stock only</span>
-            </label>
-          </div>
-        </aside>
-
-        {/* Product Grid */}
-        <div className="flex-1 min-w-0">
-          {/* Active filter chips */}
-          {hasActiveFilters && (
-            <div className="flex items-center gap-2 mb-4 sm:mb-5 flex-wrap">
-              {current.keyword && (
-                <Chip label={`"${current.keyword}"`} onClear={() => { setSearchInput(''); patch({ keyword: undefined }); }} />
-              )}
-              {current.category && <Chip label={current.category} onClear={() => patch({ category: undefined })} primary />}
-              {current.brand && <Chip label={current.brand} onClear={() => patch({ brand: undefined })} />}
-              {activePriceLabel && activePriceLabel !== 'All Prices' && (
-                <Chip label={activePriceLabel} onClear={() => patch({ minPrice: undefined, maxPrice: undefined })} />
-              )}
-              {current.minRating && <Chip label={`${current.minRating}★ & up`} onClear={() => patch({ minRating: undefined })} />}
-              {current.inStock && <Chip label="In stock" onClear={() => patch({ inStock: undefined })} />}
-            </div>
-          )}
-
-          {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
-              {[...Array(9)].map((_, i) => (
-                <div key={i} className="animate-shimmer h-60 sm:h-80 rounded-2xl" />
-              ))}
-            </div>
-          ) : error ? (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
-              {error}
-            </div>
-          ) : products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center px-4">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-4">
-                <Search size={22} className="text-gray-600" />
-              </div>
-              <h2 className="text-base sm:text-lg font-bold text-white mb-2">No products found</h2>
-              <p className="text-gray-500 text-sm mb-5 max-w-xs">Try adjusting your filters or searching for something else.</p>
-              <Button variant="ghost" onClick={clearAll} className="text-sm border border-white/10">
-                Clear All Filters
-              </Button>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
-                {products.map((product) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {pages > 1 && (
-                <div className="flex items-center justify-center gap-1.5 mt-10">
-                  <button
-                    onClick={() => patch({ page: Math.max(page - 1, 1) })}
-                    disabled={page <= 1}
-                    className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-
-                  {Array.from({ length: pages }, (_, i) => i + 1)
-                    .filter((n) => n === 1 || n === pages || Math.abs(n - page) <= 1)
-                    .map((n, idx, arr) => (
-                      <React.Fragment key={n}>
-                        {idx > 0 && n - arr[idx - 1] > 1 && <span className="text-gray-600 px-1">…</span>}
-                        <button
-                          onClick={() => patch({ page: n })}
-                          className={`min-w-9 h-9 px-2 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
-                            n === page
-                              ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                              : 'bg-white/[0.05] border border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/[0.08]'
-                          }`}
-                        >
-                          {n}
-                        </button>
-                      </React.Fragment>
-                    ))}
-
-                  <button
-                    onClick={() => patch({ page: Math.min(page + 1, pages) })}
-                    disabled={page >= pages}
-                    className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+          </>
+        )}
       </div>
+
+      {/* Filter slide-over */}
+      <FilterPanel
+        open={panelOpen}
+        onClose={() => setPanelOpen(false)}
+        current={current}
+        patch={patch}
+        filters={filters}
+        total={total}
+        clearAll={clearAll}
+      />
     </div>
   );
 };
 
+/* ── Sub-components ─────────────────────────────── */
+
 const Chip = ({ label, onClear, primary }) => (
-  <span
-    className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-[12px] font-semibold ${
-      primary
-        ? 'bg-primary/10 border border-primary/20 text-primary'
-        : 'bg-white/[0.07] border border-white/[0.1] text-gray-300'
-    }`}
-  >
+  <span className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-[12px] font-semibold ${
+    primary ? 'bg-primary/10 border border-primary/20 text-primary' : 'bg-surface-2 border border-line text-muted'
+  }`}>
     {label}
     <button onClick={onClear}><X size={10} /></button>
   </span>
+);
+
+const PageBtn = ({ children, active, disabled, onClick }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`min-w-9 h-9 px-2 flex items-center justify-center rounded-lg text-sm font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+      active ? 'bg-primary text-on-primary shadow-sm shadow-primary/25' : 'bg-surface border border-line text-muted hover:text-fg hover:border-primary/40'
+    }`}
+  >
+    {children}
+  </button>
+);
+
+const PanelSection = ({ title, children }) => (
+  <div className="py-5 border-b border-line">
+    <p className="text-[11px] font-bold text-muted uppercase tracking-[0.15em] mb-3">{title}</p>
+    {children}
+  </div>
+);
+
+const FilterPanel = ({ open, onClose, current, patch, filters, total, clearAll }) => {
+  const [brandSearch, setBrandSearch] = useState('');
+
+  const brands = (filters.brands || []).filter((b) =>
+    b.toLowerCase().includes(brandSearch.toLowerCase())
+  );
+
+  return (
+    <>
+      <div
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] transition-opacity ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
+      />
+      <aside
+        className={`fixed inset-y-0 right-0 w-full sm:w-[380px] bg-canvas border-l border-line z-[90] flex flex-col transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-line shrink-0">
+          <h2 className="text-lg font-bold text-fg">Filters</h2>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-surface text-muted hover:text-fg hover:bg-surface-2 transition-all">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5">
+          <PanelSection title="Price">
+            <div className="flex flex-col gap-1">
+              {PRICE_RANGES.map((r) => {
+                const isActive = String(r.min) === current.minPrice && String(r.max) === current.maxPrice;
+                return (
+                  <button
+                    key={r.label}
+                    onClick={() => patch({ minPrice: r.min || undefined, maxPrice: r.max || undefined })}
+                    className={`text-left px-3 py-2 rounded-xl text-[13px] transition-all ${
+                      isActive ? 'bg-primary/10 text-primary font-semibold border border-primary/20' : 'text-muted hover:text-fg hover:bg-surface-2'
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                );
+              })}
+            </div>
+          </PanelSection>
+
+          {(filters.brands || []).length > 0 && (
+            <PanelSection title="Brand">
+              {(filters.brands || []).length > 6 && (
+                <div className="relative mb-2">
+                  <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+                  <input
+                    value={brandSearch}
+                    onChange={(e) => setBrandSearch(e.target.value)}
+                    placeholder="Search brands…"
+                    className="w-full bg-surface border border-line rounded-lg pl-8 pr-3 py-2 text-[13px] text-fg placeholder-muted/60 focus:outline-none focus:border-primary/50"
+                  />
+                </div>
+              )}
+              <div className="flex flex-col gap-0.5 max-h-56 overflow-y-auto scrollbar-hide">
+                <FilterRow
+                  label="All brands"
+                  checked={!current.brand}
+                  onClick={() => patch({ brand: undefined })}
+                />
+                {brands.map((b) => (
+                  <FilterRow
+                    key={b}
+                    label={b}
+                    checked={current.brand === b}
+                    onClick={() => patch({ brand: current.brand === b ? undefined : b })}
+                  />
+                ))}
+              </div>
+            </PanelSection>
+          )}
+
+          <PanelSection title="Rating">
+            <div className="flex flex-col gap-1">
+              {RATING_OPTIONS.map((r) => (
+                <button
+                  key={r}
+                  onClick={() => patch({ minRating: current.minRating === String(r) ? undefined : r })}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] transition-all ${
+                    current.minRating === String(r) ? 'bg-primary/10 border border-primary/20' : 'hover:bg-surface-2 border border-transparent'
+                  }`}
+                >
+                  <StarRating value={r} size={13} />
+                  <span className="text-muted">& up</span>
+                </button>
+              ))}
+            </div>
+          </PanelSection>
+
+          <PanelSection title="Availability">
+            <FilterRow
+              label="In stock only"
+              checked={current.inStock}
+              onClick={() => patch({ inStock: current.inStock ? undefined : 'true' })}
+            />
+          </PanelSection>
+        </div>
+
+        <div className="px-5 py-4 border-t border-line shrink-0 flex gap-3">
+          <Button variant="secondary" className="flex-1 text-sm" onClick={clearAll}>Clear all</Button>
+          <Button variant="primary" className="flex-1 text-sm font-bold" onClick={onClose}>
+            Show {total} result{total !== 1 ? 's' : ''}
+          </Button>
+        </div>
+      </aside>
+    </>
+  );
+};
+
+const FilterRow = ({ label, checked, onClick }) => (
+  <button
+    onClick={onClick}
+    className="flex items-center gap-3 px-3 py-2 rounded-lg text-left text-[13px] text-muted hover:text-fg hover:bg-surface-2 transition-colors"
+  >
+    <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+      checked ? 'bg-primary border-primary text-on-primary' : 'border-line'
+    }`}>
+      {checked && <Check size={12} />}
+    </span>
+    {label}
+  </button>
 );
 
 export default ShopPage;

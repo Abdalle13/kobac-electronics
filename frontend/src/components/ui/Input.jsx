@@ -8,35 +8,35 @@ const Input = ({ label, id, error, icon: Icon, type, className = '', ...props })
   return (
     <div className={`flex flex-col mb-5 ${className}`}>
       {label && (
-        <label htmlFor={id} className="mb-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-gray-500">
+        <label htmlFor={id} className="mb-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-muted">
           {label}
         </label>
       )}
       <div className="relative group">
         {Icon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-primary transition-colors">
             <Icon size={16} />
           </div>
         )}
         <input
           id={id}
           type={isPassword ? (showPassword ? 'text' : 'password') : type}
-          className={`w-full bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-primary/40 focus:bg-white/[0.05] transition-all ${
+          className={`w-full bg-surface border border-line rounded-xl px-4 py-3 text-sm text-fg placeholder-muted/60 focus:outline-none focus:border-primary/50 focus:bg-surface-2 transition-all ${
             Icon ? 'pl-11' : ''
-          } ${isPassword ? 'pr-12' : ''} ${error ? 'border-red-500/40' : ''}`}
+          } ${isPassword ? 'pr-12' : ''} ${error ? 'border-danger/50' : ''}`}
           {...props}
         />
         {isPassword && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors p-1"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-fg transition-colors p-1"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
       </div>
-      {error && <span className="text-[10px] font-bold text-red-400/80 mt-1.5 ml-1 uppercase tracking-wider">{error}</span>}
+      {error && <span className="text-[10px] font-bold text-danger mt-1.5 ml-1 uppercase tracking-wider">{error}</span>}
     </div>
   );
 };

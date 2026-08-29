@@ -5,7 +5,7 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-[var(--color-border)] bg-[#0D0D0F] mt-auto">
+    <footer className="border-t border-line bg-surface mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
 
         {/* Top grid */}
@@ -14,11 +14,11 @@ const Footer = () => {
           {/* Brand */}
           <div className="sm:col-span-1">
             <Link to="/" className="inline-block mb-3 sm:mb-4">
-              <span className="text-base sm:text-lg font-black text-white tracking-tight">
+              <span className="text-base sm:text-lg font-black text-fg tracking-tight">
                 KOBAC <span className="text-primary">Electronics</span>
               </span>
             </Link>
-            <p className="text-gray-500 text-sm leading-relaxed mb-4 sm:mb-5 max-w-xs">
+            <p className="text-muted text-sm leading-relaxed mb-4 sm:mb-5 max-w-xs">
               Premium electronics and gadgets at your fingertips. Discover the future, today.
             </p>
             {/* Social Icons */}
@@ -34,7 +34,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.14] transition-all"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-surface-2 border border-line flex items-center justify-center text-muted hover:text-fg hover:bg-primary/10 hover:border-primary/30 transition-all"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     {svg}
@@ -48,8 +48,8 @@ const Footer = () => {
           <div className="grid grid-cols-2 gap-8 sm:contents">
             {/* Shop */}
             <div>
-              <h3 className="text-[10px] sm:text-[11px] font-bold text-white uppercase tracking-[0.15em] mb-3 sm:mb-4">Shop</h3>
-              <ul className="space-y-2.5 sm:space-y-3 text-[12px] sm:text-[13px] text-gray-500">
+              <h3 className="text-[10px] sm:text-[11px] font-bold text-fg uppercase tracking-[0.15em] mb-3 sm:mb-4">Shop</h3>
+              <ul className="space-y-2.5 sm:space-y-3 text-[12px] sm:text-[13px] text-muted">
                 {[
                   { to: '/shop?category=Phone', label: 'Smartphones' },
                   { to: '/shop?category=Laptop', label: 'Laptops' },
@@ -58,7 +58,7 @@ const Footer = () => {
                   { to: '/shop', label: 'All Products' },
                 ].map(({ to, label }) => (
                   <li key={to}>
-                    <Link to={to} className="hover:text-white transition-colors">{label}</Link>
+                    <Link to={to} className="hover:text-fg transition-colors">{label}</Link>
                   </li>
                 ))}
               </ul>
@@ -66,8 +66,8 @@ const Footer = () => {
 
             {/* Support */}
             <div>
-              <h3 className="text-[10px] sm:text-[11px] font-bold text-white uppercase tracking-[0.15em] mb-3 sm:mb-4">Support</h3>
-              <ul className="space-y-2.5 sm:space-y-3 text-[12px] sm:text-[13px] text-gray-500">
+              <h3 className="text-[10px] sm:text-[11px] font-bold text-fg uppercase tracking-[0.15em] mb-3 sm:mb-4">Support</h3>
+              <ul className="space-y-2.5 sm:space-y-3 text-[12px] sm:text-[13px] text-muted">
                 {[
                   { to: '/contact', label: 'Contact Us' },
                   { to: '/my-orders', label: 'Track Order' },
@@ -75,7 +75,7 @@ const Footer = () => {
                   { to: '/contact', label: 'Returns & Warranty' },
                 ].map(({ to, label }) => (
                   <li key={label}>
-                    <Link to={to} className="hover:text-white transition-colors">{label}</Link>
+                    <Link to={to} className="hover:text-fg transition-colors">{label}</Link>
                   </li>
                 ))}
               </ul>
@@ -84,13 +84,13 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/[0.06] pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
-          <p className="text-[11px] sm:text-[12px] text-gray-600 text-center sm:text-left">
+        <div className="border-t border-line pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+          <p className="text-[11px] sm:text-[12px] text-muted text-center sm:text-left">
             © {year} Kobac Electronics. All rights reserved.
           </p>
-          <div className="flex gap-4 sm:gap-5 text-[11px] sm:text-[12px] text-gray-600">
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+          <div className="flex gap-4 sm:gap-5 text-[11px] sm:text-[12px] text-muted">
+            <Link to="/privacy" className="hover:text-fg transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-fg transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

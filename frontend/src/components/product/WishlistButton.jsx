@@ -44,11 +44,11 @@ const WishlistButton = ({ product, variant = 'icon', className = '' }) => {
         onClick={toggle}
         className={`flex items-center justify-center gap-2 px-4 h-[46px] rounded-md border transition-all ${
           inWishlist
-            ? 'border-red-500/40 bg-red-500/10 text-red-400'
-            : 'border-[var(--color-border)] bg-[#111] text-gray-300 hover:text-white hover:border-gray-500'
+            ? 'border-danger/40 bg-danger/10 text-danger'
+            : 'border-line bg-surface text-muted hover:text-fg hover:border-primary/40'
         } ${className}`}
       >
-        <Heart size={18} className={inWishlist ? 'fill-red-400' : ''} />
+        <Heart size={18} className={inWishlist ? 'fill-danger' : ''} />
         <span className="text-sm font-medium">{inWishlist ? 'Saved' : 'Save'}</span>
       </button>
     );
@@ -61,7 +61,7 @@ const WishlistButton = ({ product, variant = 'icon', className = '' }) => {
       aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
       className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full backdrop-blur-md transition-all active:scale-90 ${
         inWishlist
-          ? 'bg-red-500/90 text-white'
+          ? 'bg-danger text-white'
           : 'bg-black/40 text-white hover:bg-black/60'
       } ${className}`}
     >

@@ -55,7 +55,7 @@ const CheckoutPage = () => {
   if (cartItems.length === 0 && !isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center w-full flex-grow">
-        <h2 className="text-2xl font-bold text-white mb-4">Your cart is empty</h2>
+        <h2 className="text-2xl font-bold text-fg mb-4">Your cart is empty</h2>
         <Button onClick={() => navigate('/shop')}>Continue Shopping</Button>
       </div>
     );
@@ -143,11 +143,11 @@ const CheckoutPage = () => {
   if (isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center w-full flex-grow px-4">
-        <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mb-6">
+        <div className="w-20 h-20 bg-success/15 text-success rounded-full flex items-center justify-center mb-6">
           <CheckCircle2 className="w-10 h-10" />
         </div>
-        <h2 className="text-3xl font-bold text-white mb-4">Order Placed Successfully!</h2>
-        <p className="text-gray-400 mb-8 max-w-md">
+        <h2 className="text-3xl font-bold text-fg mb-4">Order Placed Successfully!</h2>
+        <p className="text-muted mb-8 max-w-md">
           Thank you for your purchase. Your order has been placed and is being processed.
           You will receive an email confirmation shortly.
         </p>
@@ -161,15 +161,15 @@ const CheckoutPage = () => {
 
       {/* Checkout Steps Indicator */}
       <div className="flex items-center justify-center mb-12">
-        <div className={`flex items-center ${step >= 1 ? 'text-[var(--color-primary)]' : 'text-gray-500'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold mr-2 ${step >= 1 ? 'bg-[var(--color-primary)]/20 border border-[var(--color-primary)]' : 'bg-gray-800 border border-gray-700'}`}>
+        <div className={`flex items-center ${step >= 1 ? 'text-primary' : 'text-muted'}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold mr-2 ${step >= 1 ? 'bg-primary/20 border border-primary' : 'bg-surface-2 border border-line'}`}>
             1
           </div>
           <span className="font-medium hidden sm:inline">Shipping</span>
         </div>
-        <ChevronRight className="w-5 h-5 mx-2 md:mx-4 text-gray-600" />
-        <div className={`flex items-center ${step >= 2 ? 'text-[var(--color-primary)]' : 'text-gray-500'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold mr-2 ${step >= 2 ? 'bg-[var(--color-primary)]/20 border border-[var(--color-primary)]' : 'bg-gray-800 border border-gray-700'}`}>
+        <ChevronRight className="w-5 h-5 mx-2 md:mx-4 text-muted" />
+        <div className={`flex items-center ${step >= 2 ? 'text-primary' : 'text-muted'}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold mr-2 ${step >= 2 ? 'bg-primary/20 border border-primary' : 'bg-surface-2 border border-line'}`}>
             2
           </div>
           <span className="font-medium hidden sm:inline">Payment</span>
@@ -181,8 +181,8 @@ const CheckoutPage = () => {
         {/* Forms */}
         <div className="md:col-span-2">
           {step === 1 && (
-            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 md:p-8 shadow-xl">
-              <h2 className="text-2xl font-bold text-white mb-6">Shipping Details</h2>
+            <div className="bg-surface border border-line rounded-xl p-6 md:p-8 shadow-xl">
+              <h2 className="text-2xl font-bold text-fg mb-6">Shipping Details</h2>
               <form onSubmit={handleShippingSubmit} className="space-y-4">
                 <Input
                   label="Full Name"
@@ -231,52 +231,52 @@ const CheckoutPage = () => {
           )}
 
           {step === 2 && (
-            <div className="relative bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 md:p-8 shadow-xl">
-              <h2 className="text-2xl font-bold text-white mb-6">Payment Method</h2>
+            <div className="relative bg-surface border border-line rounded-xl p-6 md:p-8 shadow-xl">
+              <h2 className="text-2xl font-bold text-fg mb-6">Payment Method</h2>
               <form onSubmit={handlePaymentSubmit}>
 
                 <div className="space-y-4 mb-8">
-                  <label className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'EVC Plus' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5' : 'border-gray-700 bg-[#111] hover:bg-gray-800'}`}>
+                  <label className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'EVC Plus' ? 'border-primary bg-primary/5' : 'border-line bg-surface hover:bg-surface-2'}`}>
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="EVC Plus"
                       checked={paymentMethod === 'EVC Plus'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-5 h-5 accent-[var(--color-primary)]"
+                      className="w-5 h-5 accent-primary"
                     />
-                    <div className="w-10 h-10 bg-blue-500/20 text-blue-500 rounded-full flex items-center justify-center border border-blue-500/30">
+                    <div className="w-10 h-10 bg-primary/15 text-primary rounded-full flex items-center justify-center border border-primary/30">
                       <Smartphone className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white">EVC Plus</h3>
-                      <p className="text-sm text-gray-400">Mobile Money Payment</p>
+                      <h3 className="font-semibold text-fg">EVC Plus</h3>
+                      <p className="text-sm text-muted">Mobile Money Payment</p>
                     </div>
                   </label>
 
-                  <label className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'Cash on Delivery' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5' : 'border-gray-700 bg-[#111] hover:bg-gray-800'}`}>
+                  <label className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'Cash on Delivery' ? 'border-primary bg-primary/5' : 'border-line bg-surface hover:bg-surface-2'}`}>
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="Cash on Delivery"
                       checked={paymentMethod === 'Cash on Delivery'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-5 h-5 accent-[var(--color-primary)]"
+                      className="w-5 h-5 accent-primary"
                     />
-                    <div className="w-10 h-10 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center border border-green-500/30">
+                    <div className="w-10 h-10 bg-success/15 text-success rounded-full flex items-center justify-center border border-success/30">
                       <Banknote className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white">Cash on Delivery</h3>
-                      <p className="text-sm text-gray-400">Pay when you receive</p>
+                      <h3 className="font-semibold text-fg">Cash on Delivery</h3>
+                      <p className="text-sm text-muted">Pay when you receive</p>
                     </div>
                   </label>
                 </div>
 
                 {paymentMethod === 'EVC Plus' && (
-                  <div className="bg-[#0a0a0b] border border-gray-800 rounded-xl p-5 mb-8">
-                    <h3 className="font-medium text-white mb-4 flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-gray-400" /> Enter EVC Plus Details
+                  <div className="bg-canvas border border-line rounded-xl p-5 mb-8">
+                    <h3 className="font-medium text-fg mb-4 flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-muted" /> Enter EVC Plus Details
                     </h3>
                     <Input
                       label="Mobile Number"
@@ -296,21 +296,21 @@ const CheckoutPage = () => {
                       value={evcPin}
                       onChange={(e) => setEvcPin(e.target.value.replace(/\D/g, ''))}
                     />
-                    <p className="text-[11px] text-gray-500 flex items-center gap-1.5 -mt-1">
-                      <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
-                      Simulated gateway — demo PIN is <span className="text-gray-300 font-mono">1234</span>.
+                    <p className="text-[11px] text-muted flex items-center gap-1.5 -mt-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-success" />
+                      Simulated gateway — demo PIN is <span className="text-muted font-mono">1234</span>.
                     </p>
                   </div>
                 )}
 
                 {(evcError || error) && (
-                  <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500 text-sm flex items-start gap-2">
+                  <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm flex items-start gap-2">
                     <XCircle className="w-4 h-4 mt-0.5 shrink-0" />
                     <span>{evcError || error}</span>
                   </div>
                 )}
 
-                <div className="flex justify-between pt-4 border-t border-[var(--color-border)]">
+                <div className="flex justify-between pt-4 border-t border-line">
                   <Button type="button" variant="ghost" onClick={() => setStep(1)} disabled={loading || evcStatus !== 'idle'}>Go Back</Button>
                   <Button type="submit" className="w-full sm:w-auto px-8" disabled={loading || evcStatus !== 'idle'}>
                     {evcStatus === 'pushing' ? 'Sending request...'
@@ -322,14 +322,14 @@ const CheckoutPage = () => {
               </form>
 
               {evcStatus !== 'idle' && (
-                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center text-center p-8 z-20">
-                  <div className="w-14 h-14 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mb-4">
-                    <Loader2 className="w-7 h-7 text-blue-400 animate-spin" />
+                <div className="absolute inset-0 bg-canvas/85 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center text-center p-8 z-20">
+                  <div className="w-14 h-14 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center mb-4">
+                    <Loader2 className="w-7 h-7 text-primary animate-spin" />
                   </div>
-                  <h3 className="text-white font-bold text-lg mb-1">
+                  <h3 className="text-fg font-bold text-lg mb-1">
                     {evcStatus === 'pushing' ? 'Check your phone' : 'Finalising your order'}
                   </h3>
-                  <p className="text-gray-400 text-sm max-w-xs">
+                  <p className="text-muted text-sm max-w-xs">
                     {evcStatus === 'pushing'
                       ? `A payment request for ${formatCurrency(totalPrice)} was sent to ${evcNumber}. Enter your EVC Plus PIN to approve.`
                       : 'Payment approved. Creating your order...'}
@@ -342,36 +342,36 @@ const CheckoutPage = () => {
 
         {/* Order Summary */}
         <div className="md:col-span-1">
-          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-6 sticky top-24">
-            <h2 className="text-xl font-bold text-white mb-6 pb-4 border-b border-[var(--color-border)]">Order Summary</h2>
+          <div className="bg-surface border border-line rounded-xl p-6 sticky top-24">
+            <h2 className="text-xl font-bold text-fg mb-6 pb-4 border-b border-line">Order Summary</h2>
 
             <div className="flex flex-col gap-4 mb-6">
               {cartItems.map(item => (
                 <div key={item._id} className="flex gap-4">
-                  <img src={item.images[0] || '/placeholder.jpg'} alt={item.name} className="w-16 h-16 object-cover rounded border border-gray-800" />
+                  <img src={item.images[0] || '/placeholder.jpg'} alt={item.name} className="w-16 h-16 object-cover rounded border border-line" />
                   <div className="flex-1">
-                    <h4 className="text-sm text-white line-clamp-1">{item.name}</h4>
-                    <p className="text-xs text-gray-400 mt-1">Qty: {item.qty}</p>
-                    <p className="text-sm font-semibold text-white mt-1">{formatCurrency(item.price * item.qty)}</p>
+                    <h4 className="text-sm text-fg line-clamp-1">{item.name}</h4>
+                    <p className="text-xs text-muted mt-1">Qty: {item.qty}</p>
+                    <p className="text-sm font-semibold text-fg mt-1">{formatCurrency(item.price * item.qty)}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="border-t border-[var(--color-border)] pt-4 space-y-3">
-              <div className="flex justify-between text-gray-400 text-sm">
+            <div className="border-t border-line pt-4 space-y-3">
+              <div className="flex justify-between text-muted text-sm">
                 <span>Subtotal</span>
                 <span>{formatCurrency(itemsPrice)}</span>
               </div>
-              <div className="flex justify-between text-gray-400 text-sm">
+              <div className="flex justify-between text-muted text-sm">
                 <span>Tax (5%)</span>
                 <span>{formatCurrency(taxPrice)}</span>
               </div>
-              <div className="flex justify-between text-gray-400 text-sm">
+              <div className="flex justify-between text-muted text-sm">
                 <span>Shipping</span>
                 <span>{shippingPrice === 0 ? 'Free' : formatCurrency(shippingPrice)}</span>
               </div>
-              <div className="flex justify-between text-white font-bold text-lg pt-3 border-t border-[var(--color-border)]">
+              <div className="flex justify-between text-fg font-bold text-lg pt-3 border-t border-line">
                 <span>Total</span>
                 <span>{formatCurrency(totalPrice)}</span>
               </div>

@@ -29,17 +29,17 @@ const StarRating = ({ value = 0, onChange, size = 16, className = '', showValue 
             >
               <Star
                 size={size}
-                className={filled ? 'text-amber-400 fill-amber-400' : 'text-gray-600'}
+                className={filled ? 'text-amber-400 fill-amber-400' : 'text-muted/40'}
               />
             </button>
           );
         })}
       </div>
       {showValue && value > 0 && (
-        <span className="text-xs font-semibold text-gray-300">{Number(value).toFixed(1)}</span>
+        <span className="text-xs font-semibold text-fg">{Number(value).toFixed(1)}</span>
       )}
       {typeof count === 'number' && (
-        <span className="text-xs text-gray-500">({count})</span>
+        <span className="text-xs text-muted">({count})</span>
       )}
     </div>
   );

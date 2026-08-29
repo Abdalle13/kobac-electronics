@@ -60,14 +60,14 @@ const ProductDetailPage = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 py-12 w-full flex-grow flex items-center justify-center">
         <div className="animate-pulse w-full max-w-5xl">
-          <div className="h-8 bg-gray-800 rounded w-1/4 mb-8"></div>
+          <div className="h-8 bg-surface-2 rounded w-1/4 mb-8"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="aspect-square bg-gray-800 rounded-2xl w-full"></div>
+            <div className="aspect-square bg-surface-2 rounded-2xl w-full"></div>
             <div className="space-y-4">
-              <div className="h-10 bg-gray-800 rounded w-3/4"></div>
-              <div className="h-6 bg-gray-800 rounded w-1/4"></div>
-              <div className="h-24 bg-gray-800 rounded w-full"></div>
-              <div className="h-12 bg-gray-800 rounded w-full"></div>
+              <div className="h-10 bg-surface-2 rounded w-3/4"></div>
+              <div className="h-6 bg-surface-2 rounded w-1/4"></div>
+              <div className="h-24 bg-surface-2 rounded w-full"></div>
+              <div className="h-12 bg-surface-2 rounded w-full"></div>
             </div>
           </div>
         </div>
@@ -78,10 +78,10 @@ const ProductDetailPage = () => {
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-12 flex-grow">
-        <div className="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center max-w-lg mx-auto">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">Error Loading Product</h2>
-          <p className="text-red-400 mb-6">{error}</p>
+        <div className="bg-danger/10 border border-danger/30 rounded-lg p-6 text-center max-w-lg mx-auto">
+          <AlertCircle className="w-12 h-12 text-danger mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-fg mb-2">Error Loading Product</h2>
+          <p className="text-danger mb-6">{error}</p>
           <Button onClick={() => navigate(-1)} variant="secondary">Go Back</Button>
         </div>
       </div>
@@ -93,7 +93,7 @@ const ProductDetailPage = () => {
       
       <button 
         onClick={() => navigate(-1)}
-        className="flex items-center text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors mb-8 group"
+        className="flex items-center text-sm text-muted hover:text-fg transition-colors mb-8 group"
       >
         <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
         Back to Results
@@ -103,7 +103,7 @@ const ProductDetailPage = () => {
         
         {/* Image Gallery */}
         <div className="flex flex-col gap-4">
-          <div className="aspect-square bg-[#111] rounded-2xl overflow-hidden border border-[var(--color-border)] p-4 flex items-center justify-center relative">
+          <div className="aspect-square bg-surface rounded-2xl overflow-hidden border border-line p-4 flex items-center justify-center relative">
             <div className="absolute top-4 left-4 z-10">
               <Badge variant="neutral">{product.category}</Badge>
             </div>
@@ -120,8 +120,8 @@ const ProductDetailPage = () => {
                 <button 
                   key={idx}
                   onClick={() => setActiveImage(img)}
-                  className={`aspect-square bg-[#111] rounded-lg overflow-hidden border ${
-                    activeImage === img ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)]/50' : 'border-[var(--color-border)] hover:border-gray-500'
+                  className={`aspect-square bg-surface rounded-lg overflow-hidden border ${
+                    activeImage === img ? 'border-primary ring-2 ring-primary/50' : 'border-line hover:border-primary/40'
                   } transition-all`}
                 >
                   <img src={img} alt={`${product.name} ${idx}`} className="w-full h-full object-cover" />
@@ -133,10 +133,10 @@ const ProductDetailPage = () => {
 
         {/* Product Details */}
         <div className="flex flex-col">
-          <div className="mb-2 text-[#0066FF] font-semibold tracking-wider text-sm uppercase">
+          <div className="mb-2 text-primary font-semibold tracking-wider text-sm uppercase">
             {product.brand}
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-fg leading-tight mb-3">
             {product.name}
           </h1>
 
@@ -144,15 +144,15 @@ const ProductDetailPage = () => {
             {product.numReviews > 0 ? (
               <a href="#reviews" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <StarRating value={product.rating} size={16} showValue />
-                <span className="text-sm text-gray-400">· {product.numReviews} review{product.numReviews > 1 ? 's' : ''}</span>
+                <span className="text-sm text-muted">· {product.numReviews} review{product.numReviews > 1 ? 's' : ''}</span>
               </a>
             ) : (
-              <span className="text-sm text-gray-500">No reviews yet</span>
+              <span className="text-sm text-muted">No reviews yet</span>
             )}
           </div>
 
           <div className="flex items-center gap-4 mb-6">
-            <span className="text-3xl font-extrabold text-white">{formatCurrency(product.price)}</span>
+            <span className="text-3xl font-extrabold text-fg">{formatCurrency(product.price)}</span>
             {product.countInStock > 0 ? (
               <Badge variant="success" className="flex items-center gap-1">
                 <Check className="w-3 h-3" /> In Stock ({product.countInStock} available)
@@ -162,28 +162,28 @@ const ProductDetailPage = () => {
             )}
           </div>
 
-          <p className="text-[var(--color-text-secondary)] text-lg leading-relaxed mb-8">
+          <p className="text-muted text-lg leading-relaxed mb-8">
             {product.description}
           </p>
 
-          <div className="bg-[#111] border border-[var(--color-border)] rounded-xl p-6 mb-8 mt-auto">
+          <div className="bg-surface border border-line rounded-xl p-6 mb-8 mt-auto">
             <div className="flex flex-col sm:flex-row gap-4 items-end">
               
               <div className="w-full sm:w-1/3">
-                <label className="block text-sm font-medium text-gray-400 mb-2">Quantity</label>
-                <div className="flex items-center justify-between bg-[#0a0a0b] border border-gray-700 rounded-lg p-1">
+                <label className="block text-sm font-medium text-muted mb-2">Quantity</label>
+                <div className="flex items-center justify-between bg-canvas border border-line rounded-lg p-1">
                   <button 
                     onClick={() => setQty(Math.max(1, qty - 1))}
                     disabled={qty <= 1}
-                    className="p-2 text-gray-400 hover:text-white disabled:opacity-50 transition-colors"
+                    className="p-2 text-muted hover:text-fg disabled:opacity-50 transition-colors"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="text-white font-medium">{qty}</span>
+                  <span className="text-fg font-medium">{qty}</span>
                   <button 
                     onClick={() => setQty(Math.min(product.countInStock, qty + 1))}
                     disabled={qty >= product.countInStock}
-                    className="p-2 text-gray-400 hover:text-white disabled:opacity-50 transition-colors"
+                    className="p-2 text-muted hover:text-fg disabled:opacity-50 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -208,27 +208,27 @@ const ProductDetailPage = () => {
 
           {/* Technical Specifications */}
           {product.technicalSpecs && (
-            <div className="border border-[var(--color-border)] rounded-xl overflow-hidden mt-4">
-              <div className="bg-[#111] px-6 py-4 border-b border-[var(--color-border)]">
-                <h3 className="text-lg font-bold text-white">Technical Specifications</h3>
+            <div className="border border-line rounded-xl overflow-hidden mt-4">
+              <div className="bg-surface px-6 py-4 border-b border-line">
+                <h3 className="text-lg font-bold text-fg">Technical Specifications</h3>
               </div>
-              <div className="divide-y divide-[var(--color-border)]">
+              <div className="divide-y divide-line">
                 {product.technicalSpecs.processor && (
-                  <div className="flex px-6 py-4 bg-[#0a0a0b]/50">
-                    <div className="w-1/3 font-medium text-gray-400">Processor</div>
-                    <div className="w-2/3 text-white">{product.technicalSpecs.processor}</div>
+                  <div className="flex px-6 py-4 bg-canvas/50">
+                    <div className="w-1/3 font-medium text-muted">Processor</div>
+                    <div className="w-2/3 text-fg">{product.technicalSpecs.processor}</div>
                   </div>
                 )}
                 {product.technicalSpecs.ram && (
                   <div className="flex px-6 py-4 bg-transparent">
-                    <div className="w-1/3 font-medium text-gray-400">RAM</div>
-                    <div className="w-2/3 text-white">{product.technicalSpecs.ram}</div>
+                    <div className="w-1/3 font-medium text-muted">RAM</div>
+                    <div className="w-2/3 text-fg">{product.technicalSpecs.ram}</div>
                   </div>
                 )}
                 {product.technicalSpecs.storage && (
-                  <div className="flex px-6 py-4 bg-[#0a0a0b]/50">
-                    <div className="w-1/3 font-medium text-gray-400">Storage</div>
-                    <div className="w-2/3 text-white">{product.technicalSpecs.storage}</div>
+                  <div className="flex px-6 py-4 bg-canvas/50">
+                    <div className="w-1/3 font-medium text-muted">Storage</div>
+                    <div className="w-2/3 text-fg">{product.technicalSpecs.storage}</div>
                   </div>
                 )}
               </div>
@@ -239,37 +239,37 @@ const ProductDetailPage = () => {
       </div>
 
       {/* Reviews */}
-      <div id="reviews" className="mt-16 pt-12 border-t border-[var(--color-border)] scroll-mt-24">
+      <div id="reviews" className="mt-16 pt-12 border-t border-line scroll-mt-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
           {/* Reviews list */}
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <h2 className="text-2xl font-bold text-white">Customer Reviews</h2>
+              <h2 className="text-2xl font-bold text-fg">Customer Reviews</h2>
               {product.numReviews > 0 && (
                 <StarRating value={product.rating} size={16} showValue count={product.numReviews} />
               )}
             </div>
 
             {(!product.reviews || product.reviews.length === 0) ? (
-              <p className="text-gray-500">No reviews yet. Be the first to review this product.</p>
+              <p className="text-muted">No reviews yet. Be the first to review this product.</p>
             ) : (
               <div className="space-y-6">
                 {product.reviews.map((review) => (
-                  <div key={review._id} className="bg-[#111] border border-[var(--color-border)] rounded-xl p-5">
+                  <div key={review._id} className="bg-surface border border-line rounded-xl p-5">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-sm">
                           {review.name?.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-white font-semibold text-sm">{review.name}</p>
-                          <p className="text-[11px] text-gray-500">{new Date(review.createdAt).toLocaleDateString()}</p>
+                          <p className="text-fg font-semibold text-sm">{review.name}</p>
+                          <p className="text-[11px] text-muted">{new Date(review.createdAt).toLocaleDateString()}</p>
                         </div>
                       </div>
                       <StarRating value={review.rating} size={13} />
                     </div>
-                    <p className="text-gray-300 text-sm leading-relaxed mt-3">{review.comment}</p>
+                    <p className="text-muted text-sm leading-relaxed mt-3">{review.comment}</p>
                   </div>
                 ))}
               </div>
@@ -278,37 +278,37 @@ const ProductDetailPage = () => {
 
           {/* Write a review */}
           <div>
-            <h3 className="text-xl font-bold text-white mb-6">Write a Review</h3>
+            <h3 className="text-xl font-bold text-fg mb-6">Write a Review</h3>
 
             {!userInfo ? (
-              <div className="bg-[#111] border border-[var(--color-border)] rounded-xl p-6 text-center">
-                <p className="text-gray-400 mb-4">Please sign in to write a review.</p>
+              <div className="bg-surface border border-line rounded-xl p-6 text-center">
+                <p className="text-muted mb-4">Please sign in to write a review.</p>
                 <Link to="/login"><Button variant="secondary">Sign In</Button></Link>
               </div>
             ) : alreadyReviewed ? (
-              <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 text-green-400 text-sm">
+              <div className="bg-success/10 border border-success/30 rounded-xl p-6 text-success text-sm">
                 You've already reviewed this product. Thank you!
               </div>
             ) : (
-              <form onSubmit={handleReviewSubmit} className="bg-[#111] border border-[var(--color-border)] rounded-xl p-6 space-y-5">
+              <form onSubmit={handleReviewSubmit} className="bg-surface border border-line rounded-xl p-6 space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Your rating</label>
+                  <label className="block text-sm font-medium text-muted mb-2">Your rating</label>
                   <StarRating value={reviewRating} onChange={setReviewRating} size={28} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Your review</label>
+                  <label className="block text-sm font-medium text-muted mb-2">Your review</label>
                   <textarea
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
                     rows={4}
                     maxLength={1000}
                     placeholder="What did you think of this product?"
-                    className="w-full bg-[#0a0a0b] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[var(--color-primary)] resize-none"
+                    className="w-full bg-canvas border border-line rounded-lg px-3 py-2 text-fg text-sm focus:outline-none focus:border-primary resize-none"
                   />
                 </div>
 
                 {reviewError && (
-                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                  <div className="p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm">
                     {reviewError}
                   </div>
                 )}
@@ -320,7 +320,7 @@ const ProductDetailPage = () => {
                 >
                   {reviewLoading ? 'Submitting...' : 'Submit Review'}
                 </Button>
-                <p className="text-[11px] text-gray-500">You can only review products you have ordered.</p>
+                <p className="text-[11px] text-muted">You can only review products you have ordered.</p>
               </form>
             )}
           </div>

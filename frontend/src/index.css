@@ -1,44 +1,125 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --color-primary: #0066FF;
-  --color-primary-hover: #0052cc;
-  --color-background: #0A0A0B;
-  --color-surface: #161618;
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-text-primary: #F3F4F6;
-  --color-text-secondary: #9CA3AF;
+/*
+  ─────────────────────────────────────────────────────────────
+  Design tokens
+  - Semantic color names live in @theme (inline → Tailwind emits
+    the raw var() into utilities, so runtime theme swaps work).
+  - Actual values live on :root (light) and :root[data-theme=dark].
+  - Legacy --color-* aliases are kept so un-migrated pages still work.
+  ─────────────────────────────────────────────────────────────
+*/
 
-  /* Custom xs breakpoint for small phones */
+@theme inline {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --breakpoint-xs: 475px;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+
+  /* Semantic surface / text */
+  --color-canvas: var(--tk-bg);
+  --color-surface: var(--tk-surface);
+  --color-surface-2: var(--tk-surface-2);
+  --color-line: var(--tk-border);
+  --color-fg: var(--tk-text);
+  --color-muted: var(--tk-muted);
+
+  /* Brand */
+  --color-primary: var(--tk-primary);
+  --color-primary-hover: var(--tk-primary-hover);
+  --color-on-primary: var(--tk-on-primary);
+  --color-accent: var(--tk-accent);
+  --color-accent-soft: var(--tk-accent-soft);
+
+  /* Status */
+  --color-success: var(--tk-success);
+  --color-danger: var(--tk-danger);
+  --color-warning: var(--tk-warning);
+
+  /* Legacy aliases (pre-migration pages) */
+  --color-background: var(--tk-bg);
+  --color-border: var(--tk-border);
+  --color-text-primary: var(--tk-text);
+  --color-text-secondary: var(--tk-muted);
+}
+
+/* ── Light (default) ───────────────────────────── */
+:root {
+  --tk-bg: #ffffff;
+  --tk-surface: #f6f7f9;
+  --tk-surface-2: #eef0f3;
+  --tk-border: #e6e8ec;
+  --tk-text: #0f172a;
+  --tk-muted: #64748b;
+
+  --tk-primary: #2563eb;
+  --tk-primary-hover: #1d4ed8;
+  --tk-on-primary: #ffffff;
+  --tk-accent: #f59e0b;
+  --tk-accent-soft: rgba(245, 158, 11, 0.12);
+
+  --tk-success: #10b981;
+  --tk-danger: #ef4444;
+  --tk-warning: #f59e0b;
+
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --shimmer-a: #eef0f3;
+  --shimmer-b: #e2e5ea;
+
+  color-scheme: light;
+}
+
+/* ── Dark ──────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --tk-bg: #0b0c0f;
+  --tk-surface: #15171c;
+  --tk-surface-2: #1d2026;
+  --tk-border: rgba(255, 255, 255, 0.08);
+  --tk-text: #f1f3f5;
+  --tk-muted: #9ca3af;
+
+  --tk-primary: #3b82f6;
+  --tk-primary-hover: #2563eb;
+  --tk-on-primary: #ffffff;
+  --tk-accent: #fbbf24;
+  --tk-accent-soft: rgba(251, 191, 36, 0.14);
+
+  --tk-success: #34d399;
+  --tk-danger: #f87171;
+  --tk-warning: #fbbf24;
+
+  --glass-bg: rgba(21, 23, 28, 0.7);
+  --shimmer-a: #15171c;
+  --shimmer-b: #23262e;
+
+  color-scheme: dark;
 }
 
 :root {
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
+  background-color: var(--tk-bg);
+  color: var(--tk-text);
   font-family: var(--font-sans);
-  color-scheme: dark;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  min-height: 100dvh; /* dynamic viewport for mobile */
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
+  min-height: 100dvh;
+  background-color: var(--tk-bg);
+  color: var(--tk-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Prevent horizontal overflow on mobile */
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Better tap highlight on mobile */
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Fix mobile input zoom (prevents iOS zoom on focus) */
 input, select, textarea {
   font-size: 16px;
 }
@@ -49,43 +130,35 @@ input, select, textarea {
 }
 
 .glass {
-  background: rgba(22, 22, 24, 0.7);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--tk-border);
 }
 
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: var(--color-background);
+  background: var(--tk-bg);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--color-surface);
+  background: var(--tk-surface-2);
   border-radius: 4px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--tk-border);
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
+  background: var(--tk-primary);
 }
 
 /* Shimmer loading effect */
 @keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
 }
-
 .animate-shimmer {
   animation: shimmer 2s infinite linear;
-  background: linear-gradient(to right, #161618 4%, #222 25%, #161618 36%);
+  background: linear-gradient(to right, var(--shimmer-a) 4%, var(--shimmer-b) 25%, var(--shimmer-a) 36%);
   background-size: 1000px 100%;
 }
 
