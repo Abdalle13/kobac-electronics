@@ -10,7 +10,7 @@ const AboutPage = () => {
   ];
 
   return (
-    <div className="min-h-screen py-20 relative overflow-hidden">
+    <div className="min-h-screen py-12 sm:py-20 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
@@ -18,13 +18,13 @@ const AboutPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         
         {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-4xl md:text-6xl font-black text-fg tracking-tighter mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-fg tracking-tighter mb-4 sm:mb-6">
               About <span className="text-primary">KOBAC</span>
             </h1>
             <p className="text-muted text-lg md:text-xl leading-relaxed">
@@ -35,7 +35,7 @@ const AboutPage = () => {
         </div>
 
         {/* Story Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center mb-14 sm:mb-24">
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -60,7 +60,7 @@ const AboutPage = () => {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="glass border border-line rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
+            <div className="glass border border-line rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="flex flex-col gap-8 relative z-10">
                 <div className="flex items-center gap-6">
@@ -87,7 +87,7 @@ const AboutPage = () => {
         </div>
 
         {/* Stats Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-14 sm:mb-24">
           {stats.map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -95,7 +95,7 @@ const AboutPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="glass border border-line rounded-3xl p-8 text-center shadow-xl hover:border-line transition-colors"
+              className="glass border border-line rounded-3xl p-6 sm:p-8 text-center shadow-xl hover:border-line transition-colors"
             >
               <div className={`w-16 h-16 mx-auto rounded-full ${stat.bg} ${stat.color} flex items-center justify-center mb-6`}>
                 <stat.icon size={28} />

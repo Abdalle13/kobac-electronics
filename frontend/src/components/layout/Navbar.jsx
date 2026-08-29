@@ -58,7 +58,10 @@ const Navbar = () => {
       <div className="bg-primary text-on-primary text-[10px] sm:text-xs font-bold py-1.5 sm:py-2 text-center tracking-wide">
         <span className="flex items-center justify-center gap-2 px-4">
           <Zap size={12} className="animate-pulse shrink-0" />
-          <span>Spend ${freeShippingThreshold}+ and Get FREE Delivery — Limited Time Offer</span>
+          <span className="truncate">
+            Spend ${freeShippingThreshold}+ and Get FREE Delivery
+            <span className="hidden sm:inline"> — Limited Time Offer</span>
+          </span>
         </span>
       </div>
 

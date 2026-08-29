@@ -63,11 +63,11 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto pt-8 pb-16 px-4">
+    <div className="w-full max-w-2xl mx-auto pt-8 pb-16 px-4 sm:px-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass border border-line rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden"
+        className="glass border border-line rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -z-10"></div>

@@ -36,7 +36,7 @@ const MyOrdersPage = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12 w-full flex-grow">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full flex-grow">
       <div className="mb-10">
         <h1 className="text-3xl md:text-4xl font-bold text-fg mb-2">My Orders</h1>
         <p className="text-muted">Track and manage your current and past purchases.</p>

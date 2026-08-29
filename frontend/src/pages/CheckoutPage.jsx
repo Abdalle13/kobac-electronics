@@ -55,7 +55,7 @@ const CheckoutPage = () => {
 
   if (cartItems.length === 0 && !isSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center w-full flex-grow">
+      <div className="flex flex-col items-center justify-center py-16 sm:py-20 text-center w-full flex-grow px-4">
         <h2 className="text-2xl font-bold text-fg mb-4">Your cart is empty</h2>
         <Button onClick={() => navigate('/shop')}>Continue Shopping</Button>
       </div>
@@ -143,7 +143,7 @@ const CheckoutPage = () => {
 
   if (isSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center w-full flex-grow px-4">
+      <div className="flex flex-col items-center justify-center py-16 sm:py-20 text-center w-full flex-grow px-4">
         <div className="w-20 h-20 bg-success/15 text-success rounded-full flex items-center justify-center mb-6">
           <CheckCircle2 className="w-10 h-10" />
         </div>
@@ -158,10 +158,10 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 w-full flex-grow">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full flex-grow">
 
       {/* Checkout Steps Indicator */}
-      <div className="flex items-center justify-center mb-12">
+      <div className="flex items-center justify-center mb-8 sm:mb-12">
         <div className={`flex items-center ${step >= 1 ? 'text-primary' : 'text-muted'}`}>
           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold mr-2 ${step >= 1 ? 'bg-primary/20 border border-primary' : 'bg-surface-2 border border-line'}`}>
             1
@@ -177,7 +177,7 @@ const CheckoutPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
 
         {/* Forms */}
         <div className="md:col-span-2">
@@ -343,7 +343,7 @@ const CheckoutPage = () => {
 
         {/* Order Summary */}
         <div className="md:col-span-1">
-          <div className="bg-surface border border-line rounded-xl p-6 sticky top-24">
+          <div className="bg-surface border border-line rounded-xl p-6 md:sticky md:top-24">
             <h2 className="text-xl font-bold text-fg mb-6 pb-4 border-b border-line">Order Summary</h2>
 
             <div className="flex flex-col gap-4 mb-6">

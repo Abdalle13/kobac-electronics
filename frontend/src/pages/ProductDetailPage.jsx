@@ -99,7 +99,7 @@ const ProductDetailPage = () => {
         Back to Results
       </button>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
         
         {/* Image Gallery */}
         <div className="flex flex-col gap-4">
@@ -239,8 +239,8 @@ const ProductDetailPage = () => {
       </div>
 
       {/* Reviews */}
-      <div id="reviews" className="mt-16 pt-12 border-t border-line scroll-mt-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div id="reviews" className="mt-12 sm:mt-16 pt-10 sm:pt-12 border-t border-line scroll-mt-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
 
           {/* Reviews list */}
           <div>

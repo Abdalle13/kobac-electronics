@@ -20,7 +20,7 @@ const OrderDetailPage = () => {
 
   if (loading || (!order && !error)) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-20 flex flex-col items-center justify-center min-h-[60vh]">
+      <div className="max-w-5xl mx-auto px-4 py-14 sm:py-20 flex flex-col items-center justify-center min-h-[60vh]">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
         <p className="text-muted font-medium">Fetching order manifest...</p>
       </div>
@@ -29,7 +29,7 @@ const OrderDetailPage = () => {
 
   if (error) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-20 text-center">
+      <div className="max-w-5xl mx-auto px-4 py-14 sm:py-20 text-center">
         <div className="bg-danger/10 border border-danger/30 rounded-3xl p-10 inline-block">
           <AlertCircle className="w-16 h-16 text-danger mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-fg mb-2">Order Not Found</h2>
@@ -48,7 +48,7 @@ const OrderDetailPage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 w-full">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full">
       <Link to="/my-orders" className="flex items-center gap-2 text-muted hover:text-fg transition-colors mb-8 group">
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         <span className="text-sm font-medium tracking-wide uppercase">Back to My Orders</span>
@@ -63,7 +63,7 @@ const OrderDetailPage = () => {
         {/* Left Column: Order Manifest */}
         <div className="lg:col-span-2 space-y-8">
           <div className="glass border border-line rounded-3xl overflow-hidden shadow-2xl">
-            <div className="p-8 border-b border-line bg-surface-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="p-5 sm:p-8 border-b border-line bg-surface-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-fg mb-1 tracking-tight">
                   Order #{order._id?.substring(order._id.length - 12).toUpperCase() || 'UNKNOWN'}
@@ -123,8 +123,8 @@ const OrderDetailPage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="glass border border-line rounded-3xl p-8 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
+            <div className="glass border border-line rounded-3xl p-5 sm:p-8 ">
               <h3 className="text-xs font-bold text-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" /> Delivery Destination
               </h3>
@@ -149,7 +149,7 @@ const OrderDetailPage = () => {
               </div>
             </div>
 
-            <div className="glass border border-line rounded-3xl p-8 ">
+            <div className="glass border border-line rounded-3xl p-5 sm:p-8 ">
               <h3 className="text-xs font-bold text-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-primary" /> Payment Method
               </h3>
@@ -174,7 +174,7 @@ const OrderDetailPage = () => {
 
         {/* Right Column: Order Timeline & Summary */}
         <div className="space-y-8">
-          <div className="glass border border-line rounded-3xl p-8 relative overflow-hidden group">
+          <div className="glass border border-line rounded-3xl p-5 sm:p-8 relative overflow-hidden group">
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <h3 className="text-lg font-bold text-fg mb-6 relative z-10">Order Summary</h3>
             <div className="space-y-4 relative z-10">
@@ -197,7 +197,7 @@ const OrderDetailPage = () => {
             </div>
           </div>
 
-          <div className="glass border border-line rounded-3xl p-8">
+          <div className="glass border border-line rounded-3xl p-5 sm:p-8">
             <h3 className="text-lg font-bold text-fg mb-6">Delivery Progress</h3>
             <div className="space-y-8 relative">
               <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-surface-2"></div>
@@ -232,7 +232,7 @@ const OrderDetailPage = () => {
             </div>
           </div>
 
-          <div className="p-8 rounded-3xl bg-primary/10 border border-primary/20 text-center">
+          <div className="p-6 sm:p-8 rounded-3xl bg-primary/10 border border-primary/20 text-center">
              <Package className="w-10 h-10 text-primary mx-auto mb-3" />
              <h4 className="text-sm font-bold text-fg mb-2">Need Help with this Order?</h4>
              <p className="text-xs text-muted mb-4 px-4">Our support team is available 24/7 to assist with your technical questions.</p>
