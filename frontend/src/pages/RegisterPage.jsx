@@ -53,13 +53,13 @@ const RegisterPage = () => {
         </div>
         
         {message && (
-          <div className="bg-danger/10 border border-danger/30 text-danger px-4 py-3 rounded-xl mb-6 text-[11px] font-bold uppercase tracking-wider text-center">
+          <div className="bg-danger/10 border border-danger/30 text-danger px-4 py-2.5 rounded-xl mb-5 text-sm text-center">
             {message}
           </div>
         )}
 
         {error && (
-          <div className="bg-danger/10 border border-danger/30 text-danger px-4 py-3 rounded-xl mb-6 text-[11px] font-bold uppercase tracking-wider text-center">
+          <div className="bg-danger/10 border border-danger/30 text-danger px-4 py-2.5 rounded-xl mb-5 text-sm text-center">
             {error}
           </div>
         )}

@@ -1,6 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../utils/api';
 
+// Turn an axios error into a message worth showing a user.
+const toMessage = (error) => {
+  if (error.response?.data?.message) return error.response.data.message;
+  if (!error.response || error.response.status >= 500) {
+    return 'Cannot reach the server right now. Please try again in a moment.';
+  }
+  return error.message || 'Something went wrong. Please try again.';
+};
+
 const userInfoFromStorage = localStorage.getItem('userInfo')
   ? JSON.parse(localStorage.getItem('userInfo'))
   : null;
@@ -20,11 +29,7 @@ export const login = createAsyncThunk(
       localStorage.setItem('userInfo', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message
-      );
+      return rejectWithValue(toMessage(error));
     }
   }
 );
@@ -37,11 +42,7 @@ export const registerUser = createAsyncThunk(
       localStorage.setItem('userInfo', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message
-      );
+      return rejectWithValue(toMessage(error));
     }
   }
 );
@@ -54,11 +55,7 @@ export const updateUserProfile = createAsyncThunk(
       localStorage.setItem('userInfo', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message
-      );
+      return rejectWithValue(toMessage(error));
     }
   }
 );
@@ -70,11 +67,7 @@ export const forgotPassword = createAsyncThunk(
       const response = await api.post('/users/forgot-password', { email });
       return response.data.message;
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message
-      );
+      return rejectWithValue(toMessage(error));
     }
   }
 );
@@ -87,11 +80,7 @@ export const resetPassword = createAsyncThunk(
       localStorage.setItem('userInfo', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message
-      );
+      return rejectWithValue(toMessage(error));
     }
   }
 );
