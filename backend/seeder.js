@@ -35,7 +35,7 @@ const importData = async () => {
 
     console.log('Data Imported!'.green.inverse);
     console.log('');
-    console.log('  Admin login:    admin@kobac.com / password123'.cyan);
+    console.log('  Admin login:    cabdale13yare@gmail.com / password123'.cyan);
     console.log('  Customer login: customer@test.com / password123'.cyan);
     console.log('');
     process.exit();

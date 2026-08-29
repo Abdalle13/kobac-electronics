@@ -76,7 +76,7 @@ Seeded logins:
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
-| Admin | `admin@kobac.com` | `password123` |
+| Admin | `cabdale13yare@gmail.com` | `password123` |
 | Customer | `customer@test.com` | `password123` |
 
 Run `npm run data:destroy` to wipe the seeded data.

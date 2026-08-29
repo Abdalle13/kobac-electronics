@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 const users = [
   {
     name: 'Admin User',
-    email: 'admin@kobac.com',
+    email: 'cabdale13yare@gmail.com',
     password: 'password123',
     role: 'Admin',
   },
