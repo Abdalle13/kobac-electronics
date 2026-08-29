@@ -34,14 +34,15 @@ const AuthLayout = ({ title, subtitle, children, footer }) => (
     </div>
 
     {/* Form panel */}
-    <div className="flex items-center justify-center px-4 sm:px-6 py-10 sm:py-14 bg-canvas">
-      <div className="w-full max-w-sm">
-        <Link to="/" className="lg:hidden inline-block text-lg font-bold tracking-tight text-fg mb-8">
-          KOBAC <span className="text-primary">Electronics</span>
-        </Link>
+    <div className="flex flex-col items-center justify-center px-5 sm:px-6 py-10 sm:py-14 bg-canvas">
+      <Link to="/" className="lg:hidden text-lg font-bold tracking-tight text-fg mb-6">
+        KOBAC <span className="text-primary">Electronics</span>
+      </Link>
 
+      <div className="w-full max-w-sm bg-surface border border-line rounded-2xl p-6 sm:p-8 lg:bg-transparent lg:border-0 lg:p-0 lg:max-w-md">
         <h1 className="text-2xl sm:text-3xl font-bold text-fg tracking-tight">{title}</h1>
         {subtitle && <p className="text-muted text-sm mt-1.5 mb-7">{subtitle}</p>}
+        {!subtitle && <div className="mb-6" />}
 
         {children}
 
