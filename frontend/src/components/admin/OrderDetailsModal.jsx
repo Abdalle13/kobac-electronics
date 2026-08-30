@@ -7,8 +7,24 @@ const Field = ({ label, value }) => (
   <p className="text-sm"><span className="text-muted">{label}:</span> <span className="text-fg font-medium">{value}</span></p>
 );
 
-const OrderDetailsModal = ({ order, onClose }) => (
-  <Modal title="Order Details" onClose={onClose} footer={<Button onClick={onClose}>Close</Button>}>
+const OrderDetailsModal = ({ order, onClose, onPay, onDeliver, onCancel }) => {
+  const canPay = !order.isPaid && order.status !== 'Cancelled';
+  const canDeliver = !order.isDelivered && order.status !== 'Cancelled';
+  const canCancel = order.status !== 'Cancelled' && order.status !== 'Delivered';
+
+  return (
+  <Modal
+    title="Order Details"
+    onClose={onClose}
+    footer={
+      <>
+        {canCancel && <Button variant="ghost" className="text-danger" onClick={onCancel}>Cancel Order</Button>}
+        {canPay && <Button variant="secondary" onClick={onPay}>Mark Paid</Button>}
+        {canDeliver && <Button onClick={onDeliver}>Mark Delivered</Button>}
+        {!canPay && !canDeliver && !canCancel && <Button onClick={onClose}>Close</Button>}
+      </>
+    }
+  >
     <div className="p-5 sm:p-6 space-y-6 text-sm">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1">
@@ -72,6 +88,7 @@ const OrderDetailsModal = ({ order, onClose }) => (
       </div>
     </div>
   </Modal>
-);
+  );
+};
 
 export default OrderDetailsModal;
