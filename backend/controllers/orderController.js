@@ -285,17 +285,42 @@ const cancelOrder = async (req, res) => {
 const getOrderSummary = async (req, res) => {
   try {
     const orders = await Order.find({});
-    
-    const totalSales = orders.reduce((acc, order) => acc + (order.isPaid ? order.totalPrice : 0), 0);
+
+    const paidOrders = orders.filter((o) => o.isPaid);
+    const totalSales = paidOrders.reduce((acc, o) => acc + o.totalPrice, 0);
     const numOrders = orders.length;
-    
-    const evcSales = orders
-      .filter(o => o.paymentMethod === 'EVC Plus' && o.isPaid)
+    const numPaidOrders = paidOrders.length;
+    const avgOrderValue = numPaidOrders ? totalSales / numPaidOrders : 0;
+
+    const evcSales = paidOrders
+      .filter((o) => o.paymentMethod === 'EVC Plus')
       .reduce((acc, o) => acc + o.totalPrice, 0);
-      
-    const codSales = orders
-      .filter(o => o.paymentMethod === 'Cash on Delivery' && o.isPaid)
+
+    const codSales = paidOrders
+      .filter((o) => o.paymentMethod === 'Cash on Delivery')
       .reduce((acc, o) => acc + o.totalPrice, 0);
+
+    // Order count by status
+    const statusBreakdown = orders.reduce((acc, o) => {
+      const s = o.status || 'Pending';
+      acc[s] = (acc[s] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Paid revenue this 7-day window vs the previous 7-day window
+    const now = Date.now();
+    const day = 24 * 60 * 60 * 1000;
+    const inWindow = (o, startDaysAgo, endDaysAgo) => {
+      if (!o.paidAt) return false;
+      const t = new Date(o.paidAt).getTime();
+      return t >= now - startDaysAgo * day && t < now - endDaysAgo * day;
+    };
+    const sumIn = (a, b) => paidOrders.filter((o) => inWindow(o, a, b)).reduce((s, o) => s + o.totalPrice, 0);
+    const countIn = (a, b) => paidOrders.filter((o) => inWindow(o, a, b)).length;
+    const pctChange = (curr, prev) => (prev > 0 ? ((curr - prev) / prev) * 100 : curr > 0 ? 100 : 0);
+
+    const salesTrend = pctChange(sumIn(7, 0), sumIn(14, 7));
+    const ordersTrend = pctChange(countIn(7, 0), countIn(14, 7));
 
     // Group sales by day for a mini-chart/list (last 7 days)
     const salesByDay = orders
@@ -340,8 +365,13 @@ const getOrderSummary = async (req, res) => {
     res.json({
       totalSales,
       numOrders,
+      numPaidOrders,
+      avgOrderValue,
       evcSales,
       codSales,
+      statusBreakdown,
+      salesTrend,
+      ordersTrend,
       salesByDay,
       topProducts,
       salesByCategory,
