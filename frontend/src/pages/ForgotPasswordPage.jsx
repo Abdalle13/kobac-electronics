@@ -40,7 +40,11 @@ const ForgotPasswordPage = () => {
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-success/15 text-success mb-4">
               <MailCheck className="w-7 h-7" />
             </div>
-            <p className="text-muted text-sm mb-8">{message}</p>
+            <p className="text-muted text-sm mb-3">{message}</p>
+            <p className="text-muted text-xs mb-8">
+              Can't find it? Check your <span className="text-fg font-medium">spam</span> or
+              <span className="text-fg font-medium"> promotions</span> folder. The link expires in 30 minutes.
+            </p>
             <Link to="/login">
               <Button variant="secondary" className="w-full">Back to Sign In</Button>
             </Link>
