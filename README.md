@@ -55,7 +55,7 @@ theme, product reviews, a wishlist, transactional email, and a full admin dashbo
 - Node.js 18+
 - A MongoDB connection string (Atlas or local)
 - An ImageKit account (for product image uploads)
-- An SMTP account for email (Brevo free tier recommended; a Gmail app password works for local testing)
+- An SMTP account for email (a Gmail app password works)
 
 ### 1. Clone & install
 ```bash
@@ -79,20 +79,17 @@ IMAGEKIT_URL_ENDPOINT=...
 IMAGEKIT_PUBLIC_KEY=...
 IMAGEKIT_PRIVATE_KEY=...
 
-EMAIL_HOST=smtp-relay.brevo.com
+EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_USER=your-brevo-smtp-login
-EMAIL_PASS=your-brevo-smtp-key
-EMAIL_FROM=Kobac Electronics <your-verified-sender>
+EMAIL_USER=you@gmail.com
+EMAIL_PASS=your-app-password
+EMAIL_FROM=Kobac Electronics <you@gmail.com>
 
 EVC_DEMO_PIN=1234
 ```
 
-For email to land in the inbox rather than spam, use a real SMTP provider and a
-verified sender. [Brevo](https://www.brevo.com) is free for 300 emails/day: sign
-up, verify your sender address under **Senders**, then copy the SMTP login and key
-from **SMTP & API**. A personal Gmail app password still works but its mail is
-often flagged as spam.
+Mail sent from a personal Gmail account can land in the recipient's spam or
+promotions folder. The forgot-password screen tells users to check there.
 
 ### 3. Run
 ```bash
