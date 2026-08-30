@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Printer } from 'lucide-react';
+import { Download } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/formatter';
+import { downloadSalesReport } from '../../utils/salesReportPdf';
 import Button from '../ui/Button';
 
 const Row = ({ label, value }) => (
@@ -24,12 +26,24 @@ const ReportTab = () => {
   const { storeName } = useSelector((s) => s.settings);
   const [data, setData] = useState(null);
   const [userCount, setUserCount] = useState(0);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     Promise.all([api.get('/orders/summary'), api.get('/users')])
       .then(([s, u]) => { setData(s.data); setUserCount(u.data.length); })
       .catch(() => setData({}));
   }, []);
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      await downloadSalesReport({ storeName, userCount, data });
+    } catch {
+      toast.error('Could not generate the PDF. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (!data) return <div className="flex justify-center py-20 text-muted">Building report…</div>;
 
@@ -42,13 +56,14 @@ const ReportTab = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end no-print">
-        <Button onClick={() => window.print()} className="flex items-center gap-2">
-          <Printer className="w-4 h-4" /> Save as PDF
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted">Live preview of the sales report.</p>
+        <Button onClick={handleDownload} disabled={downloading} className="flex items-center gap-2">
+          <Download className="w-4 h-4" /> {downloading ? 'Preparing…' : 'Download PDF'}
         </Button>
       </div>
 
-      <div className="admin-report bg-surface border border-line rounded-2xl p-6 sm:p-10 max-w-3xl mx-auto space-y-8">
+      <div className="bg-surface border border-line rounded-2xl p-6 sm:p-10 max-w-3xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-line pb-6">
           <div>

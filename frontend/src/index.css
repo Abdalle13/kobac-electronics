@@ -136,29 +136,6 @@ input, select, textarea {
   border: 1px solid var(--tk-border);
 }
 
-/* Print: show only .admin-report, forced to a clean light palette */
-@media print {
-  :root {
-    --tk-bg: #ffffff;
-    --tk-surface: #ffffff;
-    --tk-surface-2: #f3f4f6;
-    --tk-border: #d1d5db;
-    --tk-text: #111827;
-    --tk-muted: #4b5563;
-  }
-  body * { visibility: hidden; }
-  .admin-report, .admin-report * { visibility: visible; }
-  .admin-report {
-    position: absolute;
-    inset: 0;
-    margin: 0;
-    max-width: none;
-    border: 0;
-    box-shadow: none;
-  }
-  .no-print { display: none !important; }
-}
-
 ::-webkit-scrollbar {
   width: 8px;
 }
