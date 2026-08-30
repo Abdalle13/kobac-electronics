@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { DollarSign, ShoppingBag, Users, Package, Activity, AlertTriangle } from 'lucide-react';
+import { DollarSign, ShoppingBag, Users, Package, AlertTriangle } from 'lucide-react';
 import { listOrders } from '../../redux/slices/orderSlice';
 import { fetchProducts } from '../../redux/slices/productSlice';
 import api from '../../utils/api';
@@ -28,7 +28,8 @@ const OverviewTab = () => {
   const dispatch = useDispatch();
   const { products, loading: productsLoading } = useSelector((s) => s.products);
   const { orders, loading: ordersLoading } = useSelector((s) => s.order);
-  const [stats, setStats] = useState({ totalUsers: 0, monthlySales: [], loading: true });
+  const [stats, setStats] = useState({ totalUsers: 0, salesByDay: [], loading: true });
+  const [range, setRange] = useState(7);
 
   useEffect(() => {
     dispatch(listOrders());
@@ -40,10 +41,9 @@ const OverviewTab = () => {
           api.get('/users'),
           api.get('/orders/summary'),
         ]);
-        const chartData = Object.entries(summaryRes.data.salesByDay || {})
-          .map(([date, amount]) => ({ date: date.split('/').slice(0, 2).join('/'), amount }))
-          .slice(-7);
-        setStats({ totalUsers: usersRes.data.length, monthlySales: chartData, loading: false });
+        const salesByDay = Object.entries(summaryRes.data.salesByDay || {})
+          .map(([date, amount]) => ({ date: date.split('/').slice(0, 2).join('/'), amount }));
+        setStats({ totalUsers: usersRes.data.length, salesByDay, loading: false });
       } catch {
         setStats((p) => ({ ...p, loading: false }));
       }
@@ -51,7 +51,7 @@ const OverviewTab = () => {
   }, [dispatch]);
 
   const revenue = orders.filter((o) => o.isPaid).reduce((acc, o) => acc + o.totalPrice, 0);
-  const chartData = stats.monthlySales.length > 0 ? stats.monthlySales : [];
+  const chartData = stats.salesByDay.slice(-range);
   const lowStock = products.filter((p) => p.countInStock <= LOW_STOCK).sort((a, b) => a.countInStock - b.countInStock);
   const recentOrders = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
 
@@ -71,18 +71,27 @@ const OverviewTab = () => {
       <div className="bg-surface border border-line rounded-2xl p-5 sm:p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h3 className="text-lg sm:text-xl font-bold text-fg tracking-tight">Revenue (last 7 days)</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-fg tracking-tight">Revenue</h3>
             <p className="text-xs text-muted mt-1">Paid orders by day</p>
           </div>
-          <div className="flex items-center gap-2 text-primary bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/10">
-            <Activity size={14} />
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wide">Live</span>
+          <div className="flex items-center gap-1 bg-surface-2 rounded-lg p-0.5">
+            {[7, 30].map((r) => (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors ${
+                  range === r ? 'bg-primary text-on-primary' : 'text-muted hover:text-fg'
+                }`}
+              >
+                {r}d
+              </button>
+            ))}
           </div>
         </div>
 
         <div className="h-[240px] sm:h-[340px] w-full">
           {chartData.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-muted text-sm">No paid sales in the last 7 days.</div>
+            <div className="h-full flex items-center justify-center text-muted text-sm">No paid sales in this period.</div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
