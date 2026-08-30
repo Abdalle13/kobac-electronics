@@ -130,6 +130,34 @@ const getRecentReviews = async (req, res) => {
   }
 };
 
+// @desc    Every review across the catalogue (for admin moderation)
+// @route   GET /api/products/reviews/all
+// @access  Private/Admin
+const getAllReviews = async (req, res) => {
+  try {
+    const rows = await Product.aggregate([
+      { $match: { 'reviews.0': { $exists: true } } },
+      { $unwind: '$reviews' },
+      { $sort: { 'reviews.createdAt': -1 } },
+      { $limit: 500 },
+      {
+        $project: {
+          _id: '$reviews._id',
+          name: '$reviews.name',
+          rating: '$reviews.rating',
+          comment: '$reviews.comment',
+          createdAt: '$reviews.createdAt',
+          productId: '$_id',
+          productName: '$name',
+        },
+      },
+    ]);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: Unable to fetch reviews', error: error.message });
+  }
+};
+
 // @desc    Available filter options (categories, brands, price range) for the shop
 // @route   GET /api/products/filters
 // @access  Public
@@ -334,6 +362,7 @@ export {
   getProducts,
   getBestSellers,
   getRecentReviews,
+  getAllReviews,
   getProductFilters,
   getProductById,
   createProduct,
