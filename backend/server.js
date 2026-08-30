@@ -28,24 +28,38 @@ const app = express();
 // Security headers
 app.use(helmet());
 
-// CORS — locked to FRONTEND_URL when configured, open otherwise (with a warning)
+// CORS — allow localhost, any *.vercel.app deployment, and whatever FRONTEND_URL
+// lists (comma-separated, trailing slashes ignored).
+const stripSlash = (u) => (u || '').trim().replace(/\/+$/, '');
 const devOrigins = ['http://localhost:5173', 'http://localhost:3000'];
-const allowlist = [process.env.FRONTEND_URL, ...devOrigins].filter(Boolean);
+const configuredOrigins = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map(stripSlash)
+  .filter(Boolean);
+const allowlist = [...configuredOrigins, ...devOrigins];
+
+const isAllowedOrigin = (origin) => {
+  const clean = stripSlash(origin);
+  if (allowlist.includes(clean)) return true;
+  try {
+    return new URL(clean).hostname.endsWith('.vercel.app');
+  } catch {
+    return false;
+  }
+};
 
 app.use(cors({
   origin: (origin, cb) => {
     // Requests with no Origin: curl, server-to-server, Vercel rewrites
     if (!origin) return cb(null, true);
-    // Not configured -> stay permissive so nothing breaks (see boot warning)
-    if (!process.env.FRONTEND_URL) return cb(null, true);
-    if (allowlist.includes(origin)) return cb(null, true);
+    if (isAllowedOrigin(origin)) return cb(null, true);
     return cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
 }));
 
 if (!process.env.FRONTEND_URL && process.env.NODE_ENV === 'production') {
-  console.warn('WARNING: FRONTEND_URL not set — CORS is open to all origins. Set it in production.'.yellow.bold);
+  console.warn('WARNING: FRONTEND_URL not set — CORS falls back to localhost + *.vercel.app only.'.yellow.bold);
 }
 
 app.use(express.json({ limit: '20mb' }));
