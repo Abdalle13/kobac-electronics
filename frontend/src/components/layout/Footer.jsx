@@ -89,8 +89,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-line pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-[12px] text-muted">
-          <p>© {year} Kobac Electronics. All rights reserved.</p>
+        <div className="border-t border-line pt-6 flex flex-col items-center gap-1.5 text-center text-[12px] text-muted">
           <p>
             Designed &amp; built by{' '}
             <a
@@ -102,6 +101,7 @@ const Footer = () => {
               Abdalle Hussein
             </a>
           </p>
+          <p>© {year} Kobac Electronics. All rights reserved.</p>
         </div>
       </div>
     </footer>
