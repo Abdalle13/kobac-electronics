@@ -8,8 +8,10 @@ import {
 import { clearCart } from '../redux/slices/cartSlice';
 import { createOrder, payOrder, resetOrder } from '../redux/slices/orderSlice';
 import Input from '../components/ui/Input';
+import Select from '../components/ui/Select';
 import Button from '../components/ui/Button';
 import { formatCurrency } from '../utils/formatter';
+import { somaliCities, districtsFor } from '../data/somaliLocations';
 import api from '../utils/api';
 
 const STEPS = [
@@ -177,8 +179,25 @@ const CheckoutPage = () => {
               <p className="text-sm text-muted mb-6">Where should we send <span className="text-fg font-medium">{userInfo?.name}</span>'s order?</p>
               <form onSubmit={handleShippingSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <Input label="City" placeholder="Muqdisho, Hargeisa…" required value={shipping.city} onChange={(e) => setShipping({ ...shipping, city: e.target.value })} />
-                  <Input label="District" placeholder="Hodan, Karan…" required value={shipping.district} onChange={(e) => setShipping({ ...shipping, district: e.target.value })} />
+                  <Select
+                    label="City"
+                    required
+                    value={shipping.city}
+                    onChange={(e) => setShipping({ ...shipping, city: e.target.value, district: '' })}
+                  >
+                    <option value="" disabled>Select a city</option>
+                    {somaliCities.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </Select>
+                  <Select
+                    label="District"
+                    required
+                    disabled={!shipping.city}
+                    value={shipping.district}
+                    onChange={(e) => setShipping({ ...shipping, district: e.target.value })}
+                  >
+                    <option value="" disabled>{shipping.city ? 'Select a district' : 'Choose a city first'}</option>
+                    {districtsFor(shipping.city).map((d) => <option key={d} value={d}>{d}</option>)}
+                  </Select>
                 </div>
                 <Input label="Street Name" required value={shipping.streetName} onChange={(e) => setShipping({ ...shipping, streetName: e.target.value })} />
                 <Input label="Nearest Landmark" placeholder="Near Masjidka Isbaheysiga…" required value={shipping.landmark} onChange={(e) => setShipping({ ...shipping, landmark: e.target.value })} />
