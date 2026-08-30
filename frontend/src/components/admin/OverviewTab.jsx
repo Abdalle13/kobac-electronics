@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { DollarSign, ShoppingBag, Users, Package, AlertTriangle } from 'lucide-react';
+import { DollarSign, ShoppingBag, Users, Package, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 import { listOrders } from '../../redux/slices/orderSlice';
 import { fetchProducts } from '../../redux/slices/productSlice';
 import api from '../../utils/api';
@@ -12,7 +12,18 @@ const LOW_STOCK = 5;
 const statusTone = (s) =>
   s === 'Delivered' ? 'text-success' : s === 'Cancelled' ? 'text-danger' : s === 'Paid' ? 'text-primary' : 'text-muted';
 
-const StatCard = ({ icon: Icon, label, value, tone }) => (
+const Trend = ({ pct }) => {
+  if (pct == null || !isFinite(pct)) return null;
+  const up = pct >= 0;
+  const Icon = up ? TrendingUp : TrendingDown;
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs font-semibold ${up ? 'text-success' : 'text-danger'}`}>
+      <Icon size={13} /> {Math.abs(pct).toFixed(0)}%
+    </span>
+  );
+};
+
+const StatCard = ({ icon: Icon, label, value, tone, trend }) => (
   <div className="bg-surface border border-line rounded-2xl p-5 sm:p-6">
     <div className="flex items-center gap-3 mb-4">
       <div className={`p-2.5 rounded-xl border ${tone}`}>
@@ -21,6 +32,9 @@ const StatCard = ({ icon: Icon, label, value, tone }) => (
       <h3 className="text-muted font-semibold tracking-wider text-[10px] uppercase">{label}</h3>
     </div>
     <p className="text-2xl sm:text-3xl font-bold text-fg">{value}</p>
+    {trend !== undefined && (
+      <p className="mt-1"><Trend pct={trend} /> <span className="text-xs text-muted">vs last week</span></p>
+    )}
   </div>
 );
 
@@ -43,7 +57,13 @@ const OverviewTab = () => {
         ]);
         const salesByDay = Object.entries(summaryRes.data.salesByDay || {})
           .map(([date, amount]) => ({ date: date.split('/').slice(0, 2).join('/'), amount }));
-        setStats({ totalUsers: usersRes.data.length, salesByDay, loading: false });
+        setStats({
+          totalUsers: usersRes.data.length,
+          salesByDay,
+          salesTrend: summaryRes.data.salesTrend,
+          ordersTrend: summaryRes.data.ordersTrend,
+          loading: false,
+        });
       } catch {
         setStats((p) => ({ ...p, loading: false }));
       }
@@ -62,8 +82,8 @@ const OverviewTab = () => {
   return (
     <div className="space-y-6 sm:space-y-8">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        <StatCard icon={DollarSign} label="Total Revenue" value={formatCurrency(revenue)} tone="bg-primary/10 text-primary border-primary/20" />
-        <StatCard icon={ShoppingBag} label="Orders" value={orders.length} tone="bg-success/10 text-success border-success/20" />
+        <StatCard icon={DollarSign} label="Total Revenue" value={formatCurrency(revenue)} tone="bg-primary/10 text-primary border-primary/20" trend={stats.salesTrend} />
+        <StatCard icon={ShoppingBag} label="Orders" value={orders.length} tone="bg-success/10 text-success border-success/20" trend={stats.ordersTrend} />
         <StatCard icon={Users} label="Active Users" value={stats.totalUsers} tone="bg-accent/10 text-accent border-accent/20" />
         <StatCard icon={Package} label="Products" value={products.length} tone="bg-primary/10 text-primary border-primary/20" />
       </div>

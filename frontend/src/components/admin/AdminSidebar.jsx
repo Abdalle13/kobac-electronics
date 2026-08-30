@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Package, ShoppingBag, Users, DollarSign, Settings, Star, LogOut, XCircle } from 'lucide-react';
+import { PieChart, Package, ShoppingBag, Users, DollarSign, Settings, Star, FileText, LogOut, XCircle } from 'lucide-react';
 import ThemeToggle from '../ui/ThemeToggle';
 
 const NAV = [
@@ -9,6 +9,7 @@ const NAV = [
   { id: 'reviews', icon: Star, label: 'Reviews' },
   { id: 'users', icon: Users, label: 'Users' },
   { id: 'finance', icon: DollarSign, label: 'Payments' },
+  { id: 'report', icon: FileText, label: 'Report' },
   { id: 'settings', icon: Settings, label: 'Settings' },
 ];
 

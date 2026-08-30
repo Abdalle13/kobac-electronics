@@ -10,6 +10,7 @@ import OrdersTab from '../components/admin/OrdersTab';
 import ReviewsTab from '../components/admin/ReviewsTab';
 import UsersTab from '../components/admin/UsersTab';
 import PaymentsTab from '../components/admin/PaymentsTab';
+import ReportTab from '../components/admin/ReportTab';
 import SettingsTab from '../components/admin/SettingsTab';
 
 const TITLES = {
@@ -19,6 +20,7 @@ const TITLES = {
   reviews: 'Product Reviews',
   users: 'Manage Users',
   finance: 'Payment Analytics',
+  report: 'Sales Report',
   settings: 'Dashboard Settings',
 };
 
@@ -85,6 +87,7 @@ const AdminDashboard = () => {
           {activeTab === 'reviews' && <ReviewsTab search={search} />}
           {activeTab === 'users' && <UsersTab search={search} />}
           {activeTab === 'finance' && <PaymentsTab />}
+          {activeTab === 'report' && <ReportTab />}
           {activeTab === 'settings' && <SettingsTab />}
         </main>
       </div>
