@@ -43,7 +43,7 @@ router.post('/', async (req, res) => {
   const ack = contactAckEmail(name);
   await sendEmail({ to: email, subject: ack.subject, html: ack.html });
 
-  res.json({ message: 'Thanks! Your message has been sent — we\'ll reply within one business day.' });
+  res.json({ message: 'Thanks! Your message has been sent. We\'ll reply within one business day.' });
 });
 
 export default router;

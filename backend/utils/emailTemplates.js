@@ -36,8 +36,8 @@ const layout = (heading, bodyHtml, cta) => `
 export const welcomeEmail = (name) => ({
   subject: `Welcome to ${STORE}`,
   html: layout(
-    `Welcome, ${name} 👋`,
-    `Your ${STORE} account is ready. Explore premium phones, laptops, gaming gear and more —
+    `Welcome, ${name}`,
+    `Your ${STORE} account is ready. Explore premium phones, laptops, gaming gear and more,
      with fast local delivery and EVC Plus checkout.`,
     { label: 'Start shopping', url: process.env.FRONTEND_URL || '#' }
   ),
@@ -57,7 +57,7 @@ export const orderConfirmationEmail = (order, user) => {
   const addr = order.shippingAddress || {};
 
   return {
-    subject: `Order confirmed · ${money(order.totalPrice)}`,
+    subject: `Order confirmed (${money(order.totalPrice)})`,
     html: layout(
       `Thanks for your order, ${user.name}!`,
       `We've received your order <strong style="color:${TEXT};">#${String(order._id).slice(-8).toUpperCase()}</strong>
@@ -72,7 +72,7 @@ export const orderConfirmationEmail = (order, user) => {
        </table>
        <p style="margin:0;"><strong style="color:${TEXT};">Deliver to:</strong><br/>
        ${addr.streetName || ''}, ${addr.district || ''}, ${addr.city || ''}<br/>
-       Landmark: ${addr.landmark || '—'}</p>
+       Landmark: ${addr.landmark || 'N/A'}</p>
        <p style="margin:16px 0 0;"><strong style="color:${TEXT};">Payment:</strong> ${order.paymentMethod}${order.isPaid ? ' (paid)' : ' (pending)'}</p>`,
       { label: 'View your order', url: `${process.env.FRONTEND_URL || ''}/order/${order._id}` }
     ),
@@ -80,9 +80,9 @@ export const orderConfirmationEmail = (order, user) => {
 };
 
 export const paymentReceivedEmail = (order, user) => ({
-  subject: `Payment received · ${money(order.totalPrice)}`,
+  subject: `Payment received (${money(order.totalPrice)})`,
   html: layout(
-    `Payment confirmed ✅`,
+    `Payment confirmed`,
     `We've received your ${money(order.totalPrice)} payment for order
      <strong style="color:${TEXT};">#${String(order._id).slice(-8).toUpperCase()}</strong>
      via ${order.paymentMethod}. Your order is now being prepared for delivery.`,
@@ -91,11 +91,11 @@ export const paymentReceivedEmail = (order, user) => ({
 });
 
 export const orderDeliveredEmail = (order, user) => ({
-  subject: `Your order was delivered 📦`,
+  subject: `Your order was delivered`,
   html: layout(
-    `Delivered, ${user.name}!`,
+    `Delivered, ${user.name}`,
     `Order <strong style="color:${TEXT};">#${String(order._id).slice(-8).toUpperCase()}</strong>
-     has been marked as delivered. We hope you love it — leave a review to help other shoppers.`,
+     has been marked as delivered. We hope you love it. Leave a review to help other shoppers.`,
     { label: 'Leave a review', url: `${process.env.FRONTEND_URL || ''}/order/${order._id}` }
   ),
 });

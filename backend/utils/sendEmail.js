@@ -21,7 +21,13 @@ const getTransporter = () => {
     host: EMAIL_HOST,
     port,
     secure: port === 465, // 465 = implicit TLS, 587 = STARTTLS
+    requireTLS: port === 587,
     auth: { user: EMAIL_USER, pass: EMAIL_PASS },
+    // The send now runs before the HTTP response, so cap how long a stuck
+    // SMTP server can hold up the request.
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 
   return transporter;
