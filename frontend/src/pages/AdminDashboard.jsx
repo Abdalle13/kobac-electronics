@@ -7,6 +7,7 @@ import AdminSidebar from '../components/admin/AdminSidebar';
 import OverviewTab from '../components/admin/OverviewTab';
 import ProductsTab from '../components/admin/ProductsTab';
 import OrdersTab from '../components/admin/OrdersTab';
+import ReviewsTab from '../components/admin/ReviewsTab';
 import UsersTab from '../components/admin/UsersTab';
 import PaymentsTab from '../components/admin/PaymentsTab';
 import SettingsTab from '../components/admin/SettingsTab';
@@ -15,12 +16,13 @@ const TITLES = {
   overview: 'Dashboard Overview',
   products: 'Manage Products',
   orders: 'Customer Orders',
+  reviews: 'Product Reviews',
   users: 'Manage Users',
   finance: 'Payment Analytics',
   settings: 'Dashboard Settings',
 };
 
-const SEARCHABLE = ['products', 'orders', 'users'];
+const SEARCHABLE = ['products', 'orders', 'reviews', 'users'];
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -80,6 +82,7 @@ const AdminDashboard = () => {
           {activeTab === 'overview' && <OverviewTab />}
           {activeTab === 'products' && <ProductsTab search={search} />}
           {activeTab === 'orders' && <OrdersTab search={search} />}
+          {activeTab === 'reviews' && <ReviewsTab search={search} />}
           {activeTab === 'users' && <UsersTab search={search} />}
           {activeTab === 'finance' && <PaymentsTab />}
           {activeTab === 'settings' && <SettingsTab />}

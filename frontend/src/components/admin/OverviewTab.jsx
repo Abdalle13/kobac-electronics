@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { DollarSign, ShoppingBag, Users, Package, Activity } from 'lucide-react';
+import { DollarSign, ShoppingBag, Users, Package, Activity, AlertTriangle } from 'lucide-react';
 import { listOrders } from '../../redux/slices/orderSlice';
 import { fetchProducts } from '../../redux/slices/productSlice';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/formatter';
+
+const LOW_STOCK = 5;
+
+const statusTone = (s) =>
+  s === 'Delivered' ? 'text-success' : s === 'Cancelled' ? 'text-danger' : s === 'Paid' ? 'text-primary' : 'text-muted';
 
 const StatCard = ({ icon: Icon, label, value, tone }) => (
   <div className="bg-surface border border-line rounded-2xl p-5 sm:p-6">
@@ -47,6 +52,8 @@ const OverviewTab = () => {
 
   const revenue = orders.filter((o) => o.isPaid).reduce((acc, o) => acc + o.totalPrice, 0);
   const chartData = stats.monthlySales.length > 0 ? stats.monthlySales : [];
+  const lowStock = products.filter((p) => p.countInStock <= LOW_STOCK).sort((a, b) => a.countInStock - b.countInStock);
+  const recentOrders = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
 
   if (stats.loading || ordersLoading || productsLoading) {
     return <div className="flex justify-center py-20 text-muted">Loading metrics…</div>;
@@ -96,6 +103,56 @@ const OverviewTab = () => {
                 <Area type="monotone" dataKey="amount" stroke="var(--tk-primary)" strokeWidth={2.5} fill="url(#rev)" dot={false} />
               </AreaChart>
             </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        {/* Recent orders */}
+        <div className="bg-surface border border-line rounded-2xl p-5 sm:p-6">
+          <h3 className="text-base font-bold text-fg mb-4">Recent Orders</h3>
+          {recentOrders.length === 0 ? (
+            <p className="text-muted text-sm">No orders yet.</p>
+          ) : (
+            <div className="divide-y divide-line">
+              {recentOrders.map((o) => (
+                <div key={o._id} className="flex items-center justify-between py-2.5 text-sm">
+                  <div className="min-w-0">
+                    <p className="text-fg font-medium truncate">{o.user?.name || 'Guest'}</p>
+                    <p className="text-xs text-muted">{new Date(o.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div className="text-right shrink-0 ml-3">
+                    <p className="text-fg font-semibold">{formatCurrency(o.totalPrice)}</p>
+                    <p className={`text-xs font-medium ${statusTone(o.status)}`}>{o.status || 'Pending'}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Low stock */}
+        <div className="bg-surface border border-line rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertTriangle size={16} className={lowStock.length ? 'text-warning' : 'text-muted'} />
+            <h3 className="text-base font-bold text-fg">Low Stock</h3>
+            {lowStock.length > 0 && (
+              <span className="text-xs font-bold text-warning bg-warning/10 px-2 py-0.5 rounded-full">{lowStock.length}</span>
+            )}
+          </div>
+          {lowStock.length === 0 ? (
+            <p className="text-muted text-sm">All products are well stocked.</p>
+          ) : (
+            <div className="divide-y divide-line max-h-64 overflow-y-auto scrollbar-hide">
+              {lowStock.map((p) => (
+                <div key={p._id} className="flex items-center justify-between py-2.5 text-sm">
+                  <span className="text-fg truncate mr-3">{p.name}</span>
+                  <span className={`font-bold shrink-0 ${p.countInStock === 0 ? 'text-danger' : 'text-warning'}`}>
+                    {p.countInStock === 0 ? 'Out of stock' : `${p.countInStock} left`}
+                  </span>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>

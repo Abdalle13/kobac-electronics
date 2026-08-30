@@ -1,11 +1,12 @@
 import React from 'react';
-import { PieChart, Package, ShoppingBag, Users, DollarSign, Settings, LogOut, XCircle } from 'lucide-react';
+import { PieChart, Package, ShoppingBag, Users, DollarSign, Settings, Star, LogOut, XCircle } from 'lucide-react';
 import ThemeToggle from '../ui/ThemeToggle';
 
 const NAV = [
   { id: 'overview', icon: PieChart, label: 'Overview' },
   { id: 'products', icon: Package, label: 'Products' },
   { id: 'orders', icon: ShoppingBag, label: 'Orders' },
+  { id: 'reviews', icon: Star, label: 'Reviews' },
   { id: 'users', icon: Users, label: 'Users' },
   { id: 'finance', icon: DollarSign, label: 'Payments' },
   { id: 'settings', icon: Settings, label: 'Settings' },
