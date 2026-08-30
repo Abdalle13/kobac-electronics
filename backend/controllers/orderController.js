@@ -309,12 +309,42 @@ const getOrderSummary = async (req, res) => {
         return acc;
       }, {});
 
+    // Per-product units & revenue from paid orders, with each product's category
+    const perProduct = await Order.aggregate([
+      { $match: { isPaid: true } },
+      { $unwind: '$orderItems' },
+      {
+        $group: {
+          _id: '$orderItems.product',
+          name: { $first: '$orderItems.name' },
+          units: { $sum: '$orderItems.qty' },
+          revenue: { $sum: { $multiply: ['$orderItems.price', '$orderItems.qty'] } },
+        },
+      },
+      { $lookup: { from: 'products', localField: '_id', foreignField: '_id', as: 'p' } },
+      { $addFields: { category: { $ifNull: [{ $arrayElemAt: ['$p.category', 0] }, 'Other'] } } },
+      { $project: { p: 0 } },
+      { $sort: { revenue: -1 } },
+    ]);
+
+    const topProducts = perProduct.slice(0, 8);
+
+    const byCat = {};
+    perProduct.forEach((p) => {
+      byCat[p.category] = byCat[p.category] || { category: p.category, revenue: 0, units: 0 };
+      byCat[p.category].revenue += p.revenue;
+      byCat[p.category].units += p.units;
+    });
+    const salesByCategory = Object.values(byCat).sort((a, b) => b.revenue - a.revenue);
+
     res.json({
       totalSales,
       numOrders,
       evcSales,
       codSales,
-      salesByDay
+      salesByDay,
+      topProducts,
+      salesByCategory,
     });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching summary', error: error.message });
