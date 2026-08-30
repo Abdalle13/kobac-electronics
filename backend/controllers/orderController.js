@@ -107,11 +107,12 @@ const addOrderItems = async (req, res) => {
     throw error;
   }
 
-  res.status(201).json(createdOrder);
-
-  // Fire the confirmation email after responding (sendEmail never throws)
+  // Send the confirmation email BEFORE responding — on serverless the function
+  // can be frozen the instant the response is flushed. sendEmail never throws.
   const { subject, html } = orderConfirmationEmail(createdOrder, req.user);
   await sendEmail({ to: req.user.email, subject, html });
+
+  res.status(201).json(createdOrder);
 };
 
 // @desc    Get order by ID
@@ -164,10 +165,11 @@ const updateOrderToPaid = async (req, res) => {
     };
 
     const updatedOrder = await order.save();
-    res.json(updatedOrder);
 
     const { subject, html } = paymentReceivedEmail(updatedOrder, req.user);
     await sendEmail({ to: req.user.email, subject, html });
+
+    res.json(updatedOrder);
   } else {
     res.status(404).json({ message: 'Order not found' });
   }
@@ -201,12 +203,13 @@ const updateOrderToDelivered = async (req, res) => {
     order.status = 'Delivered';
 
     const updatedOrder = await order.save();
-    res.json(updatedOrder);
 
     if (order.user?.email) {
       const { subject, html } = orderDeliveredEmail(updatedOrder, order.user);
       await sendEmail({ to: order.user.email, subject, html });
     }
+
+    res.json(updatedOrder);
   } else {
     res.status(404).json({ message: 'Order not found' });
   }
@@ -228,12 +231,13 @@ const updateOrderToPaidAdmin = async (req, res) => {
     };
 
     const updatedOrder = await order.save();
-    res.json(updatedOrder);
 
     if (order.user?.email) {
       const { subject, html } = paymentReceivedEmail(updatedOrder, order.user);
       await sendEmail({ to: order.user.email, subject, html });
     }
+
+    res.json(updatedOrder);
   } else {
     res.status(404).json({ message: 'Order not found' });
   }

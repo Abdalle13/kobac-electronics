@@ -49,6 +49,12 @@ const registerUser = async (req, res) => {
   });
 
   if (user) {
+    // Send the welcome email BEFORE responding. On serverless (Vercel) the
+    // function stops the moment the response is flushed, so anything awaited
+    // after res.json() often never runs. sendEmail never throws.
+    const { subject, html } = welcomeEmail(user.name);
+    await sendEmail({ to: user.email, subject, html });
+
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -56,9 +62,6 @@ const registerUser = async (req, res) => {
       role: user.role,
       token: generateToken(res, user._id),
     });
-
-    const { subject, html } = welcomeEmail(user.name);
-    await sendEmail({ to: user.email, subject, html });
   } else {
     res.status(400).json({ message: 'Invalid user data received' });
   }
