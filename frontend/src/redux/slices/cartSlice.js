@@ -41,6 +41,15 @@ const cartSlice = createSlice({
       state.isCartOpen = false;
     }
   },
+  extraReducers: (builder) => {
+    // The cart lives in localStorage, so it must not carry over between
+    // accounts. Wipe it whenever someone logs out.
+    builder.addCase('auth/logout', (state) => {
+      state.cartItems = [];
+      state.isCartOpen = false;
+      localStorage.removeItem('cartItems');
+    });
+  },
 });
 
 export const { addToCart, removeFromCart, clearCart, toggleCart, closeCart } = cartSlice.actions;

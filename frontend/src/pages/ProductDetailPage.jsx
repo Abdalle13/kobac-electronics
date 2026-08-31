@@ -17,6 +17,7 @@ const ProductDetailPage = () => {
 
   const { product, loading, error, reviewLoading, reviewError } = useSelector((state) => state.products);
   const { userInfo } = useSelector((state) => state.auth);
+  const isAdmin = userInfo?.role?.toLowerCase() === 'admin';
   const [qty, setQty] = useState(1);
   const [activeImage, setActiveImage] = useState('');
   const [reviewRating, setReviewRating] = useState(0);
@@ -166,45 +167,54 @@ const ProductDetailPage = () => {
             {product.description}
           </p>
 
-          <div className="bg-surface border border-line rounded-xl p-6 mb-8 mt-auto">
-            <div className="flex flex-col sm:flex-row gap-4 items-end">
-              
-              <div className="w-full sm:w-1/3">
-                <label className="block text-sm font-medium text-muted mb-2">Quantity</label>
-                <div className="flex items-center justify-between bg-canvas border border-line rounded-lg p-1">
-                  <button 
-                    onClick={() => setQty(Math.max(1, qty - 1))}
-                    disabled={qty <= 1}
-                    className="p-2 text-muted hover:text-fg disabled:opacity-50 transition-colors"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="text-fg font-medium">{qty}</span>
-                  <button 
-                    onClick={() => setQty(Math.min(product.countInStock, qty + 1))}
-                    disabled={qty >= product.countInStock}
-                    className="p-2 text-muted hover:text-fg disabled:opacity-50 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="w-full sm:w-2/3 flex gap-2">
-                <Button
-                  variant="primary"
-                  className="flex-1 py-3 h-[46px] flex items-center justify-center gap-2 text-lg"
-                  onClick={handleAddToCart}
-                  disabled={product.countInStock === 0}
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  {product.countInStock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                </Button>
-                <WishlistButton product={product} variant="inline" />
-              </div>
-
+          {isAdmin ? (
+            <div className="bg-surface border border-line rounded-xl p-6 mb-8 mt-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <p className="text-sm text-muted">You are signed in as an admin.</p>
+              <Link to="/dashboard">
+                <Button variant="secondary" className="w-full sm:w-auto">Manage in dashboard</Button>
+              </Link>
             </div>
-          </div>
+          ) : (
+            <div className="bg-surface border border-line rounded-xl p-6 mb-8 mt-auto">
+              <div className="flex flex-col sm:flex-row gap-4 items-end">
+
+                <div className="w-full sm:w-1/3">
+                  <label className="block text-sm font-medium text-muted mb-2">Quantity</label>
+                  <div className="flex items-center justify-between bg-canvas border border-line rounded-lg p-1">
+                    <button
+                      onClick={() => setQty(Math.max(1, qty - 1))}
+                      disabled={qty <= 1}
+                      className="p-2 text-muted hover:text-fg disabled:opacity-50 transition-colors"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="text-fg font-medium">{qty}</span>
+                    <button
+                      onClick={() => setQty(Math.min(product.countInStock, qty + 1))}
+                      disabled={qty >= product.countInStock}
+                      className="p-2 text-muted hover:text-fg disabled:opacity-50 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="w-full sm:w-2/3 flex gap-2">
+                  <Button
+                    variant="primary"
+                    className="flex-1 py-3 h-[46px] flex items-center justify-center gap-2 text-lg"
+                    onClick={handleAddToCart}
+                    disabled={product.countInStock === 0}
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    {product.countInStock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                  </Button>
+                  <WishlistButton product={product} variant="inline" />
+                </div>
+
+              </div>
+            </div>
+          )}
 
           {/* Technical Specifications */}
           {product.technicalSpecs && (

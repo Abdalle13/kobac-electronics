@@ -81,7 +81,7 @@ const Footer = () => {
             title="Account"
             links={[
               { to: '/my-orders', label: 'My Orders' },
-              { to: '/wishlist', label: 'Wishlist' },
+              { to: '/wishlist', label: 'Favorites' },
               { to: '/settings', label: 'Settings' },
               { to: '/contact', label: 'Support' },
             ]}

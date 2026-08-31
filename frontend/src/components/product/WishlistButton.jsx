@@ -23,17 +23,17 @@ const WishlistButton = ({ product, variant = 'icon', className = '' }) => {
     e.stopPropagation();
 
     if (!userInfo) {
-      toast.error('Sign in to save items to your wishlist');
+      toast.error('Sign in to save favorites');
       navigate('/login');
       return;
     }
 
     if (inWishlist) {
       dispatch(removeFromWishlist(product._id));
-      toast('Removed from wishlist');
+      toast('Removed from favorites');
     } else {
       dispatch(addToWishlist(product));
-      toast.success('Saved to wishlist');
+      toast.success('Added to favorites');
     }
   };
 
@@ -58,7 +58,7 @@ const WishlistButton = ({ product, variant = 'icon', className = '' }) => {
     <button
       type="button"
       onClick={toggle}
-      aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+      aria-label={inWishlist ? 'Remove from favorites' : 'Add to favorites'}
       className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full backdrop-blur-md transition-all active:scale-90 ${
         inWishlist
           ? 'bg-danger text-white'

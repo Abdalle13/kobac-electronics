@@ -22,7 +22,6 @@ const Navbar = () => {
 
   const { cartItems } = useSelector((s) => s.cart);
   const { userInfo } = useSelector((s) => s.auth);
-  const { items: wishlistItems } = useSelector((s) => s.wishlist);
   const { freeShippingThreshold } = useSelector((s) => s.settings);
 
   const isAdmin = userInfo?.role?.toLowerCase() === 'admin';
@@ -47,26 +46,28 @@ const Navbar = () => {
     { to: '/shop', icon: Store, label: 'Shop' },
     { to: '/about', icon: Info, label: 'About' },
     { to: '/contact', icon: Mail, label: 'Support' },
-    ...(userInfo ? [
-      { to: '/wishlist', icon: Heart, label: 'Wishlist' },
+    ...(userInfo && !isAdmin ? [
+      { to: '/wishlist', icon: Heart, label: 'Favorites' },
       { to: '/my-orders', icon: Package, label: 'Orders' },
-      { to: '/settings', icon: Settings, label: 'Settings' },
     ] : []),
+    ...(userInfo ? [{ to: '/settings', icon: Settings, label: 'Settings' }] : []),
     ...(isAdmin ? [{ to: '/dashboard', icon: ShieldCheck, label: 'Dashboard' }] : []),
   ];
 
   return (
     <>
       {/* Promo bar */}
-      <div className="bg-primary text-on-primary text-[10px] sm:text-xs font-medium py-1.5 sm:py-2 text-center">
-        <span className="flex items-center justify-center gap-2 px-4">
-          <Zap size={12} className="animate-pulse shrink-0" />
-          <span className="truncate">
-            Spend ${freeShippingThreshold}+ and get free delivery
-            <span className="hidden sm:inline"> (limited time)</span>
+      {!isAdmin && (
+        <div className="bg-primary text-on-primary text-[10px] sm:text-xs font-medium py-1.5 sm:py-2 text-center">
+          <span className="flex items-center justify-center gap-2 px-4">
+            <Zap size={12} className="animate-pulse shrink-0" />
+            <span className="truncate">
+              Spend ${freeShippingThreshold}+ and get free delivery
+              <span className="hidden sm:inline"> (limited time)</span>
+            </span>
           </span>
-        </span>
-      </div>
+        </div>
+      )}
 
       {/* Navbar */}
       <nav className="sticky top-0 w-full z-[60] glass border-b border-line h-16 sm:h-20">
@@ -122,25 +123,16 @@ const Navbar = () => {
 
             <ThemeToggle />
 
-            {userInfo && (
-              <Link to="/wishlist" className="relative text-muted hover:text-fg transition-colors p-2 hidden sm:block" aria-label="Wishlist">
-                <Heart size={20} />
-                {wishlistItems.length > 0 && (
+            {!isAdmin && (
+              <button onClick={() => setIsCartOpen(true)} className="relative text-muted hover:text-fg transition-colors p-2" aria-label="Open cart">
+                <ShoppingCart size={20} />
+                {cartCount > 0 && (
                   <span className="absolute top-0.5 right-0.5 bg-primary text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full text-on-primary ring-2 ring-canvas">
-                    {wishlistItems.length}
+                    {cartCount}
                   </span>
                 )}
-              </Link>
+              </button>
             )}
-
-            <button onClick={() => setIsCartOpen(true)} className="relative text-muted hover:text-fg transition-colors p-2" aria-label="Open cart">
-              <ShoppingCart size={20} />
-              {cartCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 bg-primary text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full text-on-primary ring-2 ring-canvas">
-                  {cartCount}
-                </span>
-              )}
-            </button>
 
             {/* Desktop profile dropdown */}
             {userInfo && (
@@ -181,17 +173,20 @@ const Navbar = () => {
                         </div>
 
                         <div className="p-1.5">
-                          {isAdmin && (
+                          {isAdmin ? (
                             <Link to="/dashboard" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
                               <ShieldCheck size={15} className="text-primary" /> Admin Dashboard
                             </Link>
+                          ) : (
+                            <>
+                              <Link to="/my-orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
+                                <Package size={15} className="text-muted" /> My Orders
+                              </Link>
+                              <Link to="/wishlist" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
+                                <Heart size={15} className="text-muted" /> Favorites
+                              </Link>
+                            </>
                           )}
-                          <Link to="/my-orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
-                            <Package size={15} className="text-muted" /> My Orders
-                          </Link>
-                          <Link to="/wishlist" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
-                            <Heart size={15} className="text-muted" /> Wishlist
-                          </Link>
                           <Link to="/settings" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
                             <Settings size={15} className="text-muted" /> Settings
                           </Link>

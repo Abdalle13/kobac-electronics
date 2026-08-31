@@ -45,7 +45,8 @@ const CheckoutPage = () => {
   const toFreeShipping = Math.max(freeShippingThreshold - itemsPrice, 0);
 
   useEffect(() => {
-    if (!userInfo) navigate('/login?redirect=checkout');
+    if (!userInfo) navigate('/login?redirect=/checkout');
+    else if (userInfo.role?.toLowerCase() === 'admin') navigate('/dashboard');
   }, [userInfo, navigate]);
 
   useEffect(() => {

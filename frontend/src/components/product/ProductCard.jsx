@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, toggleCart } from '../../redux/slices/cartSlice';
 import Badge from '../ui/Badge';
 import StarRating from '../ui/StarRating';
@@ -10,6 +10,8 @@ import { formatCurrency } from '../../utils/formatter';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
+  const { userInfo } = useSelector((s) => s.auth);
+  const isAdmin = userInfo?.role?.toLowerCase() === 'admin';
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -41,9 +43,11 @@ const ProductCard = ({ product }) => {
         <div className="absolute top-2 left-2">
           <Badge variant="neutral" className="text-[9px] sm:text-[10px] px-1.5 py-0.5 sm:px-2">{product.category}</Badge>
         </div>
-        <div className="absolute bottom-2 right-2">
-          <WishlistButton product={product} />
-        </div>
+        {!isAdmin && (
+          <div className="absolute bottom-2 right-2">
+            <WishlistButton product={product} />
+          </div>
+        )}
       </div>
 
       {/* Info */}
@@ -61,13 +65,15 @@ const ProductCard = ({ product }) => {
           <span className="text-base sm:text-xl font-bold text-fg">
             {formatCurrency(product.price)}
           </span>
-          <button
-            onClick={handleAddToCart}
-            disabled={product.countInStock === 0}
-            className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-primary text-on-primary hover:bg-primary-hover active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-primary/20"
-          >
-            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
+          {!isAdmin && (
+            <button
+              onClick={handleAddToCart}
+              disabled={product.countInStock === 0}
+              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-primary text-on-primary hover:bg-primary-hover active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-primary/20"
+            >
+              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+          )}
         </div>
       </div>
     </Link>

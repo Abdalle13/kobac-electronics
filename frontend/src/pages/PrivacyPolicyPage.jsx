@@ -15,7 +15,7 @@ const PrivacyPolicyPage = () => (
           'Account details: your name, email address, and a securely hashed password.',
           'Order details: the items you buy, your delivery address (street, district, city, landmark), and the phone number used at checkout.',
           'Payment details: for EVC Plus we receive a transaction reference and the paying phone number from the payment gateway. We never see or store your EVC Plus PIN or any card numbers.',
-          'Content you submit: product reviews, ratings, wishlist items, and messages you send us through the contact form.',
+          'Content you submit: product reviews, ratings, favorite items, and messages you send us through the contact form.',
           'Basic technical data: your browser type and general usage of the site, used to keep it working and secure.',
         ]}
       />

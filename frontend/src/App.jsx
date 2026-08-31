@@ -39,7 +39,7 @@ const AppContent = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && userInfo.role?.toLowerCase() !== 'admin') {
       dispatch(fetchWishlist());
     } else {
       dispatch(clearWishlist());
