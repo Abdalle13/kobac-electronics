@@ -39,6 +39,20 @@ const orderSchema = mongoose.Schema(
       update_time: { type: String },
       payer_phone: { type: String },
     },
+    // "Qaybo" — pay the order off in monthly installments
+    installmentPlan: {
+      enabled: { type: Boolean, default: false },
+      installments: [
+        {
+          amount: { type: Number, required: true },
+          dueDate: { type: Date, required: true },
+          paid: { type: Boolean, default: false },
+          paidAt: { type: Date },
+          method: { type: String }, // 'EVC Plus' | 'Cash' | 'Manual'
+          reference: { type: String },
+        },
+      ],
+    },
     itemsPrice: {
       type: Number,
       required: true,

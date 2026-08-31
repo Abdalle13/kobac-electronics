@@ -9,14 +9,33 @@ const DEFAULT_SHIPPING_FEE = 15;
 const DEFAULT_FREE_SHIPPING_THRESHOLD = 400;
 const PAYMENT_METHODS = ['EVC Plus', 'Cash on Delivery'];
 
+// Installments ("qaybo") are only offered for EVC Plus orders above this total.
+const INSTALLMENT_MIN_TOTAL = 150;
+const INSTALLMENT_COUNTS = [2, 3, 4];
+
 const isOwner = (order, user) => order.user.toString() === user._id.toString();
 const isAdmin = (user) => user.role === 'Admin';
+const round2 = (n) => Number(n.toFixed(2));
+
+// Split `total` into `count` monthly installments (first one carries the rounding),
+// starting one month from now.
+const buildInstallments = (total, count) => {
+  const base = round2(total / count);
+  const first = round2(total - base * (count - 1));
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const due = new Date();
+    due.setMonth(due.getMonth() + i);
+    out.push({ amount: i === 0 ? first : base, dueDate: due, paid: false });
+  }
+  return out;
+};
 
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
 const addOrderItems = async (req, res) => {
-  const { orderItems, shippingAddress, paymentMethod } = req.body;
+  const { orderItems, shippingAddress, paymentMethod, installments } = req.body;
 
   if (!orderItems || orderItems.length === 0) {
     res.status(400);
@@ -26,6 +45,18 @@ const addOrderItems = async (req, res) => {
   if (!PAYMENT_METHODS.includes(paymentMethod)) {
     res.status(400);
     throw new Error('Invalid payment method');
+  }
+
+  const useInstallments = Boolean(installments);
+  if (useInstallments) {
+    if (paymentMethod !== 'EVC Plus') {
+      res.status(400);
+      throw new Error('Installments are only available with EVC Plus');
+    }
+    if (!INSTALLMENT_COUNTS.includes(Number(installments))) {
+      res.status(400);
+      throw new Error('Invalid installment count');
+    }
   }
 
   // 1. Atomically reserve stock AND read the authoritative price/name from the DB.
@@ -89,6 +120,16 @@ const addOrderItems = async (req, res) => {
   const taxPrice = Number((TAX_RATE * itemsPrice).toFixed(2));
   const totalPrice = Number((itemsPrice + shippingPrice + taxPrice).toFixed(2));
 
+  if (useInstallments && totalPrice < INSTALLMENT_MIN_TOTAL) {
+    await rollback();
+    res.status(400);
+    throw new Error(`Installments need an order of at least $${INSTALLMENT_MIN_TOTAL}`);
+  }
+
+  const installmentPlan = useInstallments
+    ? { enabled: true, installments: buildInstallments(totalPrice, Number(installments)) }
+    : undefined;
+
   // 3. Persist (roll stock back if saving the order fails)
   let createdOrder;
   try {
@@ -101,6 +142,7 @@ const addOrderItems = async (req, res) => {
       taxPrice,
       shippingPrice,
       totalPrice,
+      ...(installmentPlan ? { installmentPlan } : {}),
     });
     createdOrder = await order.save();
   } catch (error) {
@@ -153,6 +195,11 @@ const updateOrderToPaid = async (req, res) => {
     if (order.isPaid) {
       res.status(400);
       throw new Error('Order is already paid');
+    }
+
+    if (order.installmentPlan?.enabled) {
+      res.status(400);
+      throw new Error('This order is on a payment plan; pay each installment instead');
     }
 
     order.isPaid = true;
@@ -284,6 +331,73 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+// @desc    Pay one installment of a payment plan
+// @route   PUT /api/orders/:id/installments/:index/pay
+// @access  Private (owner pays via EVC; admin can record a cash payment)
+const payInstallment = async (req, res) => {
+  const order = await Order.findById(req.params.id).populate('user', 'name email');
+
+  if (!order) {
+    res.status(404).json({ message: 'Order not found' });
+    return;
+  }
+
+  const admin = isAdmin(req.user);
+  if (!admin && order.user._id.toString() !== req.user._id.toString()) {
+    res.status(403).json({ message: 'Not authorized to pay this order' });
+    return;
+  }
+
+  if (!order.installmentPlan?.enabled) {
+    res.status(400).json({ message: 'This order has no payment plan' });
+    return;
+  }
+  if (order.status === 'Cancelled') {
+    res.status(400).json({ message: 'Order is cancelled' });
+    return;
+  }
+
+  const list = order.installmentPlan.installments;
+  const index = Number(req.params.index);
+  const target = list[index];
+
+  if (!target) {
+    res.status(404).json({ message: 'Installment not found' });
+    return;
+  }
+  if (target.paid) {
+    res.status(400).json({ message: 'That installment is already paid' });
+    return;
+  }
+  // Installments must be paid in order
+  const firstUnpaid = list.findIndex((i) => !i.paid);
+  if (index !== firstUnpaid) {
+    res.status(400).json({ message: 'Pay the earlier installments first' });
+    return;
+  }
+
+  target.paid = true;
+  target.paidAt = Date.now();
+  target.method = admin ? 'Manual' : 'EVC Plus';
+  target.reference = req.body.reference || req.body.transactionId || '';
+
+  const allPaid = list.every((i) => i.paid);
+  if (allPaid) {
+    order.isPaid = true;
+    order.paidAt = Date.now();
+    order.status = 'Paid';
+    order.paymentResult = { status: 'Installments complete', update_time: String(Date.now()) };
+  }
+
+  const updated = await order.save();
+  res.json(updated);
+
+  if (allPaid && order.user?.email) {
+    const { subject, html } = paymentReceivedEmail(updated, order.user);
+    await queueEmail({ to: order.user.email, subject, html });
+  }
+};
+
 // @desc    Get order summary (Lacagta/Finance)
 // @route   GET /api/orders/summary
 // @access  Private/Admin
@@ -406,14 +520,15 @@ const getOrderSummary = async (req, res) => {
   }
 };
 
-export { 
-  addOrderItems, 
-  getOrderById, 
-  updateOrderToPaid, 
-  getMyOrders, 
-  getOrders, 
-  updateOrderToDelivered, 
-  updateOrderToPaidAdmin, 
+export {
+  addOrderItems,
+  getOrderById,
+  updateOrderToPaid,
+  getMyOrders,
+  getOrders,
+  updateOrderToDelivered,
+  updateOrderToPaidAdmin,
   cancelOrder,
+  payInstallment,
   getOrderSummary
 };
