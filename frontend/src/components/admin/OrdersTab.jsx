@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { XCircle } from 'lucide-react';
-import { listOrders, deliverOrder, payOrderAdmin } from '../../redux/slices/orderSlice';
+import { listOrders, deliverOrder, payOrderAdmin, assignRider, updateDelivery } from '../../redux/slices/orderSlice';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/formatter';
 import Button from '../ui/Button';
@@ -18,8 +18,20 @@ const OrdersTab = ({ search }) => {
   const { orders } = useSelector((s) => s.order);
   const [selected, setSelected] = useState(null);
   const [tab, setTab] = useState('All');
+  const [riders, setRiders] = useState([]);
 
-  useEffect(() => { dispatch(listOrders()); }, [dispatch]);
+  useEffect(() => {
+    dispatch(listOrders());
+    api.get('/users').then((r) => setRiders(r.data.filter((u) => u.role === 'Rider'))).catch(() => {});
+  }, [dispatch]);
+
+  // keep the open modal in sync with refreshed orders
+  useEffect(() => {
+    if (selected) {
+      const fresh = orders.find((o) => o._id === selected._id);
+      if (fresh && fresh !== selected) setSelected(fresh);
+    }
+  }, [orders]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const counts = useMemo(() => {
     const c = { All: orders.length };
@@ -70,6 +82,18 @@ const OrdersTab = ({ search }) => {
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);
     }
+  };
+
+  const doAssign = async (id, riderId) => {
+    const res = await dispatch(assignRider({ id, riderId }));
+    if (assignRider.fulfilled.match(res)) { toast.success(riderId ? 'Rider assigned' : 'Rider removed'); dispatch(listOrders()); }
+    else toast.error(res.payload || 'Could not assign');
+  };
+
+  const advanceDelivery = async (id, status) => {
+    const res = await dispatch(updateDelivery({ id, status }));
+    if (updateDelivery.fulfilled.match(res)) { toast.success(`Marked ${status}`); dispatch(listOrders()); }
+    else toast.error(res.payload || 'Could not update');
   };
 
   return (
@@ -125,11 +149,14 @@ const OrdersTab = ({ search }) => {
       {selected && (
         <OrderDetailsModal
           order={selected}
+          riders={riders}
           onClose={() => setSelected(null)}
           onPay={() => markPaid(selected._id)}
           onDeliver={() => markDelivered(selected._id)}
           onCancel={() => cancel(selected._id)}
           onInstallmentPaid={(i) => recordInstallment(selected._id, i)}
+          onAssign={(riderId) => doAssign(selected._id, riderId)}
+          onAdvanceDelivery={(status) => advanceDelivery(selected._id, status)}
         />
       )}
     </div>

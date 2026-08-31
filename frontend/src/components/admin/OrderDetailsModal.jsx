@@ -7,12 +7,18 @@ const Field = ({ label, value }) => (
   <p className="text-sm"><span className="text-muted">{label}:</span> <span className="text-fg font-medium">{value}</span></p>
 );
 
-const OrderDetailsModal = ({ order, onClose, onPay, onDeliver, onCancel, onInstallmentPaid }) => {
+const DELIVERY_FLOW = ['Unassigned', 'Assigned', 'Picked Up', 'On the Way', 'Delivered'];
+
+const OrderDetailsModal = ({ order, riders = [], onClose, onPay, onDeliver, onCancel, onInstallmentPaid, onAssign, onAdvanceDelivery }) => {
   const plan = order.installmentPlan?.enabled ? order.installmentPlan.installments : null;
   const nextInstallment = plan ? plan.findIndex((i) => !i.paid) : -1;
   const canPay = !order.isPaid && order.status !== 'Cancelled' && !plan;
   const canDeliver = !order.isDelivered && order.status !== 'Cancelled';
   const canCancel = order.status !== 'Cancelled' && order.status !== 'Delivered';
+
+  const dStatus = order.delivery?.status || 'Unassigned';
+  const dIdx = DELIVERY_FLOW.indexOf(dStatus);
+  const nextDelivery = dIdx > 0 && dIdx < 4 ? DELIVERY_FLOW[dIdx + 1] : null;
 
   return (
   <Modal
@@ -64,6 +70,44 @@ const OrderDetailsModal = ({ order, onClose, onPay, onDeliver, onCancel, onInsta
           </tbody>
         </table>
       </div>
+
+      {order.status !== 'Cancelled' && onAssign && (
+        <div className="border border-line rounded-xl p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-muted text-xs uppercase tracking-wider font-semibold">Delivery</h3>
+            <span className="text-xs font-medium text-fg">{dStatus}</span>
+          </div>
+
+          <div>
+            <label className="text-xs text-muted">Assigned rider</label>
+            <select
+              value={order.delivery?.rider?._id || order.delivery?.rider || ''}
+              onChange={(e) => onAssign(e.target.value || null)}
+              className="mt-1 w-full bg-surface border border-line rounded-lg px-3 py-2 text-sm text-fg"
+            >
+              <option value="">Unassigned</option>
+              {riders.map((r) => <option key={r._id} value={r._id}>{r.name}</option>)}
+            </select>
+            {riders.length === 0 && <p className="text-[11px] text-muted mt-1">No riders yet. Add one in the Users tab.</p>}
+          </div>
+
+          {nextDelivery && onAdvanceDelivery && (
+            <Button className="text-xs px-3 py-1.5" onClick={() => onAdvanceDelivery(nextDelivery)}>
+              Mark {nextDelivery}
+            </Button>
+          )}
+
+          {order.delivery?.events?.length > 0 && (
+            <div className="border-t border-line pt-2 space-y-1">
+              {order.delivery.events.slice().reverse().map((ev, i) => (
+                <p key={i} className="text-[11px] text-muted">
+                  {new Date(ev.at).toLocaleString()}: {ev.status}{ev.note ? ` (${ev.note})` : ''}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {plan && (
         <div className="border border-line rounded-xl p-4">

@@ -81,6 +81,45 @@ export const listMyOrders = createAsyncThunk(
   }
 );
 
+// Orders assigned to the logged-in rider
+export const listRiderOrders = createAsyncThunk(
+  'order/listRiderOrders',
+  async (_, thunkAPI) => {
+    try {
+      const { data } = await api.get('/orders/rider');
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+// Assign / unassign a rider (admin)
+export const assignRider = createAsyncThunk(
+  'order/assignRider',
+  async ({ id, riderId }, thunkAPI) => {
+    try {
+      const { data } = await api.put(`/orders/${id}/assign`, { riderId });
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+// Advance delivery status (rider or admin)
+export const updateDelivery = createAsyncThunk(
+  'order/updateDelivery',
+  async ({ id, status, note }, thunkAPI) => {
+    try {
+      const { data } = await api.put(`/orders/${id}/delivery`, { status, note });
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 // Get All Orders (Admin)
 export const listOrders = createAsyncThunk(
   'order/listOrders',
@@ -209,6 +248,25 @@ const orderSlice = createSlice({
       .addCase(listMyOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Rider orders
+      .addCase(listRiderOrders.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(listRiderOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orders = action.payload;
+      })
+      .addCase(listRiderOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateDelivery.fulfilled, (state, action) => {
+        state.orders = state.orders.map((o) => (o._id === action.payload._id ? action.payload : o));
+        if (state.order?._id === action.payload._id) state.order = action.payload;
+      })
+      .addCase(assignRider.fulfilled, (state, action) => {
+        state.orders = state.orders.map((o) => (o._id === action.payload._id ? action.payload : o));
       })
       // List All Orders (Admin)
       .addCase(listOrders.pending, (state) => {

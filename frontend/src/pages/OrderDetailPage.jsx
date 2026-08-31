@@ -19,6 +19,13 @@ const OrderDetailPage = () => {
     dispatch(getOrderDetails(id));
   }, [dispatch, id]);
 
+  // Poll while the order is still in transit so the customer sees live progress
+  useEffect(() => {
+    if (!order || order.isDelivered || order.status === 'Cancelled') return;
+    const t = setInterval(() => dispatch(getOrderDetails(id)), 15000);
+    return () => clearInterval(t);
+  }, [dispatch, id, order?.isDelivered, order?.status]);
+
   if (loading || (!order && !error)) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-14 sm:py-20 flex flex-col items-center justify-center min-h-[60vh]">
@@ -201,38 +208,54 @@ const OrderDetailPage = () => {
           <InstallmentPlan order={order} />
 
           <div className="glass border border-line rounded-3xl p-5 sm:p-8">
-            <h3 className="text-lg font-bold text-fg mb-6">Delivery Progress</h3>
-            <div className="space-y-8 relative">
-              <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-surface-2"></div>
-              
-              <div className="flex gap-4 relative">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${order.isPaid ? 'bg-success text-white' : 'bg-surface-2 text-muted'}`}>
-                   <CheckCircle2 size={14} />
-                </div>
-                <div>
-                   <p className={`text-sm font-bold ${order.isPaid ? 'text-fg' : 'text-muted'}`}>Order Paid</p>
-                   {order.isPaid ? (
-                     <p className="text-[10px] text-muted mt-1">{new Date(order.paidAt).toLocaleString()}</p>
-                   ) : (
-                     <p className="text-[10px] text-muted mt-1">Pending verification</p>
-                   )}
-                </div>
-              </div>
-
-              <div className="flex gap-4 relative">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${order.isDelivered ? 'bg-success text-white' : 'bg-surface-2 text-muted'}`}>
-                   <Truck size={14} />
-                </div>
-                <div>
-                   <p className={`text-sm font-bold ${order.isDelivered ? 'text-fg' : 'text-muted'}`}>Shipment Delivered</p>
-                   {order.isDelivered ? (
-                     <p className="text-[10px] text-muted mt-1">{new Date(order.deliveredAt).toLocaleString()}</p>
-                   ) : (
-                     <p className="text-[10px] text-muted mt-1">Estimated delivery: 2-3 days</p>
-                   )}
-                </div>
-              </div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-fg">Delivery Progress</h3>
+              {order.delivery?.rider && !order.isDelivered && (
+                <span className="text-xs text-muted">Rider: <span className="text-fg">{order.delivery.rider.name}</span></span>
+              )}
             </div>
+
+            {(() => {
+              const STAGES = ['Assigned', 'Picked Up', 'On the Way', 'Delivered'];
+              const cur = order.isDelivered ? 4 : STAGES.indexOf(order.delivery?.status || '');
+              const events = order.delivery?.events || [];
+              const evAt = (s) => events.find((e) => e.status === s)?.at;
+              return (
+                <div className="space-y-6 relative">
+                  <div className="absolute left-[11px] top-2 bottom-2 w-[2px] bg-surface-2" />
+                  <div className="flex gap-4 relative">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${order.isPaid ? 'bg-success text-white' : 'bg-surface-2 text-muted'}`}>
+                      <CheckCircle2 size={14} />
+                    </div>
+                    <div>
+                      <p className={`text-sm font-bold ${order.isPaid ? 'text-fg' : 'text-muted'}`}>Order {order.isPaid ? 'Paid' : 'Placed'}</p>
+                      <p className="text-[10px] text-muted mt-1">
+                        {order.isPaid && order.paidAt ? new Date(order.paidAt).toLocaleString() : 'Awaiting payment'}
+                      </p>
+                    </div>
+                  </div>
+                  {STAGES.map((stage, i) => {
+                    const reached = cur >= i;
+                    const at = stage === 'Delivered' ? order.deliveredAt : evAt(stage);
+                    return (
+                      <div key={stage} className="flex gap-4 relative">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${reached ? 'bg-success text-white' : 'bg-surface-2 text-muted'}`}>
+                          {stage === 'Delivered' ? <CheckCircle2 size={14} /> : <Truck size={14} />}
+                        </div>
+                        <div>
+                          <p className={`text-sm font-bold ${reached ? 'text-fg' : 'text-muted'}`}>{stage}</p>
+                          <p className="text-[10px] text-muted mt-1">
+                            {reached && at ? new Date(at).toLocaleString()
+                              : i === 0 && cur < 0 ? 'Waiting for a courier'
+                              : 'Pending'}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
 
           <div className="p-6 sm:p-8 rounded-3xl bg-primary/10 border border-primary/20 text-center">

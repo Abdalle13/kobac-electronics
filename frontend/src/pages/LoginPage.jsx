@@ -22,13 +22,11 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (userInfo) {
-      if (redirect) {
-        navigate(redirect);
-      } else if (userInfo.role && userInfo.role.toLowerCase() === 'admin') {
-        navigate('/dashboard');
-      } else {
-        navigate('/');
-      }
+      const role = userInfo.role?.toLowerCase();
+      if (redirect) navigate(redirect);
+      else if (role === 'admin') navigate('/dashboard');
+      else if (role === 'rider') navigate('/rider');
+      else navigate('/');
     }
   }, [userInfo, navigate, redirect]);
 

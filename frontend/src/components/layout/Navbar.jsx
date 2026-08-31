@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   ShoppingCart, Search, Menu, LogOut, Settings,
-  Package, ShieldCheck, Zap, X, Mail, Home, Store, Info, Heart, ChevronDown,
+  Package, ShieldCheck, Zap, X, Mail, Home, Store, Info, Heart, ChevronDown, Bike,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import CartDrawer from './CartDrawer';
@@ -24,7 +24,10 @@ const Navbar = () => {
   const { userInfo } = useSelector((s) => s.auth);
   const { freeShippingThreshold } = useSelector((s) => s.settings);
 
-  const isAdmin = userInfo?.role?.toLowerCase() === 'admin';
+  const role = userInfo?.role?.toLowerCase();
+  const isAdmin = role === 'admin';
+  const isRider = role === 'rider';
+  const isStaff = isAdmin || isRider;
   const cartCount = cartItems.reduce((acc, i) => acc + i.qty, 0);
 
   const closeMenu = () => setIsMenuOpen(false);
@@ -46,18 +49,19 @@ const Navbar = () => {
     { to: '/shop', icon: Store, label: 'Shop' },
     { to: '/about', icon: Info, label: 'About' },
     { to: '/contact', icon: Mail, label: 'Support' },
-    ...(userInfo && !isAdmin ? [
+    ...(userInfo && !isStaff ? [
       { to: '/wishlist', icon: Heart, label: 'Favorites' },
       { to: '/my-orders', icon: Package, label: 'Orders' },
     ] : []),
     ...(userInfo ? [{ to: '/settings', icon: Settings, label: 'Settings' }] : []),
+    ...(isRider ? [{ to: '/rider', icon: Bike, label: 'Deliveries' }] : []),
     ...(isAdmin ? [{ to: '/dashboard', icon: ShieldCheck, label: 'Dashboard' }] : []),
   ];
 
   return (
     <>
       {/* Promo bar */}
-      {!isAdmin && (
+      {!isStaff && (
         <div className="bg-primary text-on-primary text-[10px] sm:text-xs font-medium py-1.5 sm:py-2 text-center">
           <span className="flex items-center justify-center gap-2 px-4">
             <Zap size={12} className="animate-pulse shrink-0" />
@@ -80,6 +84,8 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-7 text-sm font-medium">
             {isAdmin ? (
               <Link to="/dashboard" className="text-primary hover:text-primary-hover transition-colors font-semibold">Admin Dashboard</Link>
+            ) : isRider ? (
+              <Link to="/rider" className="text-primary hover:text-primary-hover transition-colors font-semibold">Deliveries</Link>
             ) : (
               [
                 { to: '/', label: 'Home' },
@@ -122,7 +128,7 @@ const Navbar = () => {
 
             <ThemeToggle />
 
-            {!isAdmin && (
+            {!isStaff && (
               <button onClick={() => setIsCartOpen(true)} className="relative text-muted hover:text-fg transition-colors p-2" aria-label="Open cart">
                 <ShoppingCart size={20} />
                 {cartCount > 0 && (
@@ -172,11 +178,17 @@ const Navbar = () => {
                         </div>
 
                         <div className="p-1.5">
-                          {isAdmin ? (
+                          {isAdmin && (
                             <Link to="/dashboard" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
                               <ShieldCheck size={15} className="text-primary" /> Admin Dashboard
                             </Link>
-                          ) : (
+                          )}
+                          {isRider && (
+                            <Link to="/rider" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
+                              <Bike size={15} className="text-primary" /> Deliveries
+                            </Link>
+                          )}
+                          {!isStaff && (
                             <>
                               <Link to="/my-orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
                                 <Package size={15} className="text-muted" /> My Orders

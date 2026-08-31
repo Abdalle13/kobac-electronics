@@ -22,6 +22,8 @@ import TermsOfServicePage from './pages/TermsOfServicePage';
 import { Toaster } from 'react-hot-toast';
 import PrivateRoute from './components/routing/PrivateRoute';
 import AdminRoute from './components/routing/AdminRoute';
+import RiderRoute from './components/routing/RiderRoute';
+import RiderDashboard from './pages/RiderDashboard';
 import ScrollToTop from './components/routing/ScrollToTop';
 import SettingsPage from './pages/SettingsPage';
 import WishlistPage from './pages/WishlistPage';
@@ -39,7 +41,8 @@ const AppContent = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (userInfo && userInfo.role?.toLowerCase() !== 'admin') {
+    const role = userInfo?.role?.toLowerCase();
+    if (userInfo && role !== 'admin' && role !== 'rider') {
       dispatch(fetchWishlist());
     } else {
       dispatch(clearWishlist());
@@ -105,6 +108,11 @@ const AppContent = () => {
           {/* Admin Routes */}
           <Route element={<AdminRoute />}>
             <Route path="/dashboard" element={<AdminDashboard />} />
+          </Route>
+
+          {/* Rider Routes */}
+          <Route element={<RiderRoute />}>
+            <Route path="/rider" element={<RiderDashboard />} />
           </Route>
         </Routes>
       </main>
