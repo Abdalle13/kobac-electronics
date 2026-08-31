@@ -6,7 +6,7 @@ import {
   ShieldCheck, Loader2, XCircle, MapPin, ArrowLeft, ArrowRight, Package,
 } from 'lucide-react';
 import { clearCart } from '../redux/slices/cartSlice';
-import { createOrder, payOrder, resetOrder } from '../redux/slices/orderSlice';
+import { createOrder, payOrder, payInstallment, resetOrder } from '../redux/slices/orderSlice';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import Button from '../components/ui/Button';
@@ -30,6 +30,7 @@ const CheckoutPage = () => {
   const [step, setStep] = useState(1);
   const [shipping, setShipping] = useState({ streetName: '', city: '', district: '', landmark: '' });
   const [paymentMethod, setPaymentMethod] = useState('EVC Plus');
+  const [installments, setInstallments] = useState(0); // 0 = pay in full
   const [evcNumber, setEvcNumber] = useState('');
   const [evcPin, setEvcPin] = useState('');
   const [placedOrder, setPlacedOrder] = useState(null);
@@ -43,6 +44,21 @@ const CheckoutPage = () => {
   const taxPrice = Number((0.05 * itemsPrice).toFixed(2));
   const totalPrice = itemsPrice + shippingPrice + taxPrice;
   const toFreeShipping = Math.max(freeShippingThreshold - itemsPrice, 0);
+
+  const INSTALLMENT_MIN = 150;
+  const r2 = (n) => Number(n.toFixed(2));
+  const installmentEligible = paymentMethod === 'EVC Plus' && totalPrice >= INSTALLMENT_MIN;
+  const useInstallments = installmentEligible && installments >= 2;
+  const installmentSchedule = useInstallments
+    ? Array.from({ length: installments }, (_, i) => {
+        const base = r2(totalPrice / installments);
+        const first = r2(totalPrice - base * (installments - 1));
+        const d = new Date();
+        d.setMonth(d.getMonth() + i);
+        return { amount: i === 0 ? first : base, date: d };
+      })
+    : [];
+  const dueNow = useInstallments ? installmentSchedule[0].amount : totalPrice;
 
   useEffect(() => {
     if (!userInfo) navigate('/login?redirect=/checkout');
@@ -74,6 +90,7 @@ const CheckoutPage = () => {
     shippingAddress: { ...shipping },
     paymentMethod,
     itemsPrice, shippingPrice, taxPrice, totalPrice,
+    ...(useInstallments ? { installments } : {}),
   });
 
   const handleShippingSubmit = (e) => {
@@ -94,7 +111,7 @@ const CheckoutPage = () => {
 
     try {
       setEvcStatus('pushing');
-      const { data } = await api.post('/payment/evcplus', { phoneNumber: evcNumber, amount: totalPrice, pin: evcPin });
+      const { data } = await api.post('/payment/evcplus', { phoneNumber: evcNumber, amount: dueNow, pin: evcPin });
 
       setEvcStatus('confirming');
       const res = await dispatch(createOrder(buildOrderData()));
@@ -105,18 +122,24 @@ const CheckoutPage = () => {
       }
 
       const order = res.payload;
-      await dispatch(payOrder({
-        id: order._id,
-        paymentResult: {
-          transactionId: data?.params?.transactionId || 'EVC-UNKNOWN',
-          status: data?.state === 'APPROVED' ? 'COMPLETED' : (data?.state || 'COMPLETED'),
-          update_time: data?.params?.timestamp || new Date().toISOString(),
-          payer_phone: data?.params?.accountNo || evcNumber,
-        },
-      }));
+      const txId = data?.params?.transactionId || 'EVC-UNKNOWN';
+
+      if (useInstallments) {
+        await dispatch(payInstallment({ id: order._id, index: 0, reference: txId }));
+      } else {
+        await dispatch(payOrder({
+          id: order._id,
+          paymentResult: {
+            transactionId: txId,
+            status: data?.state === 'APPROVED' ? 'COMPLETED' : (data?.state || 'COMPLETED'),
+            update_time: data?.params?.timestamp || new Date().toISOString(),
+            payer_phone: data?.params?.accountNo || evcNumber,
+          },
+        }));
+      }
 
       setEvcStatus('idle');
-      setPlacedOrder(order);
+      setPlacedOrder({ ...order, _installmentFirst: useInstallments ? installmentSchedule : null });
     } catch (err) {
       setEvcStatus('idle');
       if (err.response?.data?.message) setEvcError(err.response.data.message);
@@ -128,6 +151,7 @@ const CheckoutPage = () => {
   /* ── Success ─────────────────────────────── */
   if (placedOrder) {
     const ref = `#${String(placedOrder._id).slice(-8).toUpperCase()}`;
+    const plan = placedOrder._installmentFirst;
     return (
       <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center w-full flex-grow px-4">
         <div className="w-20 h-20 bg-success/15 text-success rounded-full flex items-center justify-center mb-6">
@@ -135,9 +159,17 @@ const CheckoutPage = () => {
         </div>
         <h2 className="text-2xl sm:text-3xl font-bold text-fg mb-2">Order placed</h2>
         <p className="text-muted mb-1">Order <span className="font-semibold text-fg">{ref}</span> · {formatCurrency(placedOrder.totalPrice)}</p>
-        <p className="text-muted text-sm mb-8 max-w-md">
-          {placedOrder.isPaid ? 'Payment received.' : 'Pay on delivery.'} We've emailed you a confirmation.
-        </p>
+        {plan ? (
+          <p className="text-muted text-sm mb-8 max-w-md">
+            Installment 1 of {plan.length} paid ({formatCurrency(plan[0].amount)}).
+            Next {formatCurrency(plan[1].amount)} due {plan[1].date.toLocaleDateString()}.
+            Pay the rest from your order page.
+          </p>
+        ) : (
+          <p className="text-muted text-sm mb-8 max-w-md">
+            {placedOrder.isPaid ? 'Payment received.' : 'Pay on delivery.'} We've emailed you a confirmation.
+          </p>
+        )}
         <div className="flex flex-col sm:flex-row gap-3">
           <Link to={`/order/${placedOrder._id}`}><Button className="w-full sm:w-auto">View Order</Button></Link>
           <Link to="/shop"><Button variant="secondary" className="w-full sm:w-auto">Continue Shopping</Button></Link>
@@ -226,13 +258,47 @@ const CheckoutPage = () => {
                   />
                   <PaymentOption
                     selected={paymentMethod === 'Cash on Delivery'}
-                    onSelect={() => setPaymentMethod('Cash on Delivery')}
+                    onSelect={() => { setPaymentMethod('Cash on Delivery'); setInstallments(0); }}
                     icon={Banknote}
                     tone="bg-success/15 text-success"
                     title="Cash on Delivery"
                     subtitle="Pay the courier when your order arrives"
                   />
                 </div>
+
+                {installmentEligible && (
+                  <div className="bg-canvas border border-line rounded-xl p-4 sm:p-5">
+                    <p className="text-sm font-semibold text-fg mb-1">Pay in installments (qaybo)</p>
+                    <p className="text-xs text-muted mb-3">Split this order into monthly EVC Plus payments.</p>
+                    <div className="flex flex-wrap gap-2">
+                      {[0, 2, 3, 4].map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setInstallments(n)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                            installments === n ? 'bg-primary text-on-primary' : 'bg-surface-2 text-muted hover:text-fg'
+                          }`}
+                        >
+                          {n === 0 ? 'Pay in full' : `${n} months`}
+                        </button>
+                      ))}
+                    </div>
+                    {useInstallments && (
+                      <div className="mt-4 divide-y divide-line border-t border-line">
+                        {installmentSchedule.map((s, i) => (
+                          <div key={i} className="flex justify-between py-1.5 text-xs">
+                            <span className="text-muted">
+                              {i === 0 ? 'Today' : s.date.toLocaleDateString()}
+                              {i === 0 && <span className="text-success"> · paid now</span>}
+                            </span>
+                            <span className="text-fg font-medium">{formatCurrency(s.amount)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {paymentMethod === 'EVC Plus' && (
                   <div className="bg-canvas border border-line rounded-xl p-4 sm:p-5 space-y-1">
@@ -276,6 +342,8 @@ const CheckoutPage = () => {
                     {evcStatus === 'pushing' ? 'Sending request…'
                       : evcStatus === 'confirming' ? 'Confirming…'
                       : loading ? 'Processing…'
+                      : paymentMethod !== 'EVC Plus' ? 'Place order'
+                      : useInstallments ? `Pay ${formatCurrency(dueNow)} now`
                       : `Pay ${formatCurrency(totalPrice)}`}
                   </Button>
                 </div>

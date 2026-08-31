@@ -78,11 +78,21 @@ const MyOrdersPage = () => {
             >
               <div className="flex flex-col md:flex-row justify-between gap-6">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-3 mb-4 flex-wrap">
                     <span className="text-xs font-mono text-muted uppercase tracking-tight">Order #{order._id.substring(order._id.length - 8)}</span>
                     <Badge variant={order.isPaid ? 'primary' : 'neutral'}>
                       {order.isPaid ? 'Paid' : 'Payment Pending'}
                     </Badge>
+                    {order.installmentPlan?.enabled && !order.isPaid && (() => {
+                      const list = order.installmentPlan.installments;
+                      const paid = list.filter((i) => i.paid).length;
+                      const left = list.filter((i) => !i.paid).reduce((s, i) => s + i.amount, 0);
+                      return (
+                        <Badge variant="neutral">
+                          Plan: {paid}/{list.length} paid · {formatCurrency(left)} left
+                        </Badge>
+                      );
+                    })()}
                   </div>
 
                   <div className="flex gap-4 mb-4 overflow-x-auto pb-2">

@@ -60,6 +60,18 @@ const OrdersTab = ({ search }) => {
     }
   };
 
+  const recordInstallment = async (id, index) => {
+    if (!window.confirm('Record a cash payment for this installment?')) return;
+    try {
+      await api.put(`/orders/${id}/installments/${index}/pay`, { reference: 'Cash' });
+      toast.success('Installment recorded');
+      dispatch(listOrders());
+      setSelected(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    }
+  };
+
   return (
     <div>
       <div className="flex gap-1.5 overflow-x-auto scrollbar-hide mb-5">
@@ -84,9 +96,16 @@ const OrdersTab = ({ search }) => {
             <td className="p-4 text-xs text-muted">{o._id.slice(0, 12)}…</td>
             <td className="p-4 text-fg">{o.user?.name || 'Guest'}</td>
             <td className="p-4 text-fg">{formatCurrency(o.totalPrice)}</td>
-            <td className="p-4"><Badge variant={statusVariant(o.status)}>{o.status || 'Pending'}</Badge></td>
+            <td className="p-4">
+              <Badge variant={statusVariant(o.status)}>{o.status || 'Pending'}</Badge>
+              {o.installmentPlan?.enabled && !o.isPaid && (
+                <span className="block text-[11px] text-muted mt-1">
+                  Plan {o.installmentPlan.installments.filter((i) => i.paid).length}/{o.installmentPlan.installments.length}
+                </span>
+              )}
+            </td>
             <td className="p-4 text-right whitespace-nowrap space-x-1.5">
-              {!o.isPaid && o.status !== 'Cancelled' && (
+              {!o.isPaid && o.status !== 'Cancelled' && !o.installmentPlan?.enabled && (
                 <Button className="text-xs px-3 py-1.5" onClick={() => markPaid(o._id)}>Mark Paid</Button>
               )}
               {!o.isDelivered && o.status !== 'Cancelled' && (
@@ -110,6 +129,7 @@ const OrdersTab = ({ search }) => {
           onPay={() => markPaid(selected._id)}
           onDeliver={() => markDelivered(selected._id)}
           onCancel={() => cancel(selected._id)}
+          onInstallmentPaid={(i) => recordInstallment(selected._id, i)}
         />
       )}
     </div>

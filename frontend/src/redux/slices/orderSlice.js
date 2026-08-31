@@ -49,6 +49,22 @@ export const payOrder = createAsyncThunk(
   }
 );
 
+// Pay one installment of a payment plan
+export const payInstallment = createAsyncThunk(
+  'order/payInstallment',
+  async ({ id, index, reference }, thunkAPI) => {
+    try {
+      const { data } = await api.put(`/orders/${id}/installments/${index}/pay`, { reference });
+      return data;
+    } catch (error) {
+      const message = error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Get User Orders
 export const listMyOrders = createAsyncThunk(
   'order/listMyOrders',
@@ -165,6 +181,20 @@ const orderSlice = createSlice({
         state.success = true;
       })
       .addCase(payOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Pay Installment
+      .addCase(payInstallment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(payInstallment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.order = action.payload;
+      })
+      .addCase(payInstallment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

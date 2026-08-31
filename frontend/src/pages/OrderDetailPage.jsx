@@ -6,6 +6,7 @@ import { ArrowLeft, Package, Truck, CreditCard, Calendar, CheckCircle2, AlertCir
 import { getOrderDetails } from '../redux/slices/orderSlice';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
+import InstallmentPlan from '../components/order/InstallmentPlan';
 import { formatCurrency } from '../utils/formatter';
 
 const OrderDetailPage = () => {
@@ -196,6 +197,8 @@ const OrderDetailPage = () => {
               </div>
             </div>
           </div>
+
+          <InstallmentPlan order={order} />
 
           <div className="glass border border-line rounded-3xl p-5 sm:p-8">
             <h3 className="text-lg font-bold text-fg mb-6">Delivery Progress</h3>

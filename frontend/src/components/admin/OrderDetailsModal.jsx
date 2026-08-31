@@ -7,8 +7,10 @@ const Field = ({ label, value }) => (
   <p className="text-sm"><span className="text-muted">{label}:</span> <span className="text-fg font-medium">{value}</span></p>
 );
 
-const OrderDetailsModal = ({ order, onClose, onPay, onDeliver, onCancel }) => {
-  const canPay = !order.isPaid && order.status !== 'Cancelled';
+const OrderDetailsModal = ({ order, onClose, onPay, onDeliver, onCancel, onInstallmentPaid }) => {
+  const plan = order.installmentPlan?.enabled ? order.installmentPlan.installments : null;
+  const nextInstallment = plan ? plan.findIndex((i) => !i.paid) : -1;
+  const canPay = !order.isPaid && order.status !== 'Cancelled' && !plan;
   const canDeliver = !order.isDelivered && order.status !== 'Cancelled';
   const canCancel = order.status !== 'Cancelled' && order.status !== 'Delivered';
 
@@ -62,6 +64,30 @@ const OrderDetailsModal = ({ order, onClose, onPay, onDeliver, onCancel }) => {
           </tbody>
         </table>
       </div>
+
+      {plan && (
+        <div className="border border-line rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-muted text-xs uppercase tracking-wider font-semibold">Payment plan</h3>
+            <span className="text-xs text-muted">{plan.filter((i) => i.paid).length}/{plan.length} paid</span>
+          </div>
+          <div className="space-y-1.5">
+            {plan.map((inst, i) => (
+              <div key={i} className="flex items-center justify-between text-sm">
+                <span className={inst.paid ? 'text-muted line-through' : 'text-fg'}>
+                  {formatCurrency(inst.amount)}
+                  <span className="text-xs text-muted ml-2">
+                    {inst.paid ? `paid ${new Date(inst.paidAt).toLocaleDateString()} (${inst.method || 'EVC Plus'})` : `due ${new Date(inst.dueDate).toLocaleDateString()}`}
+                  </span>
+                </span>
+                {i === nextInstallment && onInstallmentPaid && (
+                  <Button className="text-xs px-2.5 py-1" onClick={() => onInstallmentPaid(i)}>Record cash payment</Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row justify-between gap-4 border-t border-line pt-4">
         <div className="space-y-1">
