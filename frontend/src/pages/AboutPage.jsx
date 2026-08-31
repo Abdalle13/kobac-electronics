@@ -1,129 +1,111 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, ShieldCheck, Zap, Users, Store, Smartphone } from 'lucide-react';
+import { ShoppingBag, ShieldCheck, Zap, Users, Store, Smartphone, Truck } from 'lucide-react';
+
+const stats = [
+  { label: 'Happy customers', value: '10k+', icon: Users },
+  { label: 'Original products', value: '100%', icon: ShieldCheck },
+  { label: 'Support', value: '24/7', icon: Zap },
+];
+
+const highlights = [
+  { icon: Smartphone, title: 'Latest tech', text: 'We bring the newest releases first.' },
+  { icon: Store, title: 'Trusted store', text: 'A physical and digital presence you can rely on.' },
+  { icon: Truck, title: 'Local delivery', text: 'Fast, tracked delivery across Somalia.' },
+];
+
+const values = [
+  {
+    icon: ShoppingBag,
+    title: 'Premium shopping experience',
+    text: 'From browsing the site to unboxing your device, every step is built for your convenience.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Secure payments',
+    text: 'EVC Plus and other trusted local payment methods keep your money safe.',
+  },
+];
+
+const fade = {
+  initial: { opacity: 0, y: 16 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.4 },
+};
 
 const AboutPage = () => {
-  const stats = [
-    { label: 'Happy Customers', value: '10k+', icon: Users, color: 'text-primary', bg: 'bg-primary/10' },
-    { label: 'Original Products', value: '100%', icon: ShieldCheck, color: 'text-success', bg: 'bg-success/10' },
-    { label: 'Fast Delivery', value: '24/7', icon: Zap, color: 'text-accent', bg: 'bg-accent/10' },
-  ];
-
   return (
-    <div className="min-h-screen py-12 sm:py-20 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
+    <div className="py-12 sm:py-20">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-        
-        {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-fg tracking-tight mb-4 sm:mb-6">
-              About <span className="text-primary">KOBAC</span>
-            </h1>
-            <p className="text-muted text-lg md:text-xl leading-relaxed">
-              We are Somalia's premier destination for original, high-quality electronics. 
-              Our mission is to bring the world's best technology right to your doorstep with unmatched reliability and service.
-            </p>
-          </motion.div>
-        </div>
+        {/* Header */}
+        <motion.div {...fade} className="max-w-2xl mb-14 sm:mb-20">
+          <h1 className="text-3xl sm:text-5xl font-bold text-fg tracking-tight mb-4">
+            About <span className="text-primary">Kobac</span>
+          </h1>
+          <p className="text-muted text-base sm:text-lg leading-relaxed">
+            Somalia's destination for original, high-quality electronics. We bring the
+            world's best technology to your doorstep with reliable service and local payment.
+          </p>
+        </motion.div>
 
-        {/* Story Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center mb-14 sm:mb-24">
-          <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
-          >
-            <h2 className="text-3xl font-bold text-fg tracking-tight">Our Story</h2>
-            <div className="w-20 h-1.5 bg-primary rounded-full"></div>
+        {/* Story */}
+        <motion.div {...fade} className="grid md:grid-cols-2 gap-8 md:gap-12 mb-14 sm:mb-20">
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-fg tracking-tight">Our story</h2>
+            <div className="w-14 h-1 bg-primary rounded-full" />
             <p className="text-muted leading-relaxed">
-              Founded with a vision to revolutionize the electronics market in the region, Kobac Electronics started as a small dream to provide authentic devices to tech enthusiasts. 
+              Kobac Electronics started as a small dream to give tech enthusiasts in the
+              region a reliable place to buy authentic devices.
             </p>
             <p className="text-muted leading-relaxed">
-              Today, we have grown into a trusted brand, partnering with global tech giants to ensure that every smartphone, laptop, and accessory you purchase from us is 100% genuine and backed by warranty.
+              Today we are a trusted brand, working with global tech suppliers so that every
+              phone, laptop and accessory you buy from us is genuine and backed by warranty.
             </p>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative"
-          >
-            <div className="glass border border-line rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="flex flex-col gap-8 relative z-10">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 rounded-2xl bg-surface-2 flex items-center justify-center border border-line shrink-0">
-                    <Smartphone className="w-8 h-8 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-fg">Latest Tech</h3>
-                    <p className="text-sm text-muted mt-1">We bring the newest releases first.</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 rounded-2xl bg-surface-2 flex items-center justify-center border border-line shrink-0">
-                    <Store className="w-8 h-8 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-fg">Trusted Store</h3>
-                    <p className="text-sm text-muted mt-1">A physical and digital presence you can rely on.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-14 sm:mb-24">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="glass border border-line rounded-3xl p-6 sm:p-8 text-center shadow-xl hover:border-line transition-colors"
-            >
-              <div className={`w-16 h-16 mx-auto rounded-full ${stat.bg} ${stat.color} flex items-center justify-center mb-6`}>
-                <stat.icon size={28} />
-              </div>
-              <h3 className="text-4xl font-bold text-fg mb-2">{stat.value}</h3>
-              <p className="text-sm font-bold text-muted uppercase tracking-wide">{stat.label}</p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Values Section */}
-        <div className="text-center max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-fg tracking-tight mb-6">Why Choose Us?</h2>
-          <p className="text-muted mb-12">We don't just sell electronics; we sell peace of mind.</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            <div className="bg-surface-2 border border-line rounded-2xl p-6">
-              <ShoppingBag className="w-8 h-8 text-primary mb-4" />
-              <h4 className="text-lg font-bold text-fg mb-2">Premium Shopping Experience</h4>
-              <p className="text-sm text-muted leading-relaxed">From browsing our sleek website to unboxing your new device, every step is designed for your convenience.</p>
-            </div>
-            <div className="bg-surface-2 border border-line rounded-2xl p-6">
-              <ShieldCheck className="w-8 h-8 text-primary mb-4" />
-              <h4 className="text-lg font-bold text-fg mb-2">Secure Payments</h4>
-              <p className="text-sm text-muted leading-relaxed">We support EVC Plus and other trusted local payment methods to ensure your money is always safe.</p>
-            </div>
           </div>
-        </div>
+
+          <div className="border border-line rounded-2xl bg-surface divide-y divide-line">
+            {highlights.map(({ icon: Icon, title, text }) => (
+              <div key={title} className="flex items-start gap-4 p-5">
+                <div className="w-11 h-11 rounded-xl bg-surface-2 border border-line flex items-center justify-center shrink-0">
+                  <Icon className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-fg">{title}</h3>
+                  <p className="text-sm text-muted mt-0.5">{text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div {...fade} className="grid grid-cols-3 gap-3 sm:gap-4 mb-14 sm:mb-20">
+          {stats.map(({ label, value, icon: Icon }) => (
+            <div key={label} className="border border-line rounded-2xl bg-surface p-5 sm:p-6 text-center">
+              <Icon className="w-5 h-5 text-muted mx-auto mb-3" />
+              <p className="text-2xl sm:text-3xl font-bold text-fg">{value}</p>
+              <p className="text-xs sm:text-sm text-muted mt-1">{label}</p>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Values */}
+        <motion.div {...fade}>
+          <h2 className="text-2xl font-bold text-fg tracking-tight mb-2">Why choose us</h2>
+          <p className="text-muted mb-8">We don't just sell electronics, we sell peace of mind.</p>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {values.map(({ icon: Icon, title, text }) => (
+              <div key={title} className="border border-line rounded-2xl bg-surface p-6">
+                <Icon className="w-6 h-6 text-primary mb-3" />
+                <h3 className="font-semibold text-fg mb-1.5">{title}</h3>
+                <p className="text-sm text-muted leading-relaxed">{text}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
       </div>
     </div>
