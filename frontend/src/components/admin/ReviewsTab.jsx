@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Trash2, Star, MessageSquare, Package } from 'lucide-react';
+import { Trash2, Star, MessageSquare, Package, X } from 'lucide-react';
 import api from '../../utils/api';
 import StarRating from '../ui/StarRating';
 import AdminTable, { EmptyRow } from './AdminTable';
@@ -21,6 +20,7 @@ const Stat = ({ icon: Icon, label, value }) => (
 const ReviewsTab = ({ search }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [productFilter, setProductFilter] = useState(null); // { id, name } | null
 
   const load = async () => {
     try {
@@ -68,7 +68,9 @@ const ReviewsTab = ({ search }) => {
 
   const q = search.toLowerCase();
   const rows = reviews.filter(
-    (r) => r.name.toLowerCase().includes(q) || r.productName.toLowerCase().includes(q) || r.comment.toLowerCase().includes(q)
+    (r) =>
+      (!productFilter || r.productId === productFilter.id) &&
+      (r.name.toLowerCase().includes(q) || r.productName.toLowerCase().includes(q) || r.comment.toLowerCase().includes(q))
   );
 
   const maxCount = topProducts[0]?.count || 1;
@@ -85,34 +87,53 @@ const ReviewsTab = ({ search }) => {
       {/* Most reviewed products */}
       {!loading && topProducts.length > 0 && (
         <div className="bg-surface border border-line rounded-2xl p-5">
-          <h3 className="text-sm font-bold text-fg mb-4">Most reviewed products</h3>
-          <div className="space-y-3">
-            {topProducts.map((p, i) => (
-              <div key={p.id} className="flex items-center gap-3">
-                <span className="text-xs text-muted w-4 shrink-0">{i + 1}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-3 mb-1">
-                    <Link to={`/product/${p.id}`} className="text-sm text-fg font-medium truncate hover:text-primary">
-                      {p.name}
-                    </Link>
-                    <span className="flex items-center gap-2 shrink-0 text-xs text-muted">
-                      <StarRating value={p.avg} size={12} />
-                      {p.count} review{p.count !== 1 ? 's' : ''}
-                    </span>
+          <h3 className="text-sm font-bold text-fg mb-1">Most reviewed products</h3>
+          <p className="text-xs text-muted mb-4">Tap a product to see only its reviews below.</p>
+          <div className="space-y-1">
+            {topProducts.map((p, i) => {
+              const active = productFilter?.id === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setProductFilter(active ? null : { id: p.id, name: p.name })}
+                  className={`w-full flex items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors ${
+                    active ? 'bg-primary/10' : 'hover:bg-surface-2'
+                  }`}
+                >
+                  <span className="text-xs text-muted w-4 shrink-0">{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-3 mb-1">
+                      <span className={`text-sm font-medium truncate ${active ? 'text-primary' : 'text-fg'}`}>{p.name}</span>
+                      <span className="flex items-center gap-2 shrink-0 text-xs text-muted">
+                        <StarRating value={p.avg} size={12} />
+                        {p.count} review{p.count !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
+                      <div className="h-full bg-primary rounded-full" style={{ width: `${(p.count / maxCount) * 100}%` }} />
+                    </div>
                   </div>
-                  <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full" style={{ width: `${(p.count / maxCount) * 100}%` }} />
-                  </div>
-                </div>
-              </div>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* All reviews */}
       <div>
-        <h3 className="text-sm font-bold text-fg mb-3">All reviews</h3>
+        <div className="flex items-center gap-3 mb-3">
+          <h3 className="text-sm font-bold text-fg">All reviews</h3>
+          {productFilter && (
+            <button
+              onClick={() => setProductFilter(null)}
+              className="flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 rounded-full pl-3 pr-2 py-1"
+            >
+              {productFilter.name}
+              <X size={13} />
+            </button>
+          )}
+        </div>
         <AdminTable minWidth={760} columns={['Reviewer', 'Rating', 'Comment', 'Product', 'Date', { label: '', className: 'text-right' }]}>
           {loading ? (
             <EmptyRow colSpan={6}>Loading…</EmptyRow>
@@ -123,9 +144,7 @@ const ReviewsTab = ({ search }) => {
               <td className="p-4 text-fg font-medium whitespace-nowrap">{r.name}</td>
               <td className="p-4"><StarRating value={r.rating} size={13} /></td>
               <td className="p-4 text-muted max-w-xs"><p className="line-clamp-3">{r.comment}</p></td>
-              <td className="p-4 whitespace-nowrap">
-                <Link to={`/product/${r.productId}`} className="text-primary hover:underline text-sm">{r.productName}</Link>
-              </td>
+              <td className="p-4 whitespace-nowrap text-sm text-fg">{r.productName}</td>
               <td className="p-4 text-muted text-xs whitespace-nowrap">{new Date(r.createdAt).toLocaleDateString()}</td>
               <td className="p-4 text-right">
                 <button onClick={() => remove(r)} className="p-2 text-danger hover:bg-danger/10 rounded-lg transition-colors" title="Delete review">
