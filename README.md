@@ -1,8 +1,8 @@
 # KOBAC Electronics
 
-A full-stack e-commerce store for premium electronics, built for the Somali market
-with EVC Plus mobile-money checkout and local delivery. MERN stack, with a light/dark
-theme, product reviews, a wishlist, transactional email, and a full admin dashboard.
+A full-stack e-commerce platform built for the Somali market: EVC Plus mobile-money
+checkout, installment payment plans, local delivery with a rider app, and a full
+admin dashboard. MERN stack, light/dark theme, transactional email.
 
 **Live:** [kobac-electronics.vercel.app](https://kobac-electronics.vercel.app/) &nbsp;·&nbsp; **Repo:** [github.com/Abdalle13/kobac-electronics](https://github.com/Abdalle13/kobac-electronics)
 
@@ -12,30 +12,40 @@ theme, product reviews, a wishlist, transactional email, and a full admin dashbo
 
 ### Storefront
 
-- Product catalogue with server-side **filtering** (category, brand, price, rating, in-stock), **sorting** and **pagination** — all reflected in the URL.
-- Product pages with an image gallery, specs, and **verified-purchase reviews & ratings**.
-- **Wishlist** tied to the user account.
-- Cart drawer and a two-step **checkout** (address → payment).
+- Product catalogue with server-side filtering (category, brand, price, rating, in stock), sorting and pagination, all reflected in the URL.
+- Product pages with an image gallery, technical specs, and verified-purchase reviews and ratings.
+- Favorites list tied to the user account.
+- Cart drawer and a two-step checkout (address then payment) with Somali city and district dropdowns.
 - **EVC Plus** (simulated mobile-money gateway with PIN confirmation) and **Cash on Delivery**.
-- Order history and a delivery-progress timeline.
-- **Light / dark theme** with a toggle, remembered per browser.
-- Forgot / reset password by email.
-- Responsive down to small phones.
+- **Installment plans ("qaybo")**: split an EVC Plus order over 2 to 4 monthly payments, pay each one from the order page.
+- Live delivery tracking: the order page shows the courier's progress from Picked Up to Delivered and refreshes on its own.
+- Light and dark theme with a toggle, remembered per browser.
+- Forgot / reset password by email; sessions expire and sign the user out cleanly.
 
 ### Admin dashboard (`/dashboard`)
 
-- **Overview** — revenue, orders, users, catalogue size, and a 7-day sales chart.
-- **Products** — create, edit and delete, with image upload.
-- **Orders** — mark paid / delivered / cancelled, view full order details.
-- **Users** — activate / deactivate accounts.
-- **Payments** — paid sales split by method, plus a daily history.
-- **Settings** — store name, support contact, free-shipping threshold and home banners. Changes propagate to the storefront live.
+- **Overview**: revenue, orders, users, catalogue size, a sales chart and week-over-week trends.
+- **Products**: create, edit and delete with image upload; cost price and margin per product, plus a category breakdown.
+- **Orders**: filter by status, mark paid / delivered / cancelled, assign a delivery rider, record installment cash payments.
+- **Reviews**: moderate every product review and see the most-reviewed products.
+- **Users**: activate / deactivate accounts, change roles, add delivery riders.
+- **Payments**: paid sales split by method, cost of goods, and gross profit with margin.
+- **Report**: a one-click branded PDF sales report.
+- **Settings**: store name, support contact, free-shipping threshold and home banners; changes reach the storefront live.
+
+### Rider app (`/rider`)
+
+- A rider signs in and sees only the orders assigned to them, with the delivery address and payment state.
+- One tap moves a job through Picked Up, On the Way and Delivered; the customer sees it update live.
+- New jobs appear automatically without a refresh.
 
 ### Backend
 
-- JWT auth, bcrypt password hashing, `helmet`, CORS allow-list, and rate-limited auth endpoints.
-- Order prices are **recomputed server-side** from the database — the client can't set them.
-- **Atomic stock reservation** so concurrent orders can't oversell.
+- JWT auth, bcrypt hashing, `helmet`, a CORS allow-list, and rate-limited auth endpoints.
+- Role-based access: Customer, Rider and Admin, enforced on every route.
+- Order prices are recomputed server-side from the database; the client cannot set them.
+- Atomic stock reservation so concurrent orders cannot oversell.
+- Delivery status can only move forward, and only the assigned rider or an admin can change it.
 - Transactional email (welcome, order confirmation, payment received, delivered, password reset) via SMTP.
 
 ---
@@ -48,6 +58,7 @@ theme, product reviews, a wishlist, transactional email, and a full admin dashbo
 | Backend    | Node.js, Express 5, Mongoose 9, JSON Web Tokens, Nodemailer, Multer, Helmet           |
 | Database   | MongoDB Atlas                                                                         |
 | Images     | ImageKit.io                                                                           |
+| PDF        | jsPDF + jspdf-autotable (lazy-loaded)                                                 |
 | Deployment | Vercel (frontend + backend serverless)                                                |
 
 ---
@@ -61,7 +72,7 @@ theme, product reviews, a wishlist, transactional email, and a full admin dashbo
 - An ImageKit account (for product image uploads)
 - An SMTP account for email (a Gmail app password works)
 
-### 1. Clone & install
+### 1. Clone and install
 
 ```bash
 git clone https://github.com/Abdalle13/kobac-electronics.git
@@ -129,7 +140,7 @@ real order data unless you add `--force`.
 
 For a fuller demo, `scripts/seedDemo.js` **adds** (never deletes) a wider catalogue,
 15 Somali customers, ~30 orders across every status and payment method, product
-reviews from customers who ordered, and delivery riders:
+reviews, delivery riders, and cost prices for the profit report:
 
 ```bash
 cd backend
@@ -140,20 +151,27 @@ node scripts/seedDemo.js --backfill-costs # cost price everywhere for the profit
 node scripts/seedDemo.js --check          # just print current counts
 ```
 
+The seeded riders sign in with `rider.cabdi@gmail.com` / `password123` (and
+`rider.maxamed@`, `rider.xasan@`).
+
 ---
 
-## EVC Plus demo checkout
+## Payment and delivery, simulated
 
-The payment gateway is simulated. At checkout, a valid Somali mobile number and the
+The EVC Plus gateway is simulated: at checkout a valid Somali mobile number and the
 demo PIN (`1234`) always succeed; any other PIN is rejected. No real money moves.
+A production build would integrate the Hormuud WAAFI merchant API.
+
+Installment plans, delivery assignment and rider status updates are all real
+application logic against the database; only the payment authorization is faked.
 
 ---
 
 ## Deployment
 
 Frontend and backend both deploy to Vercel. Set the same environment variables on the
-backend project, and set `FRONTEND_URL` to your deployed frontend origin so CORS is
-locked down.
+backend project. `FRONTEND_URL` may be blank; CORS also allows localhost and any
+`*.vercel.app` origin.
 
 ---
 
