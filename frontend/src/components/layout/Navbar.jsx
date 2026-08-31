@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   ShoppingCart, Search, Menu, LogOut, Settings,
-  Package, ShieldCheck, Zap, X, Mail, Home, Store, Info, Heart,
+  Package, ShieldCheck, Zap, X, Mail, Home, Store, Info, Heart, ChevronDown,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import CartDrawer from './CartDrawer';
@@ -144,15 +144,18 @@ const Navbar = () => {
 
             {/* Desktop profile dropdown */}
             {userInfo && (
-              <div className="hidden lg:block relative">
+              <div className="hidden lg:block relative ml-1">
                 <button
                   onClick={() => setIsUserMenuOpen((o) => !o)}
-                  className="flex items-center gap-2 bg-surface border border-line rounded-full pl-1.5 pr-3 py-1.5 hover:bg-surface-2 transition-all ml-1"
+                  className={`flex items-center gap-2 rounded-full pl-1.5 pr-2.5 py-1.5 border transition-all ${
+                    isUserMenuOpen ? 'bg-surface-2 border-line' : 'bg-surface border-line hover:bg-surface-2'
+                  }`}
                 >
                   <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-[11px] font-bold text-on-primary">
                     {userInfo.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-xs font-medium text-muted max-w-[80px] truncate">{userInfo.name.split(' ')[0]}</span>
+                  <span className="text-xs font-medium text-fg max-w-[90px] truncate">{userInfo.name.split(' ')[0]}</span>
+                  <ChevronDown size={14} className={`text-muted transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
@@ -164,17 +167,41 @@ const Navbar = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.14 }}
-                        className="absolute right-0 mt-3 w-52 bg-surface border border-line rounded-2xl shadow-xl z-50 overflow-hidden p-1.5"
+                        className="absolute right-0 mt-3 w-64 bg-surface border border-line rounded-2xl shadow-xl z-50 overflow-hidden"
                       >
-                        <Link to="/settings" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted hover:text-fg hover:bg-surface-2 transition-all">
-                          <Settings size={15} className="text-primary" /> Settings
-                        </Link>
-                        <Link to="/my-orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted hover:text-fg hover:bg-surface-2 transition-all">
-                          <Package size={15} className="text-primary" /> Orders
-                        </Link>
-                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-danger hover:bg-danger/10 transition-all text-left">
-                          <LogOut size={15} /> Log out
-                        </button>
+                        {/* Identity */}
+                        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-line">
+                          <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-on-primary shrink-0">
+                            {userInfo.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-fg truncate">{userInfo.name}</p>
+                            <p className="text-xs text-muted truncate">{userInfo.email}</p>
+                          </div>
+                        </div>
+
+                        <div className="p-1.5">
+                          {isAdmin && (
+                            <Link to="/dashboard" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
+                              <ShieldCheck size={15} className="text-primary" /> Admin Dashboard
+                            </Link>
+                          )}
+                          <Link to="/my-orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
+                            <Package size={15} className="text-muted" /> My Orders
+                          </Link>
+                          <Link to="/wishlist" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
+                            <Heart size={15} className="text-muted" /> Wishlist
+                          </Link>
+                          <Link to="/settings" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-fg hover:bg-surface-2 transition-all">
+                            <Settings size={15} className="text-muted" /> Settings
+                          </Link>
+                        </div>
+
+                        <div className="p-1.5 border-t border-line">
+                          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-danger hover:bg-danger/10 transition-all text-left">
+                            <LogOut size={15} /> Log out
+                          </button>
+                        </div>
                       </motion.div>
                     </>
                   )}
