@@ -13,7 +13,8 @@ export async function downloadSalesReport({ storeName, userCount, data }) {
 
   const {
     totalSales = 0, numOrders = 0, numPaidOrders = 0, avgOrderValue = 0,
-    evcSales = 0, codSales = 0, statusBreakdown = {}, topProducts = [], salesByCategory = [],
+    evcSales = 0, codSales = 0, goodsRevenue = 0, goodsCost = 0, grossProfit = 0, profitMargin = 0,
+    statusBreakdown = {}, topProducts = [], salesByCategory = [],
   } = data;
 
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
@@ -65,6 +66,12 @@ export async function downloadSalesReport({ storeName, userCount, data }) {
   table('Revenue by payment method', ['Method', 'Revenue'], [
     ['EVC Plus', formatCurrency(evcSales)],
     ['Cash on Delivery', formatCurrency(codSales)],
+  ]);
+
+  table('Profitability', ['Metric', 'Amount'], [
+    ['Goods revenue', formatCurrency(goodsRevenue)],
+    ['Cost of goods', formatCurrency(goodsCost)],
+    ['Gross profit', `${formatCurrency(grossProfit)} (${profitMargin.toFixed(1)}%)`],
   ]);
 
   table('Orders by status', ['Status', 'Count'],

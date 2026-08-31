@@ -49,7 +49,8 @@ const ReportTab = () => {
 
   const {
     totalSales = 0, numOrders = 0, numPaidOrders = 0, avgOrderValue = 0,
-    evcSales = 0, codSales = 0, statusBreakdown = {}, topProducts = [], salesByCategory = [],
+    evcSales = 0, codSales = 0, goodsRevenue = 0, goodsCost = 0, grossProfit = 0, profitMargin = 0,
+    statusBreakdown = {}, topProducts = [], salesByCategory = [],
   } = data;
 
   const generated = new Date().toLocaleString();
@@ -86,6 +87,14 @@ const ReportTab = () => {
           <h3 className="text-sm font-bold text-fg mb-2">Revenue by payment method</h3>
           <Row label="EVC Plus" value={formatCurrency(evcSales)} />
           <Row label="Cash on Delivery" value={formatCurrency(codSales)} />
+        </div>
+
+        {/* Profitability */}
+        <div>
+          <h3 className="text-sm font-bold text-fg mb-2">Profitability</h3>
+          <Row label="Goods revenue" value={formatCurrency(goodsRevenue)} />
+          <Row label="Cost of goods" value={formatCurrency(goodsCost)} />
+          <Row label="Gross profit" value={`${formatCurrency(grossProfit)} (${profitMargin.toFixed(1)}%)`} />
         </div>
 
         {/* Status breakdown */}

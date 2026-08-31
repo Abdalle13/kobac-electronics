@@ -101,12 +101,14 @@ const ProductsTab = ({ search }) => {
         </Button>
       </div>
 
-      <AdminTable columns={['Product', 'Price', 'Category', { label: 'Stock', className: 'hidden lg:table-cell' }, { label: 'Actions', className: 'text-right' }]}>
+      <AdminTable columns={['Product', 'Price', { label: 'Margin', className: 'hidden lg:table-cell' }, 'Category', { label: 'Stock', className: 'hidden lg:table-cell' }, { label: 'Actions', className: 'text-right' }]}>
         {loading ? (
-          <EmptyRow colSpan={5}>Loading…</EmptyRow>
+          <EmptyRow colSpan={6}>Loading…</EmptyRow>
         ) : rows.length === 0 ? (
-          <EmptyRow colSpan={5}>No products found.</EmptyRow>
-        ) : rows.map((p) => (
+          <EmptyRow colSpan={6}>No products found.</EmptyRow>
+        ) : rows.map((p) => {
+          const margin = p.costPrice > 0 && p.price > 0 ? ((p.price - p.costPrice) / p.price) * 100 : null;
+          return (
           <tr key={p._id} className="hover:bg-surface-2 transition-colors">
             <td className="p-4">
               <div className="flex items-center gap-3">
@@ -118,6 +120,13 @@ const ProductsTab = ({ search }) => {
               </div>
             </td>
             <td className="p-4 text-fg">{formatCurrency(p.price)}</td>
+            <td className="p-4 hidden lg:table-cell text-sm">
+              {margin === null ? (
+                <span className="text-muted">—</span>
+              ) : (
+                <span className={margin >= 0 ? 'text-success font-medium' : 'text-danger font-medium'}>{margin.toFixed(0)}%</span>
+              )}
+            </td>
             <td className="p-4"><Badge variant="neutral">{p.category}</Badge></td>
             <td className="p-4 hidden lg:table-cell">
               <span className={p.countInStock > 0 ? 'text-success font-semibold' : 'text-danger font-semibold'}>{p.countInStock}</span>
@@ -131,7 +140,8 @@ const ProductsTab = ({ search }) => {
               </button>
             </td>
           </tr>
-        ))}
+          );
+        })}
       </AdminTable>
 
       {modal && <ProductModal product={modal === 'new' ? null : modal} onClose={() => setModal(null)} />}

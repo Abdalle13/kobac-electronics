@@ -7,7 +7,7 @@ import Modal from './Modal';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 
-const blank = { name: '', brand: '', category: 'Phone', description: '', price: 0, countInStock: 0, ram: '', storage: '', processor: '' };
+const blank = { name: '', brand: '', category: 'Phone', description: '', price: 0, costPrice: 0, countInStock: 0, ram: '', storage: '', processor: '' };
 
 const ProductModal = ({ product, onClose }) => {
   const dispatch = useDispatch();
@@ -16,7 +16,8 @@ const ProductModal = ({ product, onClose }) => {
     editing
       ? {
           name: product.name, brand: product.brand, category: product.category,
-          description: product.description, price: product.price, countInStock: product.countInStock,
+          description: product.description, price: product.price, costPrice: product.costPrice || 0,
+          countInStock: product.countInStock,
           ram: product.technicalSpecs?.ram || '', storage: product.technicalSpecs?.storage || '',
           processor: product.technicalSpecs?.processor || '',
         }
@@ -40,7 +41,7 @@ const ProductModal = ({ product, onClose }) => {
       }
       const payload = {
         name: form.name, brand: form.brand, category: form.category, description: form.description,
-        price: Number(form.price), countInStock: Number(form.countInStock),
+        price: Number(form.price), costPrice: Number(form.costPrice) || 0, countInStock: Number(form.countInStock),
         technicalSpecs: { ram: form.ram, storage: form.storage, processor: form.processor },
         images: image ? [image] : [],
       };
@@ -90,8 +91,20 @@ const ProductModal = ({ product, onClose }) => {
             />
             {editing && !imageFile && <p className="text-xs text-muted mt-1">Leave blank to keep current image</p>}
           </div>
-          <Input label="Price ($)" type="number" step="0.01" required value={form.price} onChange={set('price')} />
+          <Input label="Sale price ($)" type="number" step="0.01" required value={form.price} onChange={set('price')} />
+          <Input label="Cost price ($)" type="number" step="0.01" min="0" placeholder="What you pay the supplier" value={form.costPrice} onChange={set('costPrice')} />
           <Input label="Stock Count" type="number" required value={form.countInStock} onChange={set('countInStock')} />
+          {Number(form.price) > 0 && Number(form.costPrice) > 0 && (
+            <div className="flex flex-col mb-5 justify-end">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted mb-1.5">Margin</p>
+              <p className="text-sm font-semibold text-fg">
+                ${(Number(form.price) - Number(form.costPrice)).toFixed(2)}{' '}
+                <span className="text-muted font-normal">
+                  ({(((Number(form.price) - Number(form.costPrice)) / Number(form.price)) * 100).toFixed(0)}%)
+                </span>
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col mb-5">

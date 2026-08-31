@@ -22,6 +22,7 @@ const PaymentsTab = () => {
 
   const {
     totalSales = 0, numOrders = 0, evcSales = 0, codSales = 0,
+    goodsRevenue = 0, goodsCost = 0, grossProfit = 0, profitMargin = 0,
     salesByDay = {}, topProducts = [], salesByCategory = [],
   } = data;
 
@@ -44,6 +45,28 @@ const PaymentsTab = () => {
           <Meter value={codSales} total={totalSales} tone="bg-success" />
         </div>
       </div>
+
+      {/* Profit */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="bg-surface border border-line rounded-2xl p-6">
+          <p className="text-muted text-sm font-semibold mb-2">Goods Revenue</p>
+          <p className="text-2xl font-bold text-fg">{formatCurrency(goodsRevenue)}</p>
+          <p className="text-xs text-muted mt-2">Items only, excludes tax and delivery</p>
+        </div>
+        <div className="bg-surface border border-line rounded-2xl p-6">
+          <p className="text-muted text-sm font-semibold mb-2">Cost of Goods</p>
+          <p className="text-2xl font-bold text-fg">{formatCurrency(goodsCost)}</p>
+          <p className="text-xs text-muted mt-2">Supplier cost of what sold</p>
+        </div>
+        <div className="bg-surface border border-line rounded-2xl p-6">
+          <p className="text-muted text-sm font-semibold mb-2">Gross Profit</p>
+          <p className={`text-2xl font-bold ${grossProfit >= 0 ? 'text-success' : 'text-danger'}`}>{formatCurrency(grossProfit)}</p>
+          <p className="text-xs text-muted mt-2">{profitMargin.toFixed(1)}% margin</p>
+        </div>
+      </div>
+      {goodsCost === 0 && goodsRevenue > 0 && (
+        <p className="text-xs text-muted -mt-3">Set a cost price on your products to see real profit.</p>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Sales by category */}
@@ -85,7 +108,10 @@ const PaymentsTab = () => {
                     <span className="text-muted text-xs w-4 shrink-0">{i + 1}</span>
                     <div className="min-w-0">
                       <p className="text-fg font-medium truncate">{p.name}</p>
-                      <p className="text-xs text-muted">{p.units} sold</p>
+                      <p className="text-xs text-muted">
+                        {p.units} sold
+                        {p.cost > 0 && <span className="text-success"> · {formatCurrency(p.profit)} profit</span>}
+                      </p>
                     </div>
                   </div>
                   <span className="text-fg font-semibold shrink-0 ml-3">{formatCurrency(p.revenue)}</span>
