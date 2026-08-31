@@ -23,11 +23,10 @@ const getTransporter = () => {
     secure: port === 465, // 465 = implicit TLS, 587 = STARTTLS
     requireTLS: port === 587,
     auth: { user: EMAIL_USER, pass: EMAIL_PASS },
-    // The send now runs before the HTTP response, so cap how long a stuck
-    // SMTP server can hold up the request.
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    // Keep a stuck SMTP server from holding a request open for long.
+    connectionTimeout: 7000,
+    greetingTimeout: 7000,
+    socketTimeout: 10000,
   });
 
   return transporter;
@@ -57,6 +56,21 @@ export const sendEmail = async ({ to, subject, html, text, replyTo }) => {
     console.error(`Email failed [${subject}] -> ${to}: ${err.message}`.red);
     return { error: err.message };
   }
+};
+
+/**
+ * Fire a transactional email tied to a request.
+ * - production: awaited, so a serverless function isn't frozen before the
+ *   mail is flushed (work after res.json() can otherwise be dropped).
+ * - development: fire-and-forget, so a slow SMTP call — or a `node --watch`
+ *   restart mid-send — can't turn into an ECONNRESET on the client.
+ */
+export const queueEmail = (opts) => {
+  if (process.env.NODE_ENV === 'production') {
+    return sendEmail(opts);
+  }
+  sendEmail(opts).catch(() => {});
+  return Promise.resolve({ queued: true });
 };
 
 export default sendEmail;

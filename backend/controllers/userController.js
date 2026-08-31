@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
-import sendEmail from '../utils/sendEmail.js';
+import sendEmail, { queueEmail } from '../utils/sendEmail.js';
 import { welcomeEmail, passwordResetEmail } from '../utils/emailTemplates.js';
 
 // @desc    Auth user & get token
@@ -49,11 +49,10 @@ const registerUser = async (req, res) => {
   });
 
   if (user) {
-    // Send the welcome email BEFORE responding. On serverless (Vercel) the
-    // function stops the moment the response is flushed, so anything awaited
-    // after res.json() often never runs. sendEmail never throws.
+    // In prod this is awaited (serverless would otherwise drop it); in dev it
+    // is fire-and-forget so a slow send can't stall the response.
     const { subject, html } = welcomeEmail(user.name);
-    await sendEmail({ to: user.email, subject, html });
+    await queueEmail({ to: user.email, subject, html });
 
     res.status(201).json({
       _id: user._id,

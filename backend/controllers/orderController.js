@@ -1,7 +1,7 @@
 import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js';
 import Settings from '../models/settingsModel.js';
-import sendEmail from '../utils/sendEmail.js';
+import { queueEmail } from '../utils/sendEmail.js';
 import { orderConfirmationEmail, paymentReceivedEmail, orderDeliveredEmail } from '../utils/emailTemplates.js';
 
 const TAX_RATE = 0.05;
@@ -108,9 +108,9 @@ const addOrderItems = async (req, res) => {
   }
 
   // Send the confirmation email BEFORE responding — on serverless the function
-  // can be frozen the instant the response is flushed. sendEmail never throws.
+  // can be frozen the instant the response is flushed. queueEmail never throws.
   const { subject, html } = orderConfirmationEmail(createdOrder, req.user);
-  await sendEmail({ to: req.user.email, subject, html });
+  await queueEmail({ to: req.user.email, subject, html });
 
   res.status(201).json(createdOrder);
 };
@@ -167,7 +167,7 @@ const updateOrderToPaid = async (req, res) => {
     const updatedOrder = await order.save();
 
     const { subject, html } = paymentReceivedEmail(updatedOrder, req.user);
-    await sendEmail({ to: req.user.email, subject, html });
+    await queueEmail({ to: req.user.email, subject, html });
 
     res.json(updatedOrder);
   } else {
@@ -206,7 +206,7 @@ const updateOrderToDelivered = async (req, res) => {
 
     if (order.user?.email) {
       const { subject, html } = orderDeliveredEmail(updatedOrder, order.user);
-      await sendEmail({ to: order.user.email, subject, html });
+      await queueEmail({ to: order.user.email, subject, html });
     }
 
     res.json(updatedOrder);
@@ -234,7 +234,7 @@ const updateOrderToPaidAdmin = async (req, res) => {
 
     if (order.user?.email) {
       const { subject, html } = paymentReceivedEmail(updatedOrder, order.user);
-      await sendEmail({ to: order.user.email, subject, html });
+      await queueEmail({ to: order.user.email, subject, html });
     }
 
     res.json(updatedOrder);
