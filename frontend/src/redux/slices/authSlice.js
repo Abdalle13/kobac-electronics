@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../utils/api';
+import { readStoredUser } from '../../utils/authToken';
 
 // Turn an axios error into a message worth showing a user.
 const toMessage = (error) => {
@@ -10,9 +11,8 @@ const toMessage = (error) => {
   return error.message || 'Something went wrong. Please try again.';
 };
 
-const userInfoFromStorage = localStorage.getItem('userInfo')
-  ? JSON.parse(localStorage.getItem('userInfo'))
-  : null;
+// null if there is no stored user or its token has already expired
+const userInfoFromStorage = readStoredUser();
 
 const initialState = {
   userInfo: userInfoFromStorage,

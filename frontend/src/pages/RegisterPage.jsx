@@ -19,11 +19,11 @@ const RegisterPage = () => {
 
   const { userInfo, loading, error } = useSelector((state) => state.auth);
 
-  const redirect = location.search ? location.search.split('=')[1] : '/';
+  const redirect = new URLSearchParams(location.search).get('redirect');
 
   useEffect(() => {
     if (userInfo) {
-      navigate(redirect);
+      navigate(redirect || (userInfo.role?.toLowerCase() === 'admin' ? '/dashboard' : '/'));
     }
   }, [userInfo, navigate, redirect]);
 
@@ -113,7 +113,7 @@ const RegisterPage = () => {
 
         <div className="mt-8 pt-8 border-t border-line text-center text-[13px] text-muted">
           Already have an account?{' '}
-          <Link to={redirect ? `/login?redirect=${redirect}` : '/login'} className="text-fg font-bold hover:text-primary transition-colors">
+          <Link to={redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : '/login'} className="text-fg font-bold hover:text-primary transition-colors">
             Sign In Here
           </Link>
         </div>

@@ -16,18 +16,21 @@ const LoginPage = () => {
 
   const { userInfo, loading, error } = useSelector((state) => state.auth);
 
-  // redirect to where the user was trying to go or home
-  const redirect = location.search ? location.search.split('=')[1] : '/';
+  const params = new URLSearchParams(location.search);
+  const redirect = params.get('redirect');
+  const expired = params.get('expired');
 
   useEffect(() => {
     if (userInfo) {
-      if (!location.search && userInfo.role && userInfo.role.toLowerCase() === 'admin') {
+      if (redirect) {
+        navigate(redirect);
+      } else if (userInfo.role && userInfo.role.toLowerCase() === 'admin') {
         navigate('/dashboard');
       } else {
-        navigate(redirect);
+        navigate('/');
       }
     }
-  }, [userInfo, navigate, redirect, location.search]);
+  }, [userInfo, navigate, redirect]);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -50,6 +53,12 @@ const LoginPage = () => {
           <p className="text-muted text-sm mt-2">Welcome back! Please enter your details.</p>
         </div>
         
+        {expired && !error && (
+          <div className="bg-surface-2 border border-line text-muted px-4 py-2.5 rounded-xl mb-5 text-sm text-center">
+            Your session expired. Please sign in again.
+          </div>
+        )}
+
         {error && (
           <div className="bg-danger/10 border border-danger/30 text-danger px-4 py-2.5 rounded-xl mb-5 text-sm text-center">
             {error}
@@ -93,7 +102,7 @@ const LoginPage = () => {
 
         <div className="mt-8 pt-8 border-t border-line text-center text-[13px] text-muted">
           New Customer?{' '}
-          <Link to={redirect ? `/register?redirect=${redirect}` : '/register'} className="text-fg font-bold hover:text-primary transition-colors">
+          <Link to={redirect ? `/register?redirect=${encodeURIComponent(redirect)}` : '/register'} className="text-fg font-bold hover:text-primary transition-colors">
             Register Here
           </Link>
         </div>

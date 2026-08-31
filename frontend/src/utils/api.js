@@ -1,37 +1,41 @@
 import axios from 'axios';
+import { isTokenExpired, clearStoredUser } from './authToken';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
 });
 
-// Request interceptor to attach the JWT token
+// Attach the JWT, unless it has already expired.
 api.interceptors.request.use(
   (config) => {
-    // We will retrieve the token from localStorage or Redux store
-    // Assuming we store userInfo in localStorage as strings via Redux
-    const userInfoString = localStorage.getItem('userInfo');
-    if (userInfoString) {
-      const userInfo = JSON.parse(userInfoString);
-      if (userInfo && userInfo.token) {
+    try {
+      const raw = localStorage.getItem('userInfo');
+      const userInfo = raw ? JSON.parse(raw) : null;
+      if (userInfo?.token && !isTokenExpired(userInfo.token)) {
         config.headers.Authorization = `Bearer ${userInfo.token}`;
       }
+    } catch {
+      /* ignore malformed storage */
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor (optional, but good for handling 401s globally)
+// On a 401 for anything other than the sign-in / register calls themselves,
+// the session is dead: clear it and send the user to the login page once.
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // You could dispatch a logout action here if you want
-      // For now, we'll just let the components handle it or add custom logic later
+    const status = error.response?.status;
+    const url = error.config?.url || '';
+    const isAuthAttempt = url.includes('/users/login') || url.includes('/users/register');
+
+    if (status === 401 && !isAuthAttempt && localStorage.getItem('userInfo')) {
+      clearStoredUser();
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.assign('/login?expired=1');
+      }
     }
     return Promise.reject(error);
   }
