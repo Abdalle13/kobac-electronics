@@ -69,6 +69,7 @@ const addOrderItems = async (req, res) => {
       qty,
       image: updated.images?.[0] || item.image,
       price: updated.price, // authoritative — never trust the client
+      cost: updated.costPrice || 0, // snapshot for profit reporting
       product: updated._id,
     });
   }
@@ -304,6 +305,18 @@ const getOrderSummary = async (req, res) => {
       .filter((o) => o.paymentMethod === 'Cash on Delivery')
       .reduce((acc, o) => acc + o.totalPrice, 0);
 
+    // Profit on goods: item revenue minus the cost snapshot on each line
+    const goodsRevenue = paidOrders.reduce(
+      (acc, o) => acc + o.orderItems.reduce((s, i) => s + i.price * i.qty, 0),
+      0
+    );
+    const goodsCost = paidOrders.reduce(
+      (acc, o) => acc + o.orderItems.reduce((s, i) => s + (i.cost || 0) * i.qty, 0),
+      0
+    );
+    const grossProfit = goodsRevenue - goodsCost;
+    const profitMargin = goodsRevenue > 0 ? (grossProfit / goodsRevenue) * 100 : 0;
+
     // Order count by status
     const statusBreakdown = orders.reduce((acc, o) => {
       const s = o.status || 'Pending';
@@ -348,10 +361,14 @@ const getOrderSummary = async (req, res) => {
           name: { $first: '$orderItems.name' },
           units: { $sum: '$orderItems.qty' },
           revenue: { $sum: { $multiply: ['$orderItems.price', '$orderItems.qty'] } },
+          cost: { $sum: { $multiply: [{ $ifNull: ['$orderItems.cost', 0] }, '$orderItems.qty'] } },
         },
       },
       { $lookup: { from: 'products', localField: '_id', foreignField: '_id', as: 'p' } },
-      { $addFields: { category: { $ifNull: [{ $arrayElemAt: ['$p.category', 0] }, 'Other'] } } },
+      { $addFields: {
+          category: { $ifNull: [{ $arrayElemAt: ['$p.category', 0] }, 'Other'] },
+          profit: { $subtract: ['$revenue', '$cost'] },
+      } },
       { $project: { p: 0 } },
       { $sort: { revenue: -1 } },
     ]);
@@ -373,6 +390,10 @@ const getOrderSummary = async (req, res) => {
       avgOrderValue,
       evcSales,
       codSales,
+      goodsRevenue,
+      goodsCost,
+      grossProfit,
+      profitMargin,
       statusBreakdown,
       salesTrend,
       ordersTrend,

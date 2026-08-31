@@ -173,6 +173,36 @@ async function seedReviews() {
   console.log(`Added ${added} reviews across ${touched.size} products`);
 }
 
+// Give every product a cost price, then stamp the matching cost onto every
+// existing order line so the profit report has data.
+async function backfillCosts() {
+  const products = await Product.find({});
+  const costById = new Map();
+  let pFixed = 0;
+  for (const p of products) {
+    if (!p.costPrice || p.costPrice === 0) {
+      p.costPrice = round2(p.price * (0.6 + Math.random() * 0.2));
+      await p.save();
+      pFixed++;
+    }
+    costById.set(p._id.toString(), p.costPrice);
+  }
+
+  const orders = await Order.find({});
+  let oFixed = 0;
+  for (const o of orders) {
+    let changed = false;
+    for (const it of o.orderItems) {
+      if (!it.cost) {
+        it.cost = costById.get(it.product.toString()) || round2(it.price * 0.7);
+        changed = true;
+      }
+    }
+    if (changed) { await o.save(); oFixed++; }
+  }
+  console.log(`Backfilled cost on ${pFixed} products and ${oFixed} orders`);
+}
+
 async function main() {
   await mongoose.connect(process.env.MONGODB_URI);
 
@@ -192,16 +222,35 @@ async function main() {
     return;
   }
 
+  if (process.argv.includes('--backfill-costs')) {
+    await backfillCosts();
+    await mongoose.disconnect();
+    return;
+  }
+
   const admin = await User.findOne({ role: 'Admin' });
   if (!admin) throw new Error('No admin user found - cannot attribute products.');
 
-  // 1. Products (skip any whose name already exists)
+  // 1. Products (skip any whose name already exists). Cost price ~ 60-80% of sale.
   const have = new Set((await Product.find({}, 'name')).map((p) => p.name));
   const toInsert = demoProducts
     .filter((p) => !have.has(p.name))
-    .map((p) => ({ ...p, images: [IMG(p.category)], user: admin._id, rating: 0, numReviews: 0, reviews: [] }));
+    .map((p) => ({
+      ...p,
+      costPrice: round2(p.price * (0.6 + Math.random() * 0.2)),
+      images: [IMG(p.category)],
+      user: admin._id, rating: 0, numReviews: 0, reviews: [],
+    }));
   const insertedProducts = toInsert.length ? await Product.insertMany(toInsert) : [];
   console.log(`Added ${insertedProducts.length} products`);
+
+  // Backfill a cost price on any product that still has none
+  const noCost = await Product.find({ $or: [{ costPrice: { $exists: false } }, { costPrice: 0 }] });
+  for (const p of noCost) {
+    p.costPrice = round2(p.price * (0.6 + Math.random() * 0.2));
+    await p.save();
+  }
+  if (noCost.length) console.log(`Backfilled cost price on ${noCost.length} products`);
 
   // 2. Somali customers (skip existing emails)
   const createdUsers = [];
@@ -242,6 +291,7 @@ async function main() {
       qty,
       image: prod.images?.[0],
       price: prod.price,
+      cost: prod.costPrice || round2(prod.price * 0.7),
       product: prod._id,
     }));
 

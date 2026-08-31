@@ -228,6 +228,7 @@ const updateProduct = async (req, res) => {
   const {
     name,
     price,
+    costPrice,
     description,
     images,
     brand,
@@ -241,6 +242,7 @@ const updateProduct = async (req, res) => {
   if (product) {
     product.name = name;
     product.price = price;
+    if (costPrice !== undefined) product.costPrice = Number(costPrice) || 0;
     product.description = description;
     product.images = images;
     product.brand = brand;
