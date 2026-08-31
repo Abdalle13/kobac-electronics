@@ -5,7 +5,7 @@ import { Package, ChevronRight, Clock, CheckCircle2, AlertCircle } from 'lucide-
 import { listMyOrders } from '../redux/slices/orderSlice';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { formatCurrency } from '../utils/formatter';
 
 const MyOrdersPage = () => {
@@ -13,14 +13,17 @@ const MyOrdersPage = () => {
   const navigate = useNavigate();
   const { orders, loading, error } = useSelector((state) => state.order);
   const { userInfo } = useSelector((state) => state.auth);
+  const isAdmin = userInfo?.role?.toLowerCase() === 'admin';
 
   useEffect(() => {
     if (!userInfo) {
       navigate('/login');
-    } else {
+    } else if (!isAdmin) {
       dispatch(listMyOrders());
     }
-  }, [dispatch, userInfo, navigate]);
+  }, [dispatch, userInfo, isAdmin, navigate]);
+
+  if (isAdmin) return <Navigate to="/dashboard" replace />;
 
   const containerVariants = {
     hidden: { opacity: 0 },

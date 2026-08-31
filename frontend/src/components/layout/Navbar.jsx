@@ -86,7 +86,6 @@ const Navbar = () => {
                 { to: '/shop', label: 'Shop' },
                 { to: '/about', label: 'About' },
                 { to: '/contact', label: 'Support' },
-                ...(userInfo ? [{ to: '/my-orders', label: 'Orders' }] : []),
               ].map(({ to, label }) => (
                 <NavLink
                   key={to}
