@@ -127,6 +127,17 @@ This loads a sample catalogue and two demo accounts:
 `data:import` and `data:destroy` replace the whole database; they will not run over
 real order data unless you add `--force`.
 
+For a fuller demo, `scripts/seedDemo.js` **adds** (never deletes) a wider catalogue,
+15 Somali customers, ~30 orders across every status and payment method, and product
+reviews from customers who ordered:
+
+```bash
+cd backend
+node scripts/seedDemo.js            # products, customers, orders
+node scripts/seedDemo.js --reviews  # reviews from those customers
+node scripts/seedDemo.js --check    # just print current counts
+```
+
 ---
 
 ## EVC Plus demo checkout
