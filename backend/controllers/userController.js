@@ -12,22 +12,28 @@ const authUser = async (req, res) => {
 
   const user = await User.findOne({ email });
 
-  if (user && user.status === 'INACTIVE') {
+  if (!user) {
+    res.status(401).json({ message: 'No account found with this email address.' });
+    return;
+  }
+
+  if (user.status === 'INACTIVE') {
     res.status(403).json({ message: 'Account is inactive. Please contact support.' });
     return;
   }
 
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      token: generateToken(res, user._id),
-    });
-  } else {
-    res.status(401).json({ message: 'Invalid email or password' });
+  if (!(await user.matchPassword(password))) {
+    res.status(401).json({ message: 'The password is incorrect.' });
+    return;
   }
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    token: generateToken(res, user._id),
+  });
 };
 
 // @desc    Register a new user
