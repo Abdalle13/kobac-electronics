@@ -1,5 +1,6 @@
 import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js';
+import User from '../models/userModel.js';
 import Settings from '../models/settingsModel.js';
 import { queueEmail } from '../utils/sendEmail.js';
 import { orderConfirmationEmail, paymentReceivedEmail, orderDeliveredEmail } from '../utils/emailTemplates.js';
@@ -162,10 +163,9 @@ const addOrderItems = async (req, res) => {
 // @route   GET /api/orders/:id
 // @access  Private (owner or admin)
 const getOrderById = async (req, res) => {
-  const order = await Order.findById(req.params.id).populate(
-    'user',
-    'name email'
-  );
+  const order = await Order.findById(req.params.id)
+    .populate('user', 'name email')
+    .populate('delivery.rider', 'name email');
 
   if (!order) {
     res.status(404);
@@ -235,8 +235,114 @@ const getMyOrders = async (req, res) => {
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = async (req, res) => {
-  const orders = await Order.find({}).populate('user', 'id name email');
+  const orders = await Order.find({})
+    .populate('user', 'id name email')
+    .populate('delivery.rider', 'name email');
   res.json(orders);
+};
+
+const DELIVERY_FLOW = ['Unassigned', 'Assigned', 'Picked Up', 'On the Way', 'Delivered'];
+
+// @desc    Orders assigned to the logged-in rider
+// @route   GET /api/orders/rider
+// @access  Private/Rider
+const getRiderOrders = async (req, res) => {
+  const orders = await Order.find({ 'delivery.rider': req.user._id })
+    .populate('user', 'name email')
+    .sort({ 'delivery.assignedAt': -1 });
+  res.json(orders);
+};
+
+// @desc    Assign a rider to an order
+// @route   PUT /api/orders/:id/assign
+// @access  Private/Admin
+const assignRider = async (req, res) => {
+  const { riderId } = req.body;
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    res.status(404).json({ message: 'Order not found' });
+    return;
+  }
+  if (order.status === 'Cancelled') {
+    res.status(400).json({ message: 'Cannot assign a cancelled order' });
+    return;
+  }
+
+  const rider = riderId ? await User.findById(riderId) : null;
+  if (riderId && (!rider || rider.role !== 'Rider')) {
+    res.status(400).json({ message: 'That user is not a rider' });
+    return;
+  }
+
+  if (!order.delivery) order.delivery = { status: 'Unassigned', events: [] };
+  if (!Array.isArray(order.delivery.events)) order.delivery.events = [];
+  order.delivery.rider = riderId || undefined;
+  order.delivery.status = riderId ? 'Assigned' : 'Unassigned';
+  order.delivery.assignedAt = riderId ? Date.now() : undefined;
+  order.delivery.events.push({
+    status: order.delivery.status,
+    at: Date.now(),
+    note: riderId ? `Assigned to ${rider.name}` : 'Rider unassigned',
+  });
+
+  await order.save();
+  const updated = await Order.findById(order._id)
+    .populate('user', 'name email')
+    .populate('delivery.rider', 'name email');
+  res.json(updated);
+};
+
+// @desc    Advance the delivery status of an order
+// @route   PUT /api/orders/:id/delivery
+// @access  Private (assigned rider or admin)
+const updateDeliveryStatus = async (req, res) => {
+  const { status, note } = req.body;
+  const order = await Order.findById(req.params.id).populate('user', 'name email');
+  if (!order) {
+    res.status(404).json({ message: 'Order not found' });
+    return;
+  }
+
+  const admin = isAdmin(req.user);
+  const isAssignedRider = order.delivery?.rider && order.delivery.rider.toString() === req.user._id.toString();
+  if (!admin && !isAssignedRider) {
+    res.status(403).json({ message: 'Not your delivery' });
+    return;
+  }
+
+  if (!order.delivery) order.delivery = { status: 'Unassigned', events: [] };
+  if (!Array.isArray(order.delivery.events)) order.delivery.events = [];
+  const from = DELIVERY_FLOW.indexOf(order.delivery.status || 'Unassigned');
+  const to = DELIVERY_FLOW.indexOf(status);
+  if (to === -1) {
+    res.status(400).json({ message: 'Invalid delivery status' });
+    return;
+  }
+  if (to <= from) {
+    res.status(400).json({ message: 'Delivery status can only move forward' });
+    return;
+  }
+  if (from === 0) {
+    res.status(400).json({ message: 'Assign a rider first' });
+    return;
+  }
+
+  order.delivery.status = status;
+  order.delivery.events.push({ status, at: Date.now(), note });
+
+  if (status === 'Delivered') {
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+    order.status = 'Delivered';
+  }
+
+  const updated = await order.save();
+  res.json(updated);
+
+  if (status === 'Delivered' && order.user?.email) {
+    const { subject, html } = orderDeliveredEmail(updated, order.user);
+    await queueEmail({ to: order.user.email, subject, html });
+  }
 };
 
 // @desc    Update order to delivered
@@ -530,5 +636,8 @@ export {
   updateOrderToPaidAdmin,
   cancelOrder,
   payInstallment,
+  getRiderOrders,
+  assignRider,
+  updateDeliveryStatus,
   getOrderSummary
 };

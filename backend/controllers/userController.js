@@ -127,6 +127,31 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+// @desc    Change a user's role
+// @route   PUT /api/users/:id/role
+// @access  Private/Admin
+const updateUserRole = async (req, res) => {
+  const { role } = req.body;
+  if (!['Admin', 'Customer', 'Rider'].includes(role)) {
+    res.status(400).json({ message: 'Invalid role' });
+    return;
+  }
+
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    res.status(404).json({ message: 'User not found' });
+    return;
+  }
+  if (user._id.toString() === req.user._id.toString()) {
+    res.status(400).json({ message: 'You cannot change your own role' });
+    return;
+  }
+
+  user.role = role;
+  const updated = await user.save();
+  res.json({ _id: updated._id, name: updated.name, email: updated.email, role: updated.role, status: updated.status });
+};
+
 // @desc    Toggle user status (Active/Inactive)
 // @route   PUT /api/users/:id/status
 // @access  Private/Admin
@@ -233,6 +258,7 @@ export {
   getUserProfile,
   updateUserProfile,
   toggleUserStatus,
+  updateUserRole,
   forgotPassword,
   resetPassword,
 };

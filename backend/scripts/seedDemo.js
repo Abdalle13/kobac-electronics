@@ -1,9 +1,11 @@
 /*
  * Additive demo-data seeder for the Kobac Electronics portfolio DB.
  *
- *   node scripts/seedDemo.js           → add demo products, Somali customers and orders
- *   node scripts/seedDemo.js --reviews → add product reviews from customers who ordered
- *   node scripts/seedDemo.js --check   → just print what is currently in the database
+ *   node scripts/seedDemo.js                 → add demo products, Somali customers and orders
+ *   node scripts/seedDemo.js --reviews       → add product reviews from customers who ordered
+ *   node scripts/seedDemo.js --riders        → add riders and assign them to open orders
+ *   node scripts/seedDemo.js --backfill-costs→ set a cost price everywhere for the profit report
+ *   node scripts/seedDemo.js --check         → just print what is currently in the database
  *
  * It NEVER deletes anything. Running it twice will add a second batch, so run once.
  */
@@ -203,6 +205,55 @@ async function backfillCosts() {
   console.log(`Backfilled cost on ${pFixed} products and ${oFixed} orders`);
 }
 
+const DELIVERY_FLOW = ['Assigned', 'Picked Up', 'On the Way', 'Delivered'];
+const demoRiders = [
+  { name: 'Cabdi Rider', email: 'rider.cabdi@gmail.com' },
+  { name: 'Maxamed Rider', email: 'rider.maxamed@gmail.com' },
+  { name: 'Xasan Rider', email: 'rider.xasan@gmail.com' },
+];
+
+async function seedRiders() {
+  const riders = [];
+  for (const r of demoRiders) {
+    let u = await User.findOne({ email: r.email });
+    if (!u) u = await User.create({ ...r, password: 'password123', role: 'Rider' });
+    else if (u.role !== 'Rider') { u.role = 'Rider'; await u.save(); }
+    riders.push(u);
+  }
+  console.log(`Riders ready: ${riders.length}`);
+
+  // Assign riders to non-cancelled, non-delivered orders; advance some along the flow.
+  const open = await Order.find({
+    status: { $nin: ['Cancelled', 'Delivered'] },
+    'delivery.rider': { $exists: false },
+  });
+
+  let assigned = 0;
+  for (const o of open) {
+    if (Math.random() > 0.7) continue; // leave some unassigned
+    const rider = pick(riders);
+    const steps = rand(1, 4); // how far along the flow
+    const now = Date.now();
+    o.delivery = {
+      status: DELIVERY_FLOW[steps - 1],
+      rider: rider._id,
+      assignedAt: new Date(now - rand(1, 48) * 3600 * 1000),
+      events: DELIVERY_FLOW.slice(0, steps).map((s, i) => ({
+        status: s,
+        at: new Date(now - (steps - i) * rand(1, 12) * 3600 * 1000),
+      })),
+    };
+    if (o.delivery.status === 'Delivered') {
+      o.isDelivered = true;
+      o.deliveredAt = o.delivery.events[steps - 1].at;
+      o.status = 'Delivered';
+    }
+    await o.save();
+    assigned++;
+  }
+  console.log(`Assigned ${assigned} orders to riders`);
+}
+
 async function main() {
   await mongoose.connect(process.env.MONGODB_URI);
 
@@ -224,6 +275,12 @@ async function main() {
 
   if (process.argv.includes('--backfill-costs')) {
     await backfillCosts();
+    await mongoose.disconnect();
+    return;
+  }
+
+  if (process.argv.includes('--riders')) {
+    await seedRiders();
     await mongoose.disconnect();
     return;
   }

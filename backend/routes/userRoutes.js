@@ -6,6 +6,7 @@ import {
   getUserProfile,
   updateUserProfile,
   toggleUserStatus,
+  updateUserRole,
   forgotPassword,
   resetPassword,
 } from '../controllers/userController.js';
@@ -25,5 +26,6 @@ router.route('/wishlist/:productId')
   .post(protect, addToWishlist)
   .delete(protect, removeFromWishlist);
 router.route('/:id/status').put(protect, admin, toggleUserStatus);
+router.route('/:id/role').put(protect, admin, updateUserRole);
 
 export default router;

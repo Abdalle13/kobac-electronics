@@ -95,6 +95,23 @@ const orderSchema = mongoose.Schema(
       enum: ['Pending', 'Paid', 'Delivered', 'Cancelled'],
       default: 'Pending',
     },
+    // Courier assignment + live delivery progress
+    delivery: {
+      status: {
+        type: String,
+        enum: ['Unassigned', 'Assigned', 'Picked Up', 'On the Way', 'Delivered'],
+        default: 'Unassigned',
+      },
+      rider: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      assignedAt: { type: Date },
+      events: [
+        {
+          status: { type: String },
+          at: { type: Date, default: Date.now },
+          note: { type: String },
+        },
+      ],
+    },
   },
   {
     timestamps: true,
