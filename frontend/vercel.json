@@ -3,6 +3,14 @@
     {
       "source": "/api/:path*",
       "destination": "https://kobac-electronics-ebkh.vercel.app/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://kobac-electronics-ebkh.vercel.app/uploads/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
