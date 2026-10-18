@@ -48,6 +48,18 @@ const isAllowedOrigin = (origin) => {
   }
 };
 
+// Serverless DB connection check
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection error in request:', err.message);
+    // Continue or handle gracefully
+    next();
+  }
+});
+
 app.use(cors({
   origin: (origin, cb) => {
     // Requests with no Origin: curl, server-to-server, Vercel rewrites
