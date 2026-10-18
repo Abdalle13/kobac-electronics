@@ -42,7 +42,7 @@ const isAllowedOrigin = (origin) => {
   const clean = stripSlash(origin);
   if (allowlist.includes(clean)) return true;
   try {
-    return new URL(clean).hostname.endsWith('.vercel.app');
+    const host = new URL(clean).hostname; return host.endsWith('.vercel.app') || host.endsWith('.netlify.app');
   } catch {
     return false;
   }

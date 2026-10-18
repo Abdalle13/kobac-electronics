@@ -2,7 +2,7 @@ import axios from 'axios';
 import { isTokenExpired, clearStoredUser } from './authToken';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://kobac-electronics-ebkh.vercel.app/api',
 });
 
 // Attach the JWT, unless it has already expired.
