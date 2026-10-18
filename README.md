@@ -4,8 +4,6 @@ A full-stack e-commerce platform built for the Somali market: EVC Plus mobile-mo
 checkout, installment payment plans, local delivery with a rider app, and a full
 admin dashboard. MERN stack, light/dark theme, transactional email.
 
-**Live:** [kobac-electronics.vercel.app](https://kobac-electronics.vercel.app/) &nbsp;·&nbsp; **Repo:** [github.com/Abdalle13/kobac-electronics](https://github.com/Abdalle13/kobac-electronics)
-
 ---
 
 ## Features
